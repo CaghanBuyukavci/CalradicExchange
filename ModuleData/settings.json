@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013, ADR-014).",
+  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013, ADR-014, ADR-015).",
   "volatilityMultiplier": 1.0,
   "maxDailyLogReturn": 0.25,
   "maxAbsShock": 1.0,
@@ -46,7 +46,7 @@
   "trading": {
     "_comment": "Commission rate falls linearly with Trade skill from commissionRateMax (skill 0) to commissionRateMin (tradeSkillCap). profitTaxRate is taken from realized profit on sells (ADR-014).",
     "commissionRateMax": 0.05,
-    "commissionRateMin": 0.01,
+    "commissionRateMin": 0.005,
     "minCommission": 5,
     "tradeSkillCap": 300,
     "profitTaxRate": 0.1,
@@ -69,7 +69,7 @@
     "VillageLooted": [
       {
         "target": "eventItem",
-        "impulse": 0.06,
+        "impulse": 0.075,
         "halfLifeDays": 10
       },
       {

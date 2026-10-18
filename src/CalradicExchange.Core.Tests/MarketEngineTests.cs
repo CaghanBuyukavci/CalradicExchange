@@ -74,11 +74,11 @@ namespace CalradicExchange.Core.Tests
             Assert.Equal(new[] { "cx_grain" }, affected);
             e.Tick(TestData.World(2));
             PriceState grain = e.Get("cx_grain");
-            Assert.Equal(0.06, grain.Shock, 9);
-            Assert.Equal(100 * System.Math.Exp(0.20 * 0.06), (double)grain.Price, 3);
+            Assert.Equal(0.075, grain.Shock, 9);
+            Assert.Equal(100 * System.Math.Exp(0.20 * 0.075), (double)grain.Price, 3);
 
             for (int d = 3; d <= 12; d++) e.Tick(TestData.World(d));
-            Assert.Equal(0.03, grain.Shock, 6);
+            Assert.Equal(0.0375, grain.Shock, 6);
             Assert.Equal(400m, e.Get("cx_salt").Price); // untouched: 10 x 40
         }
 

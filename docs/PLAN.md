@@ -76,7 +76,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 1.13 CSV çıktısı ve özet tablo; §8 hedeflerinin otomatik kontrolü (geçti/kaldı)
   - Erken oyun gelir sınırı hedefi eklendi (ADR-014).
 - [x] 1.14 Parametreleri hedefler tutana kadar ayarla; sonuçları kullanıcıya sayılarla raporla
-  - ADR-013, ADR-014. 20 seed'de 8/8 hedef geçti.
+  - ADR-013, ADR-014, ADR-015. 20 seed'de 8/8 hedef geçti. Manipülatör bot eklendi (oyuncunun kendi yağmaları).
 
 ### 1C. Oyun katmanı
 - [ ] 1.15 `WorldReader`: şehir fiyatları, refah, kuşatma durumu → `WorldSnapshot`

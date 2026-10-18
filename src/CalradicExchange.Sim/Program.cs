@@ -54,6 +54,8 @@ namespace CalradicExchange.Sim
             var chaseStats = new Dictionary<MarketEventType, (int Trades, long Pnl)>();
             var lateStats = new Dictionary<MarketEventType, (int Trades, long Pnl)>();
             var earlyPerDay = new List<double>();
+            var manip = profiles.ToDictionary(p => p, p => new List<double>());
+            var manipCycle = profiles.ToDictionary(p => p, p => new List<double>());
 
             for (int k = 0; k < o.Seeds; k++)
             {
@@ -87,8 +89,16 @@ namespace CalradicExchange.Sim
                     chase[p].Add(RunFollower(catalog, settings, seed, o.Days, years, p, includeRaids: true, p == TraderSetup.Mid ? chaseStats : null));
                 }
 
+                foreach (TraderSetup p in profiles)
+                {
+                    var bot = new ManipulatorStrategy();
+                    SimContext c = SimRun.Execute(catalog, settings, seed, o.Days, bot, p).Context;
+                    manip[p].Add(Math.Pow(c.Gold / (double)c.StartGold, 1.0 / years) - 1.0);
+                    if (bot.CycleProfits.Count > 0) manipCycle[p].Add(bot.CycleProfits.Average());
+                }
+
                 // Early-game cap: best of all bots over the first year with the early profile, in denars per day.
-                IStrategy[] earlyBots = { new EventFollowerStrategy(false), new EventFollowerStrategy(true), new BuyAndHoldStrategy(), new RandomStrategy() };
+                IStrategy[] earlyBots = { new EventFollowerStrategy(false), new EventFollowerStrategy(true), new BuyAndHoldStrategy(), new RandomStrategy(), new ManipulatorStrategy() };
                 earlyPerDay.Add(earlyBots.Max(bot =>
                 {
                     SimContext c = SimRun.Execute(catalog, settings, seed, daysPerYear, bot, TraderSetup.Early).Context;
@@ -109,6 +119,11 @@ namespace CalradicExchange.Sim
                     + $"   raid-chaser: {Pct(chase[p].Average())}");
             }
             Console.WriteLine("  raid-chaser (mid) per event type (trades per seed x avg profit per trade, denars): " + StatsLine(chaseStats, o.Seeds));
+            foreach (TraderSetup p in profiles)
+            {
+                Console.WriteLine($"  manipulator    {p.Name,-26} annualized: {Pct(manip[p].Average())}  ({Pct(manip[p].Min())} .. {Pct(manip[p].Max())})"
+                    + $"   avg profit per {ManipulatorStrategy.RaidDays}-raid cycle: {manipCycle[p].DefaultIfEmpty(0).Average():+0;-0} denars");
+            }
             Console.WriteLine("  event-follower (late) per event type: " + StatsLine(lateStats, o.Seeds));
             Console.WriteLine($"  early game, best bot, first year: {earlyPerDay.Average():0.0} denars/day on average, worst seed {earlyPerDay.Max():0.0}");
 
@@ -121,8 +136,8 @@ namespace CalradicExchange.Sim
                 $"worst min {minR.Values.Min():0.00}x, worst max {maxR.Values.Max():0.00}x" + Fails(outOfBounds)));
             checks.Add(RangeCheck("Commodity annual volatility 25% - 60%", commodities, vol, 0.25, 0.60));
             checks.Add(RangeCheck("Sector annual volatility 15% - 35%", sectors, vol, 0.15, 0.35));
-            List<string> lowCorr = corr.Keys.Where(id => corr[id].Average() <= 0.7).ToList();
-            checks.Add(("Correlation with fundamental (30d avg) > 0.7", lowCorr.Count == 0,
+            List<string> lowCorr = corr.Keys.Where(id => corr[id].Average() <= 0.65).ToList();
+            checks.Add(("Correlation with fundamental (30d avg) > 0.65", lowCorr.Count == 0,
                 $"lowest {corr.Min(c => c.Value.Average()):0.00}" + Fails(lowCorr)));
             checks.Add(("Buy-and-hold 4y return -10% .. +15%", bh.Average() >= -0.10 && bh.Average() <= 0.15, Pct(bh.Average())));
             checks.Add(("Random trading average negative", rnd.Average() < 0, Pct(rnd.Average())));

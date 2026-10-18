@@ -37,9 +37,9 @@ namespace CalradicExchange.Core.Tests
 
         [Theory]
         [InlineData(0, 0.05)]
-        [InlineData(150, 0.03)]
-        [InlineData(300, 0.01)]
-        [InlineData(1000, 0.01)]
+        [InlineData(150, 0.0275)]
+        [InlineData(300, 0.005)]
+        [InlineData(1000, 0.005)]
         [InlineData(-10, 0.05)]
         public void CommissionRate_FallsWithTradeSkill(int skill, double expected)
         {
@@ -51,7 +51,7 @@ namespace CalradicExchange.Core.Tests
         {
             Assert.Equal(5, _orders.Commission(50, 0));
             Assert.Equal(100, _orders.Commission(2000, 0));
-            Assert.Equal(20, _orders.Commission(2000, 300));
+            Assert.Equal(10, _orders.Commission(2000, 300));
         }
 
         [Fact]

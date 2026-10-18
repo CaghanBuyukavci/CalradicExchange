@@ -174,7 +174,7 @@ Bir araca birden çok olaydan gelen dürtüler toplanır. |S| en fazla 1,0 (yani
 
 Olay ID'leri ve değerleri `ModuleData/settings.json` içinde `eventShocks` altında tutulur.
 
-**Ayar notu (ADR-013):** Köy yağmasının emtia dürtüsü (+0,06) hariç tablodaki tüm dürtüler ve mevsim dürtüleri simülatör ayarında ×1,5 yapıldı (örneğin savaş → askeri tedarik +0,075, kış → tarım +0,21). Güncel değerler `settings.json`'dadır.
+**Ayar notu (ADR-013, ADR-015):** Köy yağmasının emtia dürtüsü +0,075 (ADR-015). Tablodaki diğer tüm dürtüler ve mevsim dürtüleri simülatör ayarında ×1,5 yapıldı (örneğin savaş → askeri tedarik +0,075, kış → tarım +0,21). Güncel değerler `settings.json`'dadır.
 
 ### 4.2 Haber gecikmesi (Faz 4)
 
@@ -196,7 +196,7 @@ işlem_fiyatı_alış = P × (1 + fark/2) × (1 + etki)
 işlem_fiyatı_satış = P × (1 − fark/2) × (1 − etki)
 etki = λ × (emir_değeri / derinlik)
 komisyon = max(5, oran(trade) × emir_değeri)
-oran(trade) = %5 − (%5 − %1) × min(trade, 300) / 300        (Trade 0: %5, Trade 150: %3, Trade 300+: %1)
+oran(trade) = %5 − (%5 − %0,5) × min(trade, 300) / 300      (Trade 0: %5, Trade 150: %2,75, Trade 300+: %0,5)
 kâr_vergisi = %10 × max(0, satış_geliri − komisyon − satılan_payların_maliyeti)   (sadece satışta, zararda yok)
 ```
 
@@ -244,7 +244,7 @@ Kabul hedefleri:
 | Hiçbir fiyat başlangıcının | 0,2× altına inmez, 5× üstüne çıkmaz (krallık yok olması hariç) |
 | Emtia yıllıklandırılmış oynaklık | %25–60 |
 | Endeks yıllıklandırılmış oynaklık | %15–35 |
-| Temel değerle korelasyon (30 günlük ortalamalar) | > 0,7 |
+| Temel değerle korelasyon (30 günlük ortalamalar) | > 0,65 (ADR-015; önce 0,7) |
 | "Al ve tut" stratejisi 4 yıllık getirisi (maliyetler sonrası) | −%10 ile +%15 arası |
 | Rastgele işlem stratejisi | ortalama negatif (maliyetler yüzünden) |
 | "Olayı gören" strateji (olay sonrası ilk gün işlem), geç oyun profili (klan 5, Trade 250) | pozitif ama yıllık %40'ı geçmemeli |

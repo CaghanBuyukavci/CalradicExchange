@@ -29,6 +29,15 @@ namespace CalradicExchange.Sim
             for (int day = 0; day <= days; day++)
             {
                 List<MarketEvent> events = world.Advance(day);
+                if (run.Context != null && day > 0 && strategy is IPlayerActor actor)
+                {
+                    run.Context.Day = day;
+                    foreach (string item in actor.RaidsToday(run.Context))
+                    {
+                        MarketEvent raid = world.PlayerRaid(day, item);
+                        if (raid != null) events.Add(raid);
+                    }
+                }
                 foreach (MarketEvent ev in events) market.ApplyEvent(ev);
                 TickSummary tick = market.Tick(world.Snapshot(day));
                 events.AddRange(tick.GeneratedEvents);

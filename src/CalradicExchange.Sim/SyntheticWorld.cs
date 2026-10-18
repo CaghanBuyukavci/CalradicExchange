@@ -54,6 +54,7 @@ namespace CalradicExchange.Sim
         private const double RaidSupplyShock = 0.25;
         private const double FamineShock = 0.30;
         private const double RaidsPerDay = 0.8;
+        private const int VillageRecoveryDays = 14;
         private const double SiegeRate = 1.0 / 30;
         private const double DiplomacyRate = 1.0 / 60;
         private const double RandomFamineRate = 1.0 / 50;
@@ -172,18 +173,34 @@ namespace CalradicExchange.Sim
             int raids = Poisson(RaidsPerDay);
             for (int i = 0; i < raids; i++)
             {
-                SimVillage v = _villages[_rng.NextInt(_villages.Count)];
-                if (v.Town.X.ContainsKey(v.Product)) v.Town.X[v.Product] += RaidSupplyShock;
-                events.Add(new MarketEvent
-                {
-                    Type = MarketEventType.VillageLooted,
-                    Day = day,
-                    SettlementId = v.Id,
-                    ItemId = v.Product,
-                    TownId = v.Town.Id,
-                    KingdomId = KingdomId(v.Town.Kingdom),
-                });
+                events.Add(Loot(day, _villages[_rng.NextInt(_villages.Count)]));
             }
+        }
+
+        /// <summary>
+        /// The player raids a village that produces <paramref name="itemId"/> and has not been looted for
+        /// <see cref="VillageRecoveryDays"/> days. Returns null when no such village exists.
+        /// </summary>
+        public MarketEvent PlayerRaid(int day, string itemId)
+        {
+            List<SimVillage> targets = _villages.Where(v => v.Product == itemId && day - v.LastLootedDay >= VillageRecoveryDays).ToList();
+            if (targets.Count == 0) return null;
+            return Loot(day, targets[_rng.NextInt(targets.Count)]);
+        }
+
+        private MarketEvent Loot(int day, SimVillage v)
+        {
+            if (v.Town.X.ContainsKey(v.Product)) v.Town.X[v.Product] += RaidSupplyShock;
+            v.LastLootedDay = day;
+            return new MarketEvent
+            {
+                Type = MarketEventType.VillageLooted,
+                Day = day,
+                SettlementId = v.Id,
+                ItemId = v.Product,
+                TownId = v.Town.Id,
+                KingdomId = KingdomId(v.Town.Kingdom),
+            };
         }
 
         private void Sieges(int day, List<MarketEvent> events)
@@ -304,6 +321,7 @@ namespace CalradicExchange.Sim
             public string Id;
             public SimTown Town;
             public string Product;
+            public int LastLootedDay = -1000;
         }
     }
 }

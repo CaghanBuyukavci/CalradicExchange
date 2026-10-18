@@ -92,3 +92,10 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Yeni simülatör hedefi: klan seviyesi 1, Trade 30 profilinde en iyi botun ilk yıl kârı ortalama günde ≤ 50 dinar.
   - "Olayı gören strateji pozitif" hedefi geç oyun profilinde (klan 5, Trade 250) ölçülür.
 - **Sonuç (20 seed, 4 yıl):** Erken oyun en iyi bot ortalama 1,4 dinar/gün (en kötü seed 15,5). Olay botu: erken -%8,2/yıl, orta -%3,8, geç +%0,3. Bilgiyle kâr ancak yüksek Trade becerisiyle mümkün.
+
+## ADR-015 — Dolaylı manipülasyona daha fazla alan; komisyon tabanı %0,5
+
+- **Bağlam:** Kullanıcı: oyuncu dolaylı yollardan (kendi yağmaları gibi) piyasayı etkileyebilmeli; manipülasyon yollarını keşfetmek eğlenceli. Geç oyunda bilgiyle kâr çok düşüktü (+%0,3/yıl).
+- **Karar (kullanıcı, 2026-10-18):** Trade 300'deki komisyon tabanı %1 → %0,5. Köy yağmasının emtia dürtüsü 0,06 → 0,075. Korelasyon hedefi 0,7 → 0,65 (sık yağmalanan mallar temel değerin biraz üstünde durur; bu manipülasyon alanının doğal sonucu).
+- **Ölçüm:** Simülatöre manipülatör bot eklendi: emtia alır, 4 gün boyunca o malın köylerini kendisi yağmalar, 8. gün satar, 21 günde bir tekrarlar; pozisyon ≤ 12.000 dinar (daha büyüğünde kayma kazancı yer). Döngü başına kâr: erken +49, orta +226, geç +747 dinar. Erken oyun en iyi bot ortalama 31 dinar/gün (sınır 50).
+- **Not:** Piyasa derinliği (kayma) büyük pozisyonlarla manipülasyonu kendiliğinden frenler. Faz 4 şüphe puanı bu dengenin üstüne gelecek.
