@@ -55,8 +55,10 @@ if (Test-Path $moduleDataTarget) { Remove-Item $moduleDataTarget -Recurse -Force
 Copy-Item (Join-Path $repo 'ModuleData') $moduleDataTarget -Recurse -Force
 
 $guiSource = Join-Path $repo 'GUI'
+$guiTarget = Join-Path $target 'GUI'
+if (Test-Path $guiTarget) { Remove-Item $guiTarget -Recurse -Force }
 if ((Test-Path $guiSource) -and (Get-ChildItem $guiSource -Recurse -File | Where-Object { $_.Name -ne '.gitkeep' })) {
-    Copy-Item $guiSource $target -Recurse -Force
+    Copy-Item $guiSource $guiTarget -Recurse -Force
 }
 
 Write-Host "Deployed $moduleId to $target" -ForegroundColor Green

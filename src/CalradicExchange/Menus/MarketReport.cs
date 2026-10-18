@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Pricing;
 using CalradicExchange.Core.Trading;
 using CalradicExchange.Localization;
+using CalradicExchange.UI;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
@@ -40,6 +42,7 @@ namespace CalradicExchange.Menus
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
+            if (TablePopup.Show("CxMarketTable", close => MarketTable(b, close))) return;
 
             var sb = new StringBuilder();
             sb.AppendLine(Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare).ToString());
@@ -54,6 +57,7 @@ namespace CalradicExchange.Menus
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
+            if (TablePopup.Show("CxPortfolioTable", close => PortfolioTable(b, close))) return;
             Portfolio pf = b.Portfolio;
 
             var sb = new StringBuilder();
@@ -78,6 +82,72 @@ namespace CalradicExchange.Menus
             totals.SetTextVariable("TAXES", Fmt.Denars(pf.TotalProfitTaxPaid));
             sb.AppendLine(totals.ToString());
             Show(Strings.PortfolioTitle.ToString(), sb.ToString());
+        }
+
+        private static ExchangeTableVM MarketTable(ExchangeCampaignBehavior b, Action close)
+        {
+            var vm = new ExchangeTableVM(Strings.MarketTitle.ToString(),
+                new[] { Strings.ColInstrument.ToString(), Strings.ColPrice.ToString(), Strings.ColToday.ToString(), Strings.ColWeek.ToString() },
+                null, Strings.Close.ToString(), close);
+
+            vm.MarketRows.Add(MarketRowVM.Section(Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare).ToString()));
+            AddMarketRows(vm, b, InstrumentClass.Commodity);
+            vm.MarketRows.Add(MarketRowVM.Section(Strings.HeaderSectors.ToString()));
+            AddMarketRows(vm, b, InstrumentClass.Sector);
+            return vm;
+        }
+
+        private static void AddMarketRows(ExchangeTableVM vm, ExchangeCampaignBehavior b, InstrumentClass cls)
+        {
+            bool alternate = false;
+            foreach (InstrumentDefinition def in b.Catalog.Instruments.Where(i => i.Class == cls))
+            {
+                PriceState ps = b.Market.Get(def.Id);
+                string none = Strings.NoPrice.ToString();
+                if (ps == null || !ps.HasPrice)
+                {
+                    vm.MarketRows.Add(MarketRowVM.Instrument(Names.Instrument(def), none, none, TableColors.Neutral, none, TableColors.Neutral, alternate));
+                }
+                else
+                {
+                    double day = ps.ChangeOver(1), week = ps.ChangeOver(7);
+                    vm.MarketRows.Add(MarketRowVM.Instrument(Names.Instrument(def), Fmt.Price(ps.Price),
+                        Fmt.Pct(day), TableColors.ForChange(day), Fmt.Pct(week), TableColors.ForChange(week), alternate));
+                }
+                alternate = !alternate;
+            }
+        }
+
+        private static ExchangeTableVM PortfolioTable(ExchangeCampaignBehavior b, Action close)
+        {
+            Portfolio pf = b.Portfolio;
+            TextObject totals = Strings.PortfolioTotals;
+            totals.SetTextVariable("VALUE", Fmt.Denars(pf.MarketValue(id => PriceOf(b, id))));
+            totals.SetTextVariable("OPEN", Fmt.SignedDenars(pf.UnrealizedPnl(id => PriceOf(b, id))));
+            totals.SetTextVariable("REALIZED", Fmt.SignedDenars(pf.RealizedPnl));
+            totals.SetTextVariable("FEES", Fmt.Denars(pf.TotalCommissionPaid));
+            totals.SetTextVariable("TAXES", Fmt.Denars(pf.TotalProfitTaxPaid));
+            string footer = pf.Positions.Count == 0 ? Strings.PortfolioEmpty + "\n" + totals : totals.ToString();
+
+            var vm = new ExchangeTableVM(Strings.PortfolioTitle.ToString(),
+                new[]
+                {
+                    Strings.ColInstrument.ToString(), Strings.ColQuantity.ToString(), Strings.ColBoughtAt.ToString(),
+                    Strings.ColNow.ToString(), Strings.ColProfit.ToString(), Strings.ColProfitPct.ToString(),
+                },
+                footer, Strings.Close.ToString(), close);
+
+            bool alternate = false;
+            foreach (Position pos in pf.Positions)
+            {
+                decimal price = PriceOf(b, pos.InstrumentId);
+                decimal pnl = pos.Quantity * price - pos.CostBasis;
+                double pct = pos.CostBasis > 0 ? (double)(pnl / pos.CostBasis) : 0;
+                vm.PortfolioRows.Add(new PortfolioRowVM(Names.Instrument(b.Catalog.Find(pos.InstrumentId)), pos.Quantity.ToString(),
+                    Fmt.Price(pos.AverageCost), Fmt.Price(price), Fmt.SignedDenars(pnl), Fmt.Pct(pct), TableColors.ForAmount(pnl), alternate));
+                alternate = !alternate;
+            }
+            return vm;
         }
 
         public static void ShowNews()

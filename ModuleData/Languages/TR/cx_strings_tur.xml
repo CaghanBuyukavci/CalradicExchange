@@ -102,5 +102,15 @@
     <string id="cx_sell_title" text="Hisse sat" />
     <string id="cx_tip_nothing_to_sell" text="Elinde hiç hisse yok." />
     <string id="cx_unknown" text="bilinmeyen bir yer" />
+    <string id="cx_col_instrument" text="Hisse" />
+    <string id="cx_col_price" text="Fiyat" />
+    <string id="cx_col_today" text="Bugün" />
+    <string id="cx_col_week" text="7 gün" />
+    <string id="cx_col_quantity" text="Adet" />
+    <string id="cx_col_bought_at" text="Alış" />
+    <string id="cx_col_now" text="Şimdi" />
+    <string id="cx_col_profit" text="Kâr/zarar" />
+    <string id="cx_col_profit_pct" text="Kâr/zarar %" />
+    <string id="cx_no_price_short" text="-" />
   </strings>
 </base>

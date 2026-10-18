@@ -121,3 +121,8 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Karar:** Her araç için S_ham'ın 42 gün yarı ömürlü hareketli ortalaması B tutulur, fiyat S = S_ham − B'ye göre hareket eder. İlk olay tam etkili; aynı olay sürekli tekrarlanırsa etkisi söner; uzun sessizlikten sonra yeniden haber değeri kazanır. `settings.json`: `shockBaselineHalfLifeDays` (0 = kapalı).
 - **Sonuç (20 seed, 4 yıl, gerçek veriye yaklaştırılmış sentetik dünya):** 8/8 hedef geçiyor. Erken oyun en iyi bot günde 36,7 dinar (en kötü seed 69,8). Al-tut -%0,1. Olay takipçisi geç oyunda +%0,6/yıl. Manipülatör döngü başına: erken +190, orta +384, geç +907 dinar.
 - **Simülatör kalibrasyonu:** Şehir başına günlük kıtlık olasılığı 1/40 (gerçek veri), hacim ağırlığı (üretici şehirler ağır), daha yüksek yerel/küresel fiyat gürültüsü. Temel değer günlük oynaklığı simülatörde %2,7, gerçek oyunda %4,0 (10 günlük, yaz ve kıtlık ağırlıklı örnek); uzun veriyle tekrar kontrol edilecek.
+
+## ADR-020 — Piyasa ve portföy tabloları için Gauntlet penceresi (Faz 2.6 öne çekildi)
+
+- **Bağlam:** Kullanıcı tabloların okunaklı olmasını, artışların yeşil, azalışların kırmızı yazılmasını ve sütunların hizalı olmasını istedi. Vanilla inquiry metni `Popup.Description.Text` fırçasında yalnızca `Default` stili var (renk yok), yazı tipi orantılı ve sekme durağı yok (hizalama mümkün değil).
+- **Karar:** Kendi Gauntlet prefablarımız (`GUI/Prefabs/CxMarketTable.xml`, `CxPortfolioTable.xml`) ve `ExchangeTableVM`. Sütunlar sabit genişlikli, sayılar sağa hizalı, renk `Brush.FontColor="@..."` bağlamasıyla. Vanilla fırçaları ve sprite'ları kullanılır; kendi fırçamız yok. Katman açılamazsa eski metin penceresine düşülür (ADR-006).

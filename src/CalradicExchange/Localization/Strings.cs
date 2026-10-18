@@ -38,6 +38,18 @@ namespace CalradicExchange.Localization
         public static TextObject HeaderCommodities => new TextObject("{=cx_hdr_commodities}Commodity shares (1 share = {UNITS} units)");
         public static TextObject HeaderSectors => new TextObject("{=cx_hdr_sectors}Baskets");
         public static TextObject MarketLine => new TextObject("{=cx_line_market}{NAME}: {PRICE}   today {DAY}   7 days {WEEK}");
+        // Table column headers
+        public static TextObject ColInstrument => new TextObject("{=cx_col_instrument}Instrument");
+        public static TextObject ColPrice => new TextObject("{=cx_col_price}Price");
+        public static TextObject ColToday => new TextObject("{=cx_col_today}Today");
+        public static TextObject ColWeek => new TextObject("{=cx_col_week}7 days");
+        public static TextObject ColQuantity => new TextObject("{=cx_col_quantity}Qty");
+        public static TextObject ColBoughtAt => new TextObject("{=cx_col_bought_at}Bought at");
+        public static TextObject ColNow => new TextObject("{=cx_col_now}Now");
+        public static TextObject ColProfit => new TextObject("{=cx_col_profit}Profit");
+        public static TextObject ColProfitPct => new TextObject("{=cx_col_profit_pct}Profit %");
+        public static TextObject NoPrice => new TextObject("{=cx_no_price_short}-");
+
         public static TextObject NoPriceYet => new TextObject("{=cx_no_price}{NAME}: no price yet");
 
         // Buy / sell flow
