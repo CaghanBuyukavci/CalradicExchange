@@ -33,7 +33,7 @@ namespace CalradicExchange.Core.Tests
         {
             string json = StateSerializer.Serialize(ExchangeState.CreateNew(0));
 
-            Assert.Contains("\"schemaVersion\":1", json);
+            Assert.Contains("\"schemaVersion\":" + ExchangeState.CurrentSchemaVersion, json);
         }
 
         [Fact]

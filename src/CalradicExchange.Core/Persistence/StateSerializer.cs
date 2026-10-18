@@ -2,6 +2,7 @@ using System;
 using CalradicExchange.Core.Persistence.Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace CalradicExchange.Core.Persistence
 {
@@ -15,6 +16,11 @@ namespace CalradicExchange.Core.Persistence
             MissingMemberHandling = MissingMemberHandling.Ignore,
             FloatParseHandling = FloatParseHandling.Decimal,
             Culture = System.Globalization.CultureInfo.InvariantCulture,
+            ContractResolver = new DefaultContractResolver
+            {
+                // camelCase property names, but dictionary keys (item ids) stay exactly as the game spells them.
+                NamingStrategy = new CamelCaseNamingStrategy { ProcessDictionaryKeys = false, OverrideSpecifiedNames = false },
+            },
         };
 
         public static string Serialize(ExchangeState state)
@@ -36,7 +42,11 @@ namespace CalradicExchange.Core.Persistence
             JObject root;
             try
             {
-                root = JObject.Parse(json);
+                // Decimal parsing: prices must not pass through double on the way back in.
+                using (var reader = new JsonTextReader(new System.IO.StringReader(json)) { FloatParseHandling = FloatParseHandling.Decimal })
+                {
+                    root = JObject.Load(reader);
+                }
             }
             catch (JsonException ex)
             {
@@ -51,7 +61,11 @@ namespace CalradicExchange.Core.Persistence
             }
 
             root = MigrationRunner.Migrate(root, version, ExchangeState.CurrentSchemaVersion);
-            return root.ToObject<ExchangeState>(JsonSerializer.Create(Settings));
+            // Typed read from text: each number is parsed straight into its field type (double or decimal), bit-exact.
+            ExchangeState state = JsonConvert.DeserializeObject<ExchangeState>(root.ToString(Formatting.None), Settings);
+            if (state.Market == null) state.Market = new Pricing.MarketState();
+            if (state.Portfolio == null) state.Portfolio = new Trading.Portfolio();
+            return state;
         }
     }
 }

@@ -1,3 +1,5 @@
+using CalradicExchange.Core.Pricing;
+using CalradicExchange.Core.Trading;
 using Newtonsoft.Json;
 
 namespace CalradicExchange.Core.Persistence
@@ -8,7 +10,7 @@ namespace CalradicExchange.Core.Persistence
     /// </summary>
     public sealed class ExchangeState
     {
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 2;
 
         [JsonProperty("schemaVersion")]
         public int SchemaVersion { get; set; } = CurrentSchemaVersion;
@@ -24,6 +26,14 @@ namespace CalradicExchange.Core.Persistence
         /// <summary>Mod version that last wrote this state. Informational only.</summary>
         [JsonProperty("writtenByVersion")]
         public string WrittenByVersion { get; set; } = CoreInfo.Version;
+
+        /// <summary>Prices, sentiment, history and news. Added in schema 2.</summary>
+        [JsonProperty("market")]
+        public MarketState Market { get; set; } = new MarketState();
+
+        /// <summary>The player's holdings. Added in schema 2.</summary>
+        [JsonProperty("portfolio")]
+        public Portfolio Portfolio { get; set; } = new Portfolio();
 
         public static ExchangeState CreateNew(int currentDay)
         {

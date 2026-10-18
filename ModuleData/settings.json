@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md. Tuned with the simulator (PLAN 1.14).",
+
+  "volatilityMultiplier": 1.0,
+  "maxDailyLogReturn": 0.25,
+  "maxAbsShock": 1.0,
+  "historyDays": 112,
+  "newsKeep": 30,
+
+  "classes": {
+    "Commodity": { "kappa": 0.12, "sigma": 0.020, "spread": 0.02,  "depth": 40000, "lambda": 0.5 },
+    "Sector":    { "kappa": 0.10, "sigma": 0.012, "spread": 0.01,  "depth": 80000, "lambda": 0.3 },
+    "Guild":     { "kappa": 0.08, "sigma": 0.025, "spread": 0.03,  "depth": 20000, "lambda": 0.7 },
+    "Kingdom":   { "kappa": 0.08, "sigma": 0.015, "spread": 0.015, "depth": 60000, "lambda": 0.4 },
+    "Bond":      { "kappa": 0.20, "sigma": 0.004, "spread": 0.01,  "depth": 30000, "lambda": 0.3 }
+  },
+
+  "trading": {
+    "commissionRate": 0.01,
+    "minCommission": 10,
+    "tradeSkillCap": 300,
+    "tradeSkillMaxDiscount": 0.5,
+    "permanentImpactFactor": 0.5
+  },
+
+  "limits": {
+    "baseTotal": 20000,
+    "perClanTier": 20000,
+    "perTradeSkill": 50,
+    "perInstrumentDepthMultiple": 1.5
+  },
+
+  "_targetsHelp": "instrument:<id> | tag:<tag> | eventItem | guilds:eventTown | townBond:eventTown | kingdomIndex:eventKingdom | kingdomIndex:otherKingdom | kingdomIndex:both",
+
+  "seasonImpulses": {
+    "Spring": 0.049,
+    "Summer": -0.051,
+    "Autumn": -0.105,
+    "Winter": 0.140
+  },
+
+  "eventShocks": {
+    "VillageLooted": [
+      { "target": "eventItem",                  "impulse": 0.06,  "halfLifeDays": 10 },
+      { "target": "kingdomIndex:eventKingdom",  "impulse": -0.02, "halfLifeDays": 10 },
+      { "target": "townBond:eventTown",         "impulse": -0.01, "halfLifeDays": 7 }
+    ],
+    "SiegeStarted": [
+      { "target": "guilds:eventTown",           "impulse": -0.15, "halfLifeDays": 7, "holdUntilEnd": true },
+      { "target": "townBond:eventTown",         "impulse": -0.10, "halfLifeDays": 7, "holdUntilEnd": true },
+      { "target": "instrument:cx_sector_military", "impulse": 0.03, "halfLifeDays": 14 }
+    ],
+    "SiegeEnded": [],
+    "SettlementCaptured": [
+      { "target": "kingdomIndex:eventKingdom",  "impulse": -0.08, "halfLifeDays": 21 },
+      { "target": "kingdomIndex:otherKingdom",  "impulse": 0.05,  "halfLifeDays": 21 },
+      { "target": "guilds:eventTown",           "impulse": -0.05, "halfLifeDays": 14, "volMultiplier": 2.0, "volDays": 14 }
+    ],
+    "WarDeclared": [
+      { "target": "instrument:cx_sector_military", "impulse": 0.05,  "halfLifeDays": 21 },
+      { "target": "instrument:cx_sector_luxury",   "impulse": -0.03, "halfLifeDays": 21 },
+      { "target": "kingdomIndex:both",             "impulse": -0.02, "halfLifeDays": 14, "volMultiplier": 1.5, "volDays": 14 }
+    ],
+    "PeaceMade": [
+      { "target": "instrument:cx_sector_luxury",   "impulse": 0.03,  "halfLifeDays": 21 },
+      { "target": "instrument:cx_sector_textile",  "impulse": 0.03,  "halfLifeDays": 21 },
+      { "target": "instrument:cx_sector_military", "impulse": -0.04, "halfLifeDays": 21 }
+    ],
+    "SeasonChanged": [
+      { "target": "tag:agriculture", "seasonal": true, "halfLifeDays": 21 }
+    ],
+    "FamineStarted": [
+      { "target": "tag:agriculture",  "impulse": 0.08,  "halfLifeDays": 14 },
+      { "target": "guilds:eventTown", "impulse": -0.06, "halfLifeDays": 14 }
+    ],
+    "KingdomDestroyed": []
+  }
+}

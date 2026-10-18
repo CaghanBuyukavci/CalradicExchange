@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "gameVersionVerified": "v1.4.8",
-  "_comment": "Draft (PLAN 0.5). All item, item category and workshop IDs verified against v1.4.8 game data. See docs/API_NOTES.md section 8.",
+  "_comment": "PLAN 0.5 / 1.2. Tags are used by event shock targets (settings.json, target tag:<name>). All item, item category and workshop IDs verified against v1.4.8 game data. See docs/API_NOTES.md section 8.",
   "unitsPerShare": 10,
   "commodities": [
-    { "id": "cx_grain",      "itemId": "grain",      "nameId": "cx_inst_grain",      "name": "Grain Share" },
-    { "id": "cx_olives",     "itemId": "olives",     "nameId": "cx_inst_olives",     "name": "Olive Share" },
+    { "id": "cx_grain",      "itemId": "grain",      "nameId": "cx_inst_grain",      "name": "Grain Share", "tags": ["agriculture"] },
+    { "id": "cx_olives",     "itemId": "olives",     "nameId": "cx_inst_olives",     "name": "Olive Share", "tags": ["agriculture"] },
     { "id": "cx_oil",        "itemId": "oil",        "nameId": "cx_inst_oil",        "name": "Olive Oil Share" },
-    { "id": "cx_date_fruit", "itemId": "date_fruit", "nameId": "cx_inst_date_fruit", "name": "Date Fruit Share" },
+    { "id": "cx_date_fruit", "itemId": "date_fruit", "nameId": "cx_inst_date_fruit", "name": "Date Fruit Share", "tags": ["agriculture"] },
     { "id": "cx_salt",       "itemId": "salt",       "nameId": "cx_inst_salt",       "name": "Salt Share" },
     { "id": "cx_iron",       "itemId": "iron",       "nameId": "cx_inst_iron",       "name": "Iron Ore Share" },
     { "id": "cx_tools",      "itemId": "tools",      "nameId": "cx_inst_tools",      "name": "Tools Share" },
@@ -20,6 +20,7 @@
   "sectors": [
     {
       "id": "cx_sector_agriculture", "nameId": "cx_sector_agriculture", "name": "Agriculture Basket",
+      "tags": ["agriculture"],
       "components": [
         { "itemId": "grain",      "weight": 0.35 },
         { "itemId": "fish",       "weight": 0.20 },
