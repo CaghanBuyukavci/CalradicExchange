@@ -32,8 +32,17 @@ Write-Host '== Build game module' -ForegroundColor Cyan
 dotnet build (Join-Path $repo 'src\CalradicExchange') -c $Configuration --nologo "-p:GameFolder=$GameFolder"
 if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
 
-$out = Join-Path $repo "src\CalradicExchange\bin\x64\$Configuration\net472"
-if (-not (Test-Path $out)) { $out = Join-Path $repo "src\CalradicExchange\bin\$Configuration\net472" }
+# The output folder has moved between bin\x64\... and bin\... before; take the freshest build so a stale
+# folder can never be deployed again.
+$out = @("src\CalradicExchange\bin\x64\$Configuration\net472", "src\CalradicExchange\bin\$Configuration\net472") |
+    ForEach-Object { Join-Path $repo $_ } |
+    Where-Object { Test-Path (Join-Path $_ "$moduleId.dll") } |
+    Sort-Object { (Get-Item (Join-Path $_ "$moduleId.dll")).LastWriteTime } -Descending |
+    Select-Object -First 1
+if (-not $out) { throw 'Build output not found.' }
+$built = (Get-Item (Join-Path $out "$moduleId.dll")).LastWriteTime
+if ($built -lt (Get-Date).AddMinutes(-10)) { throw "Newest build output is old ($built); the build did not write where deploy expects." }
+Write-Host "Using build output $out ($built)"
 
 Write-Host "== Deploy to $target" -ForegroundColor Cyan
 New-Item -ItemType Directory -Force $binTarget | Out-Null
@@ -46,6 +55,11 @@ try {
 }
 catch [System.IO.IOException] {
     throw "Could not overwrite the DLLs (sharing violation). Close Bannerlord and run deploy again. $_"
+}
+foreach ($name in @("$moduleId.dll", "$moduleId.Core.dll")) {
+    $a = (Get-FileHash (Join-Path $out $name)).Hash
+    $b = (Get-FileHash (Join-Path $binTarget $name)).Hash
+    if ($a -ne $b) { throw "$name in the game folder differs from the build output after copying." }
 }
 
 Copy-Item (Join-Path $repo 'SubModule.xml') $target -Force
