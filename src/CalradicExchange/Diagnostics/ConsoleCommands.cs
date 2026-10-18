@@ -159,6 +159,13 @@ namespace CalradicExchange.Diagnostics
             });
         }
 
+        /// <summary>Appends raw per-town market data to Logs/market_raw.csv (see <see cref="MarketDump"/>).</summary>
+        [CommandLineFunctionality.CommandLineArgumentFunction("dump_market", Group)]
+        public static string DumpMarket(List<string> args)
+        {
+            return RunReady("dump_market", args, b => $"Appended {MarketDump.Append(b)} rows to {MarketDump.FilePath}");
+        }
+
         private static string RunReady(string name, List<string> args, Func<ExchangeCampaignBehavior, string> body)
         {
             return Run(name, args, () =>

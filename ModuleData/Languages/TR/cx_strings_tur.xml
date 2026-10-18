@@ -10,18 +10,18 @@
     <string id="cx_btn_continue" text="Devam" />
     <string id="cx_buy_desc" text="Ne almak istediğini seç. Altın: {GOLD} dinar. Kalan limit: {LEFT} dinar." />
     <string id="cx_buy_element" text="{NAME} - {PRICE}" />
-    <string id="cx_buy_title" text="Pay al" />
+    <string id="cx_buy_title" text="Hisse al" />
     <string id="cx_closed_data" text="defterler okunamadı, exchange.log dosyasına bak" />
     <string id="cx_closed_prices" text="henüz fiyat yok" />
-    <string id="cx_confirm_buy" text="{QTY} x {NAME} al&#10; &#10;Piyasa fiyatı: {PRICE}&#10;Fark ve kayma sonrası: {EXEC}&#10;Paylar: {GROSS} dinar&#10;Sarraf hakkı: {FEE} dinar&#10; &#10;Ödenecek toplam: {TOTAL} dinar" />
-    <string id="cx_confirm_sell" text="{QTY} x {NAME} sat&#10; &#10;Piyasa fiyatı: {PRICE}&#10;Fark ve kayma sonrası: {EXEC}&#10;Paylar: {GROSS} dinar&#10;Sarraf hakkı: {FEE} dinar&#10;Kâr vergisi: {TAX} dinar&#10; &#10;Eline geçecek: {TOTAL} dinar" />
+    <string id="cx_confirm_buy" text="{QTY} x {NAME} al&#10; &#10;Piyasa fiyatı: {PRICE}&#10;Fark ve kayma sonrası: {EXEC}&#10;Paylar: {GROSS} dinar&#10;Komisyon: {FEE} dinar&#10; &#10;Ödenecek toplam: {TOTAL} dinar" />
+    <string id="cx_confirm_sell" text="{QTY} x {NAME} sat&#10; &#10;Piyasa fiyatı: {PRICE}&#10;Fark ve kayma sonrası: {EXEC}&#10;Paylar: {GROSS} dinar&#10;Komisyon: {FEE} dinar&#10;Kâr vergisi: {TAX} dinar&#10; &#10;Eline geçecek: {TOTAL} dinar" />
     <string id="cx_err_closed" text="Bu araç artık işlem görmüyor." />
     <string id="cx_err_generic" text="İşlem yapılamadı." />
     <string id="cx_err_gold" text="Yeterli altının yok." />
     <string id="cx_err_instrument_limit" text="Piyasa tek bir araçtan bu kadarını kaldıracak kadar derin değil." />
     <string id="cx_err_no_price" text="Bunun için henüz fiyat yok." />
-    <string id="cx_err_quantity" text="Geçersiz pay sayısı." />
-    <string id="cx_err_shares" text="Elinde bu kadar pay yok." />
+    <string id="cx_err_quantity" text="Geçersiz hisse sayısı." />
+    <string id="cx_err_shares" text="Elinde bu kadar hisse yok." />
     <string id="cx_err_total_limit" text="Sarraflar senden daha fazla para kabul etmiyor. Klanının ününü ya da ticaret becerini artır." />
     <string id="cx_err_unknown" text="Bu araç burada işlem görmüyor." />
     <string id="cx_ev_captured" text="{TOWN}, {K1} elinden {K2} eline geçti." />
@@ -46,47 +46,47 @@
     <string id="cx_guild_wine_press" text="Şarapçılar loncası" />
     <string id="cx_guild_wood" text="Marangozlar loncası" />
     <string id="cx_guild_wool_weavery" text="Yün dokumacıları loncası" />
-    <string id="cx_hdr_commodities" text="Emtia payları (1 pay = {UNITS} birim)" />
+    <string id="cx_hdr_commodities" text="Emtia hisseleri (1 hisse = {UNITS} birim)" />
     <string id="cx_hdr_sectors" text="Sepetler" />
-    <string id="cx_inst_date_fruit" text="Hurma payı" />
-    <string id="cx_inst_flax" text="Keten payı" />
-    <string id="cx_inst_grain" text="Tahıl payı" />
-    <string id="cx_inst_iron" text="Demir cevheri payı" />
-    <string id="cx_inst_linen" text="Keten kumaş payı" />
-    <string id="cx_inst_oil" text="Zeytinyağı payı" />
-    <string id="cx_inst_olives" text="Zeytin payı" />
-    <string id="cx_inst_salt" text="Tuz payı" />
-    <string id="cx_inst_tools" text="Alet payı" />
-    <string id="cx_inst_velvet" text="Kadife payı" />
-    <string id="cx_inst_wine" text="Şarap payı" />
-    <string id="cx_inst_wool" text="Yün payı" />
+    <string id="cx_inst_date_fruit" text="Hurma hissesi" />
+    <string id="cx_inst_flax" text="Keten hissesi" />
+    <string id="cx_inst_grain" text="Tahıl hissesi" />
+    <string id="cx_inst_iron" text="Demir cevheri hissesi" />
+    <string id="cx_inst_linen" text="Keten kumaş hissesi" />
+    <string id="cx_inst_oil" text="Zeytinyağı hissesi" />
+    <string id="cx_inst_olives" text="Zeytin hissesi" />
+    <string id="cx_inst_salt" text="Tuz hissesi" />
+    <string id="cx_inst_tools" text="Alet hissesi" />
+    <string id="cx_inst_velvet" text="Kadife hissesi" />
+    <string id="cx_inst_wine" text="Şarap hissesi" />
+    <string id="cx_inst_wool" text="Yün hissesi" />
     <string id="cx_line_market" text="{NAME}: {PRICE}   bugün {DAY}   7 gün {WEEK}" />
     <string id="cx_market_title" text="Piyasa fiyatları" />
     <string id="cx_menu_exchange_closed" text="Borsa bugün kapalı. ({REASON})" />
-    <string id="cx_menu_exchange_text" text="Hanın arka odasında sarraflar masalarının başında oturmuş, paylar ve sepetler için fiyat bağırıyor.&#10; &#10;Portföyün: {VALUE} dinar ({PNL}).&#10;Kullanılan yatırım limiti: {USED} / {LIMIT} dinar.&#10;Sarraf hakkı: {FEE}. Kâr vergisi: {TAX}." />
+    <string id="cx_menu_exchange_text" text="Hanın arka odasında sarraflar masalarının başında oturmuş, hisseler ve sepetler için fiyat bağırıyor.&#10; &#10;Portföyün: {VALUE} dinar ({PNL}).&#10;Kullanılan yatırım limiti: {USED} / {LIMIT} dinar.&#10;Komisyon: {FEE}. Kâr vergisi: {TAX}." />
     <string id="cx_menu_visit_exchange" text="Borsaya git" />
     <string id="cx_msg_big_move" text="Borsa: {NAME} {CHANGE} ({PRICE})." />
-    <string id="cx_msg_bought" text="{QTY} {NAME} {TOTAL} dinara alındı." />
-    <string id="cx_msg_sold" text="{QTY} {NAME} {TOTAL} dinara satıldı ({PNL})." />
+    <string id="cx_msg_bought" text="{QTY} adet {NAME} {TOTAL} dinara alındı." />
+    <string id="cx_msg_sold" text="{QTY} adet {NAME} {TOTAL} dinara satıldı ({PNL})." />
     <string id="cx_news_days_ago" text="{DAYS} gün önce" />
     <string id="cx_news_empty" text="Borsaya henüz haber ulaşmadı." />
     <string id="cx_news_line" text="{WHEN}: {TEXT}" />
     <string id="cx_news_title" text="Borsadaki haberler" />
     <string id="cx_news_today" text="Bugün" />
     <string id="cx_no_price" text="{NAME}: henüz fiyat yok" />
-    <string id="cx_opt_buy" text="Pay al" />
+    <string id="cx_opt_buy" text="Hisse al" />
     <string id="cx_opt_leave" text="Ayrıl" />
     <string id="cx_opt_market" text="Piyasaya bak" />
     <string id="cx_opt_news" text="Haberler" />
     <string id="cx_opt_portfolio" text="Portföyün" />
-    <string id="cx_opt_sell" text="Pay sat" />
-    <string id="cx_portfolio_empty" text="Elinde hiç pay yok." />
-    <string id="cx_portfolio_line" text="{NAME}: {QTY} pay, alış {AVG}, şimdi {PRICE}, {PNL}" />
+    <string id="cx_opt_sell" text="Hisse sat" />
+    <string id="cx_portfolio_empty" text="Elinde hiç hisse yok." />
+    <string id="cx_portfolio_line" text="{NAME}: {QTY} adet, alış {AVG}, şimdi {PRICE}, {PNL}" />
     <string id="cx_portfolio_title" text="Portföyün" />
-    <string id="cx_portfolio_totals" text="Değer {VALUE} dinar, açık kâr/zarar {OPEN}.&#10;Gerçekleşmiş kâr/zarar {REALIZED}. Ödenen sarraf hakkı {FEES}, vergi {TAXES} dinar." />
-    <string id="cx_qty_buy" text="{NAME} payının fiyatı masraflar hariç {PRICE}.&#10;Kaç pay alacaksın? (en fazla {MAX})" />
+    <string id="cx_portfolio_totals" text="Değer {VALUE} dinar, açık kâr/zarar {OPEN}.&#10;Gerçekleşmiş kâr/zarar {REALIZED}. Ödenen komisyon {FEES}, vergi {TAXES} dinar." />
+    <string id="cx_qty_buy" text="Bir {NAME} masraflar hariç {PRICE} dinar.&#10;Kaç hisse alacaksın? (en fazla {MAX})" />
     <string id="cx_qty_invalid" text="1 ile {MAX} arasında bir tam sayı gir." />
-    <string id="cx_qty_sell" text="Elinde {QTY} {NAME} payı var.&#10;Kaçını satacaksın?" />
+    <string id="cx_qty_sell" text="Elinde {QTY} adet {NAME} var.&#10;Kaçını satacaksın?" />
     <string id="cx_season_autumn" text="Sonbahar" />
     <string id="cx_season_spring" text="İlkbahar" />
     <string id="cx_season_summer" text="Yaz" />
@@ -97,9 +97,9 @@
     <string id="cx_sector_military" text="Askeri tedarik sepeti" />
     <string id="cx_sector_textile" text="Tekstil sepeti" />
     <string id="cx_sell_desc" text="Ne satmak istediğini seç." />
-    <string id="cx_sell_element" text="{NAME} - {QTY} pay, fiyat {PRICE}" />
-    <string id="cx_sell_title" text="Pay sat" />
-    <string id="cx_tip_nothing_to_sell" text="Elinde hiç pay yok." />
+    <string id="cx_sell_element" text="{NAME} - {QTY} adet, fiyat {PRICE}" />
+    <string id="cx_sell_title" text="Hisse sat" />
+    <string id="cx_tip_nothing_to_sell" text="Elinde hiç hisse yok." />
     <string id="cx_unknown" text="bilinmeyen bir yer" />
   </strings>
 </base>

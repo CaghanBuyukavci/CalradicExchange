@@ -99,3 +99,7 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Karar (kullanıcı, 2026-10-18):** Trade 300'deki komisyon tabanı %1 → %0,5. Köy yağmasının emtia dürtüsü 0,06 → 0,075. Korelasyon hedefi 0,7 → 0,65 (sık yağmalanan mallar temel değerin biraz üstünde durur; bu manipülasyon alanının doğal sonucu).
 - **Ölçüm:** Simülatöre manipülatör bot eklendi: emtia alır, 4 gün boyunca o malın köylerini kendisi yağmalar, 8. gün satar, 21 günde bir tekrarlar; pozisyon ≤ 12.000 dinar (daha büyüğünde kayma kazancı yer). Döngü başına kâr: erken +49, orta +226, geç +747 dinar. Erken oyun en iyi bot ortalama 31 dinar/gün (sınır 50).
 - **Not:** Piyasa derinliği (kayma) büyük pozisyonlarla manipülasyonu kendiliğinden frenler. Faz 4 şüphe puanı bu dengenin üstüne gelecek.
+
+## ADR-016 — Türkçe terimler: "Hisse" ve "Komisyon"
+
+- **Karar (kullanıcı, 2026-10-18):** Arayüzde "pay" yerine "hisse", "sarraf hakkı" yerine "komisyon" kullanılır (GDD §6.10 güncellendi). "Sarraf" kelimesi yalnızca betimleyici metinlerde (borsadaki para bozucular) kalır.

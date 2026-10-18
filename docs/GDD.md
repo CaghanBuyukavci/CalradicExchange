@@ -133,13 +133,13 @@ Arayüzde ortaçağ dili kullanılır:
 
 | Modern | Oyundaki adı |
 |---|---|
-| Hisse, pay | Pay senedi |
+| Hisse, pay | Hisse |
 | Endeks | Sepet / Sektör sepeti |
 | Tahvil | Borç senedi |
 | Forward | Hasat sözleşmesi |
 | Temettü | Kâr payı |
 | Açığa satış | Ödünç satış |
-| Komisyon | Sarraf hakkı |
+| Komisyon | Komisyon |
 
 İngilizce karşılıkları: share, basket, bond / debt note, harvest contract, dividend, borrowed sale, broker's fee.
 
