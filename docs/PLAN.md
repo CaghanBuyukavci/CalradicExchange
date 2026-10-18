@@ -4,7 +4,7 @@ Bu dosya projenin yol haritasıdır. Claude Code her görevi bitirdiğinde kutuc
 
 Süre tahminleri haftada 10–15 saat çalışma ve Claude Code kullanımı varsayımıyla verilmiştir.
 
-**Mevcut faz: Faz 0**
+**Mevcut faz: Faz 1** (Faz 0 tamamlandı 2026-10-18)
 
 ---
 
@@ -29,11 +29,11 @@ Amaç: Tasarımın dayandığı her şeyin oyunda gerçekten var olduğunu doğr
 - [x] 0.8 `SubModule.xml` ve deploy betiği (build sonrası `Modules\CalradicExchange`'e kopyalama)
   - `deploy.ps1`: testleri çalıştırır, derler, sadece kendi DLL'lerimizi + SubModule.xml + ModuleData'yı kopyalar.
 - [x] 0.9 Şehir menüsüne "Borsaya git" seçeneği; tıklanınca yer tutucu mesaj
-  - Türkçe metin `ModuleData/Languages/TR` altında. Oyun içi test bekleniyor.
+  - Türkçe metin `ModuleData/Languages/TR` altında. Oyun içinde doğrulandı (2026-10-18).
 - [x] 0.10 Mod log dosyası ve debug konsol komutlarının iskeleti (`exchange.ping`)
-  - `exchange.ping` çalışır; diğer komutlar Faz 1.22'ye kadar 'not implemented' döner. Oyun içi test bekleniyor.
+  - `exchange.ping` çalışır; diğer komutlar Faz 1.22'ye kadar 'not implemented' döner. Oyun içinde doğrulandı (2026-10-18).
 - [x] 0.11 JSON kayıt iskeleti: `SyncData` ile boş bir durum nesnesini kaydet ve yükle
-  - `cx_state_v1` anahtarı, schemaVersion 1, round-trip testleri. Oyun içi test bekleniyor.
+  - `cx_state_v1` anahtarı, schemaVersion 1, round-trip testleri. Oyun içinde doğrulandı (2026-10-18).
 
 **Kabul kriterleri**
 - Mod launcher'da görünüyor, kampanya hatasız açılıyor.

@@ -29,7 +29,7 @@ General notes for v1.4.8:
 | API | Purpose | Real form | Status | Notes |
 |---|---|---|---|---|
 | `CampaignEvents.DailyTickEvent` | Price update | `IMbEvent` | VERIFIED | `WeeklyTickEvent` (`IMbEvent`) also exists |
-| `CampaignTime.Now` | Current time | `static CampaignTime Now` | VERIFIED | |
+| `CampaignTime.Now` | Current time | `static CampaignTime Now` | VERIFIED | `ToDays` is absolute (≈91077 at campaign start, year 1084). `DailyTickEvent` is a periodic event aligned to `CampaignTimeModel.CampaignStartTime`, which includes +9 hours, so the tick fires at 09:00, **not** at midnight; `floor(ToDays)` changes 9 hours before the tick (seen in game test 2026-10-18). Phase 1: Core day = our own tick counter / days since `CampaignStartTime`, never `floor(ToDays)` |
 | `CampaignTime` getters | Day/season | `double ToDays`, `int GetDayOfYear`, `int GetDayOfSeason`, `int GetYear`, `Seasons GetSeasonOfYear` (properties, not methods) | VERIFIED | `CampaignTime.Seasons { Spring, Summer, Autumn, Winter }` |
 | Year length | Calendar | `static int CampaignTime.DaysInWeek`, `WeeksInSeason`, `SeasonsInYear`; `static int DaysInSeason`, `DaysInYear` | CHANGED | Not constant: normal 7/21/84 days, FastMode 3/6/24. ADR-008: read at runtime |
 
