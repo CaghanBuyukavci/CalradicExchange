@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <!-- BUTR template default for the Steam build. -->
+    <LangVersion>10.0</LangVersion>
+    <RootNamespace>CalradicExchange</RootNamespace>
+    <AssemblyName>CalradicExchange</AssemblyName>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CalradicExchange.Core\CalradicExchange.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Game assemblies: referenced, never copied (Private=false). -->
+  <ItemGroup>
+    <Reference Include="$(GameBinFolder)\TaleWorlds.*.dll" Exclude="$(GameBinFolder)\TaleWorlds.Native.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="$(GameFolder)\Modules\SandBox\bin\Win64_Shipping_Client\SandBox*.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

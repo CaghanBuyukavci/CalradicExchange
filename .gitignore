@@ -1,0 +1,19 @@
+# Build output
+bin/
+obj/
+*.user
+.vs/
+.idea/
+
+# Decompiled game code (never commit)
+.decompiled/
+
+# Game DLLs
+**/TaleWorlds.*.dll
+
+# Simulator output
+sim/out*.csv
+
+# Logs
+Logs/
+*.log

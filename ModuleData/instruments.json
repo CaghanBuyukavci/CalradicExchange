@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "gameVersionVerified": "v1.4.8",
+  "_comment": "Draft (PLAN 0.5). All item, item category and workshop IDs verified against v1.4.8 game data. See docs/API_NOTES.md section 8.",
+  "unitsPerShare": 10,
+  "commodities": [
+    { "id": "cx_grain",      "itemId": "grain",      "nameId": "cx_inst_grain",      "name": "Grain Share" },
+    { "id": "cx_olives",     "itemId": "olives",     "nameId": "cx_inst_olives",     "name": "Olive Share" },
+    { "id": "cx_oil",        "itemId": "oil",        "nameId": "cx_inst_oil",        "name": "Olive Oil Share" },
+    { "id": "cx_date_fruit", "itemId": "date_fruit", "nameId": "cx_inst_date_fruit", "name": "Date Fruit Share" },
+    { "id": "cx_salt",       "itemId": "salt",       "nameId": "cx_inst_salt",       "name": "Salt Share" },
+    { "id": "cx_iron",       "itemId": "iron",       "nameId": "cx_inst_iron",       "name": "Iron Ore Share" },
+    { "id": "cx_tools",      "itemId": "tools",      "nameId": "cx_inst_tools",      "name": "Tools Share" },
+    { "id": "cx_flax",       "itemId": "flax",       "nameId": "cx_inst_flax",       "name": "Flax Share" },
+    { "id": "cx_linen",      "itemId": "linen",      "nameId": "cx_inst_linen",      "name": "Linen Share" },
+    { "id": "cx_wool",       "itemId": "wool",       "nameId": "cx_inst_wool",       "name": "Wool Share" },
+    { "id": "cx_velvet",     "itemId": "velvet",     "nameId": "cx_inst_velvet",     "name": "Velvet Share" },
+    { "id": "cx_wine",       "itemId": "wine",       "nameId": "cx_inst_wine",       "name": "Wine Share" }
+  ],
+  "sectors": [
+    {
+      "id": "cx_sector_agriculture", "nameId": "cx_sector_agriculture", "name": "Agriculture Basket",
+      "components": [
+        { "itemId": "grain",      "weight": 0.35 },
+        { "itemId": "fish",       "weight": 0.20 },
+        { "itemId": "olives",     "weight": 0.15 },
+        { "itemId": "date_fruit", "weight": 0.15 },
+        { "itemId": "grape",      "weight": 0.15 }
+      ]
+    },
+    {
+      "id": "cx_sector_textile", "nameId": "cx_sector_textile", "name": "Textile Basket",
+      "_comment": "cloth replaced by felt, see ADR-011. cotton is 'Raw Silk' in game.",
+      "components": [
+        { "itemId": "flax",   "weight": 0.15 },
+        { "itemId": "linen",  "weight": 0.20 },
+        { "itemId": "wool",   "weight": 0.20 },
+        { "itemId": "felt",   "weight": 0.15 },
+        { "itemId": "velvet", "weight": 0.15 },
+        { "itemId": "cotton", "weight": 0.15 }
+      ]
+    },
+    {
+      "id": "cx_sector_metal", "nameId": "cx_sector_metal", "name": "Mining and Metal Basket",
+      "components": [
+        { "itemId": "iron",   "weight": 0.40 },
+        { "itemId": "tools",  "weight": 0.35 },
+        { "itemId": "silver", "weight": 0.25 }
+      ]
+    },
+    {
+      "id": "cx_sector_luxury", "nameId": "cx_sector_luxury", "name": "Luxury Basket",
+      "components": [
+        { "itemId": "wine",    "weight": 0.30 },
+        { "itemId": "velvet",  "weight": 0.25 },
+        { "itemId": "jewelry", "weight": 0.25 },
+        { "itemId": "oil",     "weight": 0.20 }
+      ]
+    },
+    {
+      "id": "cx_sector_military", "nameId": "cx_sector_military", "name": "Military Supply Basket",
+      "_comment": "Category-based (ECONOMY_MODEL 2.2). Fundamental = mean price factor of these categories x war multiplier.",
+      "warFactor": 0.15,
+      "categoryComponents": [
+        { "categoryId": "melee_weapons",    "weight": 0.08 },
+        { "categoryId": "melee_weapons_2",  "weight": 0.08 },
+        { "categoryId": "melee_weapons_3",  "weight": 0.06 },
+        { "categoryId": "ranged_weapons",   "weight": 0.06 },
+        { "categoryId": "ranged_weapons_2", "weight": 0.05 },
+        { "categoryId": "arrows",           "weight": 0.07 },
+        { "categoryId": "shield",           "weight": 0.06 },
+        { "categoryId": "shield_2",         "weight": 0.05 },
+        { "categoryId": "light_armor",      "weight": 0.08 },
+        { "categoryId": "medium_armor",     "weight": 0.08 },
+        { "categoryId": "heavy_armor",      "weight": 0.06 },
+        { "categoryId": "horse_equipment",  "weight": 0.05 },
+        { "categoryId": "horse",            "weight": 0.08 },
+        { "categoryId": "war_horse",        "weight": 0.09 },
+        { "categoryId": "sumpter_horse",    "weight": 0.05 }
+      ]
+    }
+  ],
+  "guildTypes": [
+    { "workshopTypeId": "brewery",           "nameId": "cx_guild_brewery",        "name": "Brewers' Guild" },
+    { "workshopTypeId": "wine_press",        "nameId": "cx_guild_wine_press",     "name": "Vintners' Guild" },
+    { "workshopTypeId": "olive_press",       "nameId": "cx_guild_olive_press",    "name": "Oil Pressers' Guild" },
+    { "workshopTypeId": "wool_weavery",      "nameId": "cx_guild_wool_weavery",   "name": "Wool Weavers' Guild" },
+    { "workshopTypeId": "linen_weavery",     "nameId": "cx_guild_linen_weavery",  "name": "Linen Weavers' Guild" },
+    { "workshopTypeId": "velvet_weavery",    "nameId": "cx_guild_velvet_weavery", "name": "Velvet Weavers' Guild" },
+    { "workshopTypeId": "smithy",            "nameId": "cx_guild_smithy",         "name": "Smiths' Guild" },
+    { "workshopTypeId": "pottery_shop",      "nameId": "cx_guild_pottery_shop",   "name": "Potters' Guild" },
+    { "workshopTypeId": "tannery",           "nameId": "cx_guild_tannery",        "name": "Tanners' Guild" },
+    { "workshopTypeId": "wood_WorkshopType", "nameId": "cx_guild_wood",           "name": "Woodworkers' Guild" },
+    { "workshopTypeId": "silversmithy",      "nameId": "cx_guild_silversmithy",   "name": "Silversmiths' Guild" }
+  ]
+}

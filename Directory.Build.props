@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <!-- Bannerlord install folder. Override with the BANNERLORD_GAME_DIR environment variable. -->
+    <GameFolder Condition="'$(GameFolder)' == '' and '$(BANNERLORD_GAME_DIR)' != ''">$(BANNERLORD_GAME_DIR)</GameFolder>
+    <GameFolder Condition="'$(GameFolder)' == ''">G:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
+    <GameBinFolder>$(GameFolder)\bin\Win64_Shipping_Client</GameBinFolder>
+    <ModVersion>0.0.1</ModVersion>
+    <Version>$(ModVersion)</Version>
+    <Authors>Caghan</Authors>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>
