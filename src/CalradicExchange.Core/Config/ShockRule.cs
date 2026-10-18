@@ -23,5 +23,10 @@ namespace CalradicExchange.Core.Config
         [JsonProperty("volMultiplier")] public double VolMultiplier { get; set; }
 
         [JsonProperty("volDays")] public int VolDays { get; set; }
+
+        /// <summary>Multiply the impulse by the event's town share x <see cref="TownShareMultiplier"/> (famine, ADR-018).</summary>
+        [JsonProperty("scaleByTownShare")] public bool ScaleByTownShare { get; set; }
+
+        [JsonProperty("townShareMultiplier")] public double TownShareMultiplier { get; set; } = 1.0;
     }
 }

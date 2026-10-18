@@ -20,6 +20,15 @@ namespace CalradicExchange.Core.Pricing
         /// <summary>Towns currently out of food (used to detect famine starts).</summary>
         public List<string> FamineTowns { get; set; } = new List<string>();
 
+        /// <summary>Exchange day of each town's last famine start (cooldown). Added in schema 3.</summary>
+        public Dictionary<string, int> FamineStartDays { get; set; } = new Dictionary<string, int>();
+
+        /// <summary>
+        /// How fundamentals were computed when prices were set. When it differs from
+        /// <see cref="MarketEngine.FundamentalMethodId"/> the market is rebuilt (ADR-017). Added in schema 3.
+        /// </summary>
+        public string FundamentalMethod { get; set; }
+
         /// <summary>Average item price on the day it was first observed (sector normalization F_i,0).</summary>
         public Dictionary<string, decimal> BaseItemPrices { get; set; } = new Dictionary<string, decimal>();
 

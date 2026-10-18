@@ -66,6 +66,23 @@ namespace CalradicExchange.Core.Trading
             return realized;
         }
 
+        /// <summary>
+        /// Closes every position at the given prices without fees or tax (used when the market is rebuilt).
+        /// Returns the gold to pay out.
+        /// </summary>
+        public int CloseAllAt(Func<string, decimal> priceOf)
+        {
+            int total = 0;
+            foreach (Position pos in Positions.ToList())
+            {
+                int proceeds = (int)Math.Round(pos.Quantity * priceOf(pos.InstrumentId), MidpointRounding.AwayFromZero);
+                RealizedPnl += proceeds - pos.CostBasis;
+                total += proceeds;
+            }
+            Positions.Clear();
+            return total;
+        }
+
         /// <summary>Mark-to-market value at the given prices (missing prices count as 0).</summary>
         public decimal MarketValue(Func<string, decimal> priceOf)
         {

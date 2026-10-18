@@ -14,6 +14,7 @@ using CalradicExchange.Diagnostics;
 using CalradicExchange.Localization;
 using CalradicExchange.Menus;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -114,6 +115,7 @@ namespace CalradicExchange.Behaviors
         public TickSummary RunTick()
         {
             if (_market == null) return null;
+            if (_market.NeedsRebase) SettleBeforeRebase();
             WorldSnapshot world = _reader.Read(NextDay);
             TickSummary summary = _market.Tick(world);
             _state.LastTickDay = _state.Market.LastTickDay;
@@ -122,6 +124,22 @@ namespace CalradicExchange.Behaviors
             if (summary.Processed && !summary.Initialized) NotifyBigMoves();
             if (summary.Processed && _state.Market.LastTickDay <= MarketDump.AutoDumpDays) MarketDump.Append(this);
             return summary;
+        }
+
+        /// <summary>
+        /// The saved prices were built with an older fundamental method (ADR-017). Open positions are bought back
+        /// at the current market price, without fees or tax, before the market is rebuilt.
+        /// </summary>
+        private void SettleBeforeRebase()
+        {
+            int positions = _state.Portfolio.Positions.Count;
+            int gold = _state.Portfolio.CloseAllAt(id => _market.Get(id)?.Price ?? 0);
+            ExchangeLog.Info($"Rebase: fundamental method '{_state.Market.FundamentalMethod}' -> '{MarketEngine.FundamentalMethodId}'. Closed {positions} positions for {gold} denars.");
+            if (gold > 0) GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, gold, true);
+            if (positions > 0)
+            {
+                InformationManager.DisplayMessage(new InformationMessage(Strings.Rebased.SetTextVariable("GOLD", gold).ToString(), Colors.Yellow));
+            }
         }
 
         private void LoadState(string json)
@@ -183,7 +201,8 @@ namespace CalradicExchange.Behaviors
             ExchangeLog.Info($"Market ready: {_catalog.Instruments.Count} instruments, history {_settings.HistoryDays} days.");
 
             // Mid-campaign install or new game: set opening prices from today's world right away (PLAN 1.21).
-            if (!_state.Market.Initialized) RunTick();
+            // A save priced with an older fundamental method is rebuilt right away too (ADR-017).
+            if (!_state.Market.Initialized || _market.NeedsRebase) RunTick();
         }
 
         private void OnDailyTick()

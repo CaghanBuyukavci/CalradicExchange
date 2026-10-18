@@ -20,6 +20,10 @@ namespace CalradicExchange.Core.Persistence.Migrations
                     case 1:
                         root = Migrate1To2(root);
                         break;
+                    case 2:
+                        // Schema 3 adds market.famineStartDays and market.fundamentalMethod. Both default when
+                        // missing; a missing method makes the engine rebuild prices with the new averaging (ADR-017).
+                        break;
                 }
             }
 

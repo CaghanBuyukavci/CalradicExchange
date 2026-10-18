@@ -103,3 +103,21 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 ## ADR-016 — Türkçe terimler: "Hisse" ve "Komisyon"
 
 - **Karar (kullanıcı, 2026-10-18):** Arayüzde "pay" yerine "hisse", "sarraf hakkı" yerine "komisyon" kullanılır (GDD §6.10 güncellendi). "Sarraf" kelimesi yalnızca betimleyici metinlerde (borsadaki para bozucular) kalır.
+
+## ADR-017 — Temel değer pazar hacmiyle ağırlıklandırılır; eski kayıtlar yeniden kurulur
+
+- **Bağlam:** Gerçek oyun verisi (`market_raw.csv`, 10 gün, 53 şehir): bir malın stoğu ve arzı olmayan şehirlerde oyun fiyat çarpanını çok yüksek gösteriyor (kadife: şehirlerin %87'si stoksuz, çarpan ~5; stoklu şehirlerde 1,45). Refah ağırlıklı ortalama işlenmiş malları taban değerin 5–7 katında gösteriyordu. Sadece stoklu şehirleri almak ise en oynak yöntemdi (günlük %7).
+- **Karar:** Ağırlık = günlük arz + stok (ECONOMY_MODEL §2.1'deki "pazar hacmi" alternatifi). Hacmi olmayan şehir katılmaz; hiçbir şehirde hacim yoksa refah ağırlığına düşülür. Kadife 4,2× → 1,9×, zeytinyağı 5,0× → 2,1×; günlük temel değer oynaklığı %4,0 (en düşüklerden).
+- **Geçiş:** `MarketState.FundamentalMethod` alanı eklendi (şema 3). Kayıtlı yöntem farklıysa piyasa yeniden kurulur; açık pozisyonlar o anki piyasa fiyatından masrafsız ve vergisiz geri alınır, oyuncuya mesaj gösterilir.
+
+## ADR-018 — Kıtlık şoku şehrin refah payıyla ölçeklenir, 21 gün bekleme
+
+- **Bağlam:** Gerçek oyunda yiyecek stoğu sıfırlanan şehir çok yaygın (10 günde 1/53 → 12/53). Her biri tarımı +0,12 ittiği için tarım sepeti 5 günde %60 şişti.
+- **Karar (kullanıcı, 2026-10-18, "şehir payıyla ölçekle"):** Tarım dürtüsü = 0,12 × şehrin toplam refahtaki payı × 2. Şehirlerin yarısı (refaha göre) aç kalınca toplam etki tam şoka ulaşır. Aynı şehir 21 gün içinde yeni kıtlık başlatamaz. Şehrin loncalarına etki (Faz 2) ölçeklenmez.
+
+## ADR-019 — Beklenen şok tabanı: sadece sürprizler fiyatı oynatır
+
+- **Bağlam:** Sık gelen olaylar S'yi kalıcı pozitif bir seviyeye taşıyor. Borsa S=0 ile açıldığı için ilk aylarda tarım fiyatları bu seviyeye tırmanıyor; erken alan herkes kazanıyor (simülatörde al-tut ilk yıl günde +15, manipülatör +51 dinar). Mod oyuna sonradan eklendiğinde de aynısı olur.
+- **Karar:** Her araç için S_ham'ın 42 gün yarı ömürlü hareketli ortalaması B tutulur, fiyat S = S_ham − B'ye göre hareket eder. İlk olay tam etkili; aynı olay sürekli tekrarlanırsa etkisi söner; uzun sessizlikten sonra yeniden haber değeri kazanır. `settings.json`: `shockBaselineHalfLifeDays` (0 = kapalı).
+- **Sonuç (20 seed, 4 yıl, gerçek veriye yaklaştırılmış sentetik dünya):** 8/8 hedef geçiyor. Erken oyun en iyi bot günde 36,7 dinar (en kötü seed 69,8). Al-tut -%0,1. Olay takipçisi geç oyunda +%0,6/yıl. Manipülatör döngü başına: erken +190, orta +384, geç +907 dinar.
+- **Simülatör kalibrasyonu:** Şehir başına günlük kıtlık olasılığı 1/40 (gerçek veri), hacim ağırlığı (üretici şehirler ağır), daha yüksek yerel/küresel fiyat gürültüsü. Temel değer günlük oynaklığı simülatörde %2,7, gerçek oyunda %4,0 (10 günlük, yaz ve kıtlık ağırlıklı örnek); uzun veriyle tekrar kontrol edilecek.

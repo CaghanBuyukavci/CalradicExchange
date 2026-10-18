@@ -43,6 +43,7 @@ namespace CalradicExchange.Sim
 
             var vol = new Dictionary<string, List<double>>();
             var corr = new Dictionary<string, List<double>>();
+            var fVol = new Dictionary<string, List<double>>();
             var minR = new Dictionary<string, double>();
             var maxR = new Dictionary<string, double>();
             var bh = new List<double>();
@@ -54,6 +55,7 @@ namespace CalradicExchange.Sim
             var chaseStats = new Dictionary<MarketEventType, (int Trades, long Pnl)>();
             var lateStats = new Dictionary<MarketEventType, (int Trades, long Pnl)>();
             var earlyPerDay = new List<double>();
+            var earlyByBot = new Dictionary<string, List<double>>();
             var manip = profiles.ToDictionary(p => p, p => new List<double>());
             var manipCycle = profiles.ToDictionary(p => p, p => new List<double>());
 
@@ -73,6 +75,7 @@ namespace CalradicExchange.Sim
                     if (s.Value.Count < 31) continue;
                     Add(vol, s.Key, Metrics.AnnualVolatility(s.Value, daysPerYear));
                     Add(corr, s.Key, Metrics.FundamentalCorrelation(s.Value));
+                    Add(fVol, s.Key, Metrics.FundamentalDailyVolatility(s.Value));
                     minR[s.Key] = Math.Min(minR.TryGetValue(s.Key, out double mn) ? mn : double.MaxValue, Metrics.MinRatio(s.Value));
                     maxR[s.Key] = Math.Max(maxR.TryGetValue(s.Key, out double mx) ? mx : 0, Metrics.MaxRatio(s.Value));
                 }
@@ -102,12 +105,17 @@ namespace CalradicExchange.Sim
                 earlyPerDay.Add(earlyBots.Max(bot =>
                 {
                     SimContext c = SimRun.Execute(catalog, settings, seed, daysPerYear, bot, TraderSetup.Early).Context;
-                    return (c.Gold - c.StartGold) / (double)daysPerYear;
+                    double perDay = (c.Gold - c.StartGold) / (double)daysPerYear;
+                    string key = bot is EventFollowerStrategy ef ? ef.Name : bot.Name;
+                    Add(earlyByBot, key, perDay);
+                    return perDay;
                 }));
             }
 
             PrintInstrumentTable(catalog, vol, corr, minR, maxR);
             Console.WriteLine();
+            List<double> commodityFVol = catalog.Instruments.Where(i => i.Class == InstrumentClass.Commodity && fVol.ContainsKey(i.Id)).Select(i => fVol[i.Id].Average()).ToList();
+            Console.WriteLine($"Fundamental daily volatility, commodities (median): {Metrics.Median(commodityFVol) * 100:0.00}%  [real game v1.4.8, 10 days: ~4.0%]");
             Console.WriteLine("Events per seed (avg): " + string.Join(", ", eventTotals.OrderBy(e => e.Key).Select(e => $"{e.Key} {e.Value / (double)o.Seeds:0.#}")));
             Console.WriteLine();
             Console.WriteLine($"Strategies (mean over {o.Seeds} seeds, min..max):");
@@ -125,6 +133,7 @@ namespace CalradicExchange.Sim
                     + $"   avg profit per {ManipulatorStrategy.RaidDays}-raid cycle: {manipCycle[p].DefaultIfEmpty(0).Average():+0;-0} denars");
             }
             Console.WriteLine("  event-follower (late) per event type: " + StatsLine(lateStats, o.Seeds));
+            Console.WriteLine("  early game per bot (denars/day, mean): " + string.Join(", ", earlyByBot.Select(x => $"{x.Key} {x.Value.Average():+0.0;-0.0}")));
             Console.WriteLine($"  early game, best bot, first year: {earlyPerDay.Average():0.0} denars/day on average, worst seed {earlyPerDay.Max():0.0}");
 
             var checks = new List<(string Name, bool Pass, string Detail)>();

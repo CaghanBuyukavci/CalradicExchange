@@ -41,6 +41,8 @@ namespace CalradicExchange.Core.Config
             Range(e, "maxAbsShock", s.MaxAbsShock, 0.01, 5);
             Range(e, "historyDays", s.HistoryDays, 7, 2000);
             Range(e, "newsKeep", s.NewsKeep, 0, 500);
+            Range(e, "famineCooldownDays", s.FamineCooldownDays, 0, 1000);
+            Range(e, "shockBaselineHalfLifeDays", s.ShockBaselineHalfLifeDays, 0, 10000);
 
             foreach (InstrumentClass cls in Enum.GetValues(typeof(InstrumentClass)))
             {
@@ -95,6 +97,7 @@ namespace CalradicExchange.Core.Config
                     Range(e, w + ".impulse", r.Impulse, -5, 5);
                     if (r.VolMultiplier != 0) Range(e, w + ".volMultiplier", r.VolMultiplier, 1, 10);
                     Range(e, w + ".volDays", r.VolDays, 0, 10000);
+                    Range(e, w + ".townShareMultiplier", r.TownShareMultiplier, 0, 1000);
                 }
             }
         }

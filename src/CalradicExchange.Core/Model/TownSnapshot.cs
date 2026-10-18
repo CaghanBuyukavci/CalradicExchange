@@ -16,5 +16,14 @@ namespace CalradicExchange.Core.Model
 
         /// <summary>Market price factor per item category StringId.</summary>
         public Dictionary<string, double> CategoryFactors { get; set; } = new Dictionary<string, double>();
+
+        /// <summary>
+        /// Market volume per item StringId (daily supply + units in store). Used as the averaging weight (ADR-017).
+        /// Towns with zero volume quote theoretical prices nobody can trade at and are left out.
+        /// </summary>
+        public Dictionary<string, double> ItemVolumes { get; set; } = new Dictionary<string, double>();
+
+        /// <summary>Market volume per item category StringId.</summary>
+        public Dictionary<string, double> CategoryVolumes { get; set; } = new Dictionary<string, double>();
     }
 }

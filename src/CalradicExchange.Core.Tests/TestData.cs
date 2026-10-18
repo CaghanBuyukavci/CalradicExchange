@@ -27,11 +27,15 @@ namespace CalradicExchange.Core.Tests
         /// <summary>A fresh copy each call, so tests may mutate it.</summary>
         public static MarketSettings Settings() => SettingsLoader.Parse(SettingsJson);
 
-        /// <summary>Settings with sigma = 0 for every class: prices move only through kappa and shocks.</summary>
+        /// <summary>
+        /// Settings with sigma = 0 for every class and no shock baseline: prices move only through kappa and
+        /// raw shocks, so expected values can be computed by hand.
+        /// </summary>
         public static MarketSettings NoNoiseSettings()
         {
             MarketSettings s = Settings();
             foreach (ClassParameters p in s.Classes.Values) p.Sigma = 0;
+            s.ShockBaselineHalfLifeDays = 0;
             return s;
         }
 

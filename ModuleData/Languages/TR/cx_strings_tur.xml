@@ -67,6 +67,7 @@
     <string id="cx_menu_visit_exchange" text="Borsaya git" />
     <string id="cx_msg_big_move" text="Borsa: {NAME} {CHANGE} ({PRICE})." />
     <string id="cx_msg_bought" text="{QTY} adet {NAME} {TOTAL} dinara alındı." />
+    <string id="cx_msg_rebased" text="Borsa defterlerini yeniden düzenledi. Hisselerin piyasa fiyatından geri alındı: {GOLD} dinar." />
     <string id="cx_msg_sold" text="{QTY} adet {NAME} {TOTAL} dinara satıldı ({PNL})." />
     <string id="cx_news_days_ago" text="{DAYS} gün önce" />
     <string id="cx_news_empty" text="Borsaya henüz haber ulaşmadı." />

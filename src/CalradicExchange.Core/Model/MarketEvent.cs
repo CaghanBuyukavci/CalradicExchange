@@ -27,6 +27,9 @@ namespace CalradicExchange.Core.Model
         [JsonConverter(typeof(StringEnumConverter))]
         public Season? Season { get; set; }
 
+        /// <summary>FamineStarted: the town's share of total town prosperity (0-1), for share-scaled shocks.</summary>
+        public double? TownShare { get; set; }
+
         public override string ToString()
         {
             return $"{Type} day={Day} settlement={SettlementId} item={ItemId} town={TownId} kingdom={KingdomId} other={OtherKingdomId} season={Season}";

@@ -13,7 +13,7 @@ namespace CalradicExchange.Adapters
 {
     /// <summary>
     /// Copies the parts of the campaign Core needs into a <see cref="WorldSnapshot"/> (PLAN 1.15).
-    /// Item price = item base value x town price factor of its category (ADR-009).
+    /// Item price = item base value x town price factor of its category (ADR-009); weight = supply + stock (ADR-017).
     /// </summary>
     public sealed class WorldReader
     {
@@ -64,13 +64,17 @@ namespace CalradicExchange.Adapters
                     {
                         if (!HasMarket(market, item.ItemCategory)) continue;
                         float factor = market.GetPriceFactor(item.ItemCategory);
-                        if (factor > 0) snap.ItemPrices[item.StringId] = (decimal)(item.Value * factor);
+                        if (factor <= 0) continue;
+                        snap.ItemPrices[item.StringId] = (decimal)(item.Value * factor);
+                        snap.ItemVolumes[item.StringId] = Volume(market, item.ItemCategory);
                     }
                     foreach (ItemCategory cat in _categories)
                     {
                         if (!HasMarket(market, cat)) continue;
                         float factor = market.GetPriceFactor(cat);
-                        if (factor > 0) snap.CategoryFactors[cat.StringId] = factor;
+                        if (factor <= 0) continue;
+                        snap.CategoryFactors[cat.StringId] = factor;
+                        snap.CategoryVolumes[cat.StringId] = Volume(market, cat);
                     }
                 }
                 world.Towns.Add(snap);
@@ -96,6 +100,13 @@ namespace CalradicExchange.Adapters
         {
             ItemData data = market.GetCategoryData(category);
             return data.Demand > 0 || data.Supply > 0;
+        }
+
+        /// <summary>Averaging weight (ADR-017): daily supply plus units in store.</summary>
+        private static double Volume(TownMarketData market, ItemCategory category)
+        {
+            ItemData data = market.GetCategoryData(category);
+            return Math.Max(0, data.Supply) + Math.Max(0, data.InStore);
         }
     }
 }

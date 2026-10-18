@@ -16,6 +16,17 @@ namespace CalradicExchange.Sim
             return StdDev(r) * Math.Sqrt(daysPerYear);
         }
 
+        /// <summary>Standard deviation of daily log changes of the fundamental F (not annualized).</summary>
+        public static double FundamentalDailyVolatility(IReadOnlyList<PricePoint> s)
+        {
+            var r = new List<double>();
+            for (int i = 1; i < s.Count; i++)
+            {
+                if (s[i].F > 0 && s[i - 1].F > 0) r.Add(Math.Log((double)(s[i].F / s[i - 1].F)));
+            }
+            return StdDev(r);
+        }
+
         public static double MinRatio(IReadOnlyList<PricePoint> s) => (double)(s.Min(p => p.P) / s[0].P);
 
         public static double MaxRatio(IReadOnlyList<PricePoint> s) => (double)(s.Max(p => p.P) / s[0].P);

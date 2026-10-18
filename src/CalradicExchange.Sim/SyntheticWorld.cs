@@ -48,16 +48,17 @@ namespace CalradicExchange.Sim
         public const int VillagesPerTown = 3;
 
         private const double LocalReversion = 0.08;
-        private const double LocalSigma = 0.04;
+        private const double LocalSigma = 0.08;
         private const double GlobalReversion = 0.03;
-        private const double GlobalSigma = 0.02;
+        private const double GlobalSigma = 0.045;
         private const double RaidSupplyShock = 0.25;
         private const double FamineShock = 0.30;
         private const double RaidsPerDay = 0.8;
         private const int VillageRecoveryDays = 14;
         private const double SiegeRate = 1.0 / 30;
         private const double DiplomacyRate = 1.0 / 60;
-        private const double RandomFamineRate = 1.0 / 50;
+        /// <summary>Daily chance per town to run out of food. Real v1.4.8 game: ~1 in 40 (11 of 53 towns in 10 days).</summary>
+        private const double TownFamineRate = 1.0 / 40;
 
         private readonly XorShift128Plus _rng;
         private readonly CalendarInfo _calendar = CalendarInfo.Default;
@@ -81,13 +82,19 @@ namespace CalradicExchange.Sim
                     Kingdom = t % KingdomCount,
                     Prosperity = 1500 + _rng.NextDouble() * 4500,
                 };
-                foreach (string item in BaseValues.Keys) town.X[item] = Normal(0.15);
+                foreach (string item in BaseValues.Keys)
+                {
+                    town.X[item] = Normal(0.15);
+                    town.Volume[item] = 0.2 + _rng.NextDouble();
+                }
                 foreach (string cat in _categories) town.Cat[cat] = Normal(0.05);
                 _towns.Add(town);
 
                 for (int v = 0; v < VillagesPerTown; v++)
                 {
-                    _villages.Add(new SimVillage { Id = $"village_{t:00}_{v}", Town = town, Product = PickProduct() });
+                    var village = new SimVillage { Id = $"village_{t:00}_{v}", Town = town, Product = PickProduct() };
+                    town.Volume[village.Product] = town.Volume.TryGetValue(village.Product, out double vol) ? vol + 4 : 4;
+                    _villages.Add(village);
                 }
             }
             _wars.Add((0, 1));
@@ -157,6 +164,7 @@ namespace CalradicExchange.Sim
                 {
                     double factor = Math.Max(0.1, Math.Min(10, Math.Exp(town.X[p.Key])));
                     snap.ItemPrices[p.Key] = (decimal)Math.Round(p.Value * factor, 2);
+                    snap.ItemVolumes[p.Key] = town.Volume[p.Key];
                 }
                 foreach (string cat in _categories)
                 {
@@ -265,13 +273,12 @@ namespace CalradicExchange.Sim
                 if (town.FamineDaysLeft > 0)
                 {
                     town.FamineDaysLeft--;
-                    foreach (string food in Foods) town.X[food] += FamineShock / 5;
+                    foreach (string food in Foods) town.X[food] += FamineShock / 10;
                 }
             }
-            if (_rng.NextDouble() < RandomFamineRate)
+            foreach (SimTown town in _towns)
             {
-                SimTown town = _towns[_rng.NextInt(_towns.Count)];
-                if (town.FamineDaysLeft == 0) town.FamineDaysLeft = 3 + _rng.NextInt(5);
+                if (town.FamineDaysLeft == 0 && _rng.NextDouble() < TownFamineRate) town.FamineDaysLeft = 5 + _rng.NextInt(11);
             }
         }
 
@@ -314,6 +321,7 @@ namespace CalradicExchange.Sim
             public int FamineDaysLeft;
             public readonly Dictionary<string, double> X = new Dictionary<string, double>();
             public readonly Dictionary<string, double> Cat = new Dictionary<string, double>();
+            public readonly Dictionary<string, double> Volume = new Dictionary<string, double>();
         }
 
         private sealed class SimVillage

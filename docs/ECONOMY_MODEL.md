@@ -21,11 +21,12 @@ Bir pay = 10 birim mal.
 
 ```
 F_c = 10 × Σ_towns ( w_town × price_town(c) ) / Σ_towns w_town
-w_town = prosperity_town            (alternatif: pazar hacmi, Faz 0'da veri durumuna göre seçilecek)
+w_town = arz_town(c) + stok_town(c)     (pazar hacmi, ADR-017; hiçbir şehirde hacim yoksa refah ağırlığı)
 ```
 
 - `price_town(c)`: Şehir pazarında malın satış fiyatı. Hangi API'nin bunu verdiği Faz 0'da doğrulanacak (API_NOTES).
 - Kuşatma altındaki şehirler hesaba katılmaz.
+- Hacmi sıfır olan şehirler (stoğu ve arzı yok) katılmaz: oyun orada sadece teorik, tavana yakın bir fiyat gösterir (gerçek veri: kadifede şehirlerin %87'si).
 
 ### 2.2 Sektör endeksi
 
@@ -142,8 +143,11 @@ Ayarlardaki oynaklık çarpanı σ'yı çarpar.
 Her olay ilgili araçların S terimine bir dürtü ekler:
 
 ```
-S(t) = S(t−1) × 0,5^(1 / yarı_ömür) + Σ dürtü
+S_ham(t) = Σ_bileşenler [ S_i(t−1) × 0,5^(1 / yarı_ömür_i) ] + Σ yeni dürtüler
+S(t) = S_ham(t) − B(t−1)          B: S_ham'ın 42 gün yarı ömürlü hareketli ortalaması (ADR-019)
 ```
+
+Sık tekrarlanan olayların (her gün yağma, haftada birkaç kıtlık) beklenen etkisi B'ye girer; fiyatı sadece sürpriz kısmı oynatır.
 
 Bir araca birden çok olaydan gelen dürtüler toplanır. |S| en fazla 1,0 (yani hedef en fazla e kat sapar).
 
@@ -166,7 +170,7 @@ Bir araca birden çok olaydan gelen dürtüler toplanır. |S| en fazla 1,0 (yani
 | Barış | Lüks, Tekstil | +0,03 | 21 |
 | | Askeri Tedarik | −0,04 | 21 |
 | Mevsim değişimi | Tarım emtiaları | mevsim tablosuna göre (§2.6) | 21 |
-| Kıtlık başladı | Tarım emtiaları | +0,08 | 14 |
+| Kıtlık başladı | Tarım emtiaları | +0,12 × şehrin refah payı × 2 (ADR-018) | 14 |
 | | Şehrin loncaları | −0,06 | 14 |
 | Kervan yok edildi | Bölge sigorta primi | +0,1 tehlike | 14 |
 | Lord öldü | Lord tahvili | temerrüt kontrolü (§2.5) | — |

@@ -54,6 +54,7 @@ namespace CalradicExchange.Localization
         public static TextObject ConfirmSell => new TextObject("{=cx_confirm_sell}Sell {QTY} x {NAME}\n \nMarket price: {PRICE}\nAfter spread and slippage: {EXEC}\nShares: {GROSS} denars\nBroker's fee: {FEE} denars\nTax on profit: {TAX} denars\n \nYou receive: {TOTAL} denars");
         public static TextObject Bought => new TextObject("{=cx_msg_bought}Bought {QTY} {NAME} for {TOTAL} denars.");
         public static TextObject Sold => new TextObject("{=cx_msg_sold}Sold {QTY} {NAME} for {TOTAL} denars ({PNL}).");
+        public static TextObject Rebased => new TextObject("{=cx_msg_rebased}The exchange has rewritten its ledgers. Your shares were bought back at market price: {GOLD} denars.");
         public static TextObject BigMove => new TextObject("{=cx_msg_big_move}Exchange: {NAME} {CHANGE} ({PRICE}).");
 
         // Portfolio

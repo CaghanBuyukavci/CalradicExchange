@@ -18,8 +18,14 @@ namespace CalradicExchange.Core.Pricing
         public decimal Fundamental { get; set; }
         public decimal InitialPrice { get; set; }
 
-        /// <summary>Total sentiment S after the last tick (clamped).</summary>
+        /// <summary>Effective sentiment S after the last tick: raw shocks minus their baseline, clamped.</summary>
         public double Shock { get; set; }
+
+        /// <summary>
+        /// Slow moving average of the raw shock sum: the part of S the market already expects because such
+        /// events keep happening (frequent raids, famines). Subtracted from S (ADR-019). Added in schema 3.
+        /// </summary>
+        public double ShockBaseline { get; set; }
 
         /// <summary>Log return of the last tick.</summary>
         public double LastReturn { get; set; }

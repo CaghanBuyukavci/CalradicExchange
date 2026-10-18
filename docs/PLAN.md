@@ -81,7 +81,8 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 ### 1C. Oyun katmanı
 - [x] 1.15 `WorldReader`: şehir fiyatları, refah, kuşatma durumu → `WorldSnapshot`
   - Fiyat = item değeri × kategori çarpanı; verisi olmayan şehirler atlanır. İlk oyun testi (2026-10-18): işlenmiş mallar taban değerin 5–7 katı, temel değer günde %10–17 oynuyor (simülatörde %1–2). Stoksuz şehirlerin tavan çarpanı şüpheli.
-  - [ ] 1.15a Ortalama yöntemini gerçek veriyle kalibre et (`Logs/market_raw.csv`, ilk 40 borsa günü otomatik dökülüyor), sentetik dünyayı da buna göre ayarla. Sonra otomatik dökümü kaldır.
+  - [x] 1.15a Ortalama yöntemini gerçek veriyle kalibre et (`Logs/market_raw.csv`), sentetik dünyayı da buna göre ayarla.
+  - ADR-017 (hacim ağırlığı), ADR-018 (kıtlık), ADR-019 (beklenen şok tabanı). Otomatik döküm 40. borsa gününe kadar sürüyor; uzun veriyle oynaklık tekrar kontrol edilince kaldırılacak.
 - [x] 1.16 `EventBridge`: köy yağması, kuşatma başlangıcı/bitişi, şehir el değiştirme, savaş, barış, mevsim → `MarketEvent`
   - Kale kuşatmaları ve küçük fraksiyon savaşları sayılmaz. Mevsim ve kıtlık Core'da.
 - [x] 1.17 Günlük tick: snapshot al → Core'u güncelle → büyük hareketleri mesajla bildir

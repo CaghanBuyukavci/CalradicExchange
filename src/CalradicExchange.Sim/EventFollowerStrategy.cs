@@ -9,6 +9,7 @@ namespace CalradicExchange.Sim
     /// Reads the news and buys what the event table says should rise, on the day of the event,
     /// then sells after a fixed holding period. Models a player who follows the world closely.
     /// With <c>includeRaids</c> it also chases every single village raid (the "raid chaser").
+    /// Single-town famines are not traded: they are frequent and their shock is scaled by the town share (ADR-018).
     /// </summary>
     public sealed class EventFollowerStrategy : IStrategy
     {
@@ -82,8 +83,6 @@ namespace CalradicExchange.Sim
                     return new[] { "cx_sector_military" };
                 case MarketEventType.PeaceMade:
                     return new[] { "cx_sector_luxury", "cx_sector_textile" };
-                case MarketEventType.FamineStarted:
-                    return ctx.Market.Catalog.Instruments.Where(i => i.HasTag("agriculture")).Select(i => i.Id);
                 case MarketEventType.SeasonChanged when ev.Season == Season.Winter || ev.Season == Season.Spring:
                     return ctx.Market.Catalog.Instruments.Where(i => i.HasTag("agriculture")).Select(i => i.Id);
                 default:

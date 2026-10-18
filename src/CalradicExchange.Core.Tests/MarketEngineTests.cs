@@ -170,9 +170,39 @@ namespace CalradicExchange.Core.Tests
             Assert.Equal(1, Famines(2, 0));
             Assert.Equal(0, Famines(3, 0));
             Assert.Equal(0, Famines(4, 10));
-            Assert.Equal(1, Famines(5, -1));
-            // First famine decayed for 3 ticks, plus the new one.
-            Assert.Equal(0.12 * System.Math.Pow(0.5, 3.0 / 14) + 0.12, e.Get("cx_grain").Shock, 9);
+            Assert.Equal(0, Famines(5, -1)); // same town again within the 21-day cooldown
+        }
+
+        [Fact]
+        public void Famine_CanStartAgainAfterCooldown()
+        {
+            MarketEngine e = NewEngine();
+            e.Tick(TestData.World(1));
+            int Famines(int day, double food)
+            {
+                WorldSnapshot w = TestData.World(day);
+                w.Towns[0].FoodStocks = food;
+                return e.Tick(w).GeneratedEvents.Count(x => x.Type == MarketEventType.FamineStarted);
+            }
+
+            Assert.Equal(1, Famines(2, 0));
+            Assert.Equal(0, Famines(10, 10));
+            Assert.Equal(1, Famines(23, 0));
+        }
+
+        [Fact]
+        public void FamineShock_IsScaledByTownShare()
+        {
+            MarketEngine e = NewEngine();
+            e.Tick(TestData.World(1));
+            WorldSnapshot w = TestData.World(2);
+            w.Towns[0].FoodStocks = 0;
+            w.Towns[0].Prosperity = 2000; // share 2000 / 4000 = 0.5
+
+            MarketEvent ev = e.Tick(w).GeneratedEvents.Single();
+
+            Assert.Equal(0.5, ev.TownShare.Value, 9);
+            Assert.Equal(0.12 * 0.5 * 2.0, e.Get("cx_grain").Shock, 9);
         }
 
         [Fact]

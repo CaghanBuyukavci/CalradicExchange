@@ -15,6 +15,9 @@ namespace CalradicExchange.Core.Pricing
     {
         private const double NegligibleShock = 1e-5;
 
+        /// <summary>Version of the fundamental calculation. Changing it rebuilds existing markets on load (ADR-017).</summary>
+        public const string FundamentalMethodId = "volume_v1";
+
         private readonly InstrumentCatalog _catalog;
         private readonly MarketSettings _settings;
         private readonly IRandom _rng;
@@ -32,6 +35,12 @@ namespace CalradicExchange.Core.Pricing
         public MarketState State { get; }
         public InstrumentCatalog Catalog => _catalog;
         public MarketSettings Settings => _settings;
+
+        /// <summary>
+        /// True when the saved prices were set with an older fundamental method. The next tick rebuilds the market;
+        /// the caller should first settle open positions at current prices.
+        /// </summary>
+        public bool NeedsRebase => State.Initialized && State.FundamentalMethod != FundamentalMethodId;
 
         public PriceState Get(string instrumentId)
         {
@@ -57,6 +66,7 @@ namespace CalradicExchange.Core.Pricing
                 {
                     if (ev.Season == null || !_settings.SeasonImpulses.TryGetValue(ev.Season.Value, out impulse)) continue;
                 }
+                if (rule.ScaleByTownShare) impulse *= (ev.TownShare ?? 0) * rule.TownShareMultiplier;
 
                 foreach (InstrumentDefinition def in ShockMapper.Resolve(rule.Target, ev, _catalog))
                 {
@@ -93,6 +103,7 @@ namespace CalradicExchange.Core.Pricing
             if (world.Day <= State.LastTickDay) return summary;
             summary.Processed = true;
 
+            if (NeedsRebase) Rebuild();
             SyncPriceStates();
             UpdateBaselines(world);
 
@@ -105,6 +116,7 @@ namespace CalradicExchange.Core.Pricing
                     if (f != null && f > 0) StartPrice(ps, f.Value, world.Day);
                 }
                 State.Initialized = true;
+                State.FundamentalMethod = FundamentalMethodId;
                 State.LastSeason = world.Season;
                 State.LastTickDay = world.Day;
                 summary.Initialized = true;
@@ -132,7 +144,7 @@ namespace CalradicExchange.Core.Pricing
                 }
                 if (f != null && f > 0) ps.Fundamental = f.Value;
 
-                ps.Shock = ClampShock(DecayAndSumShocks(ps));
+                ps.Shock = ClampShock(EffectiveShock(ps, DecayAndSumShocks(ps)));
                 double volMult = ActiveVolMultiplier(ps, world.Day);
                 ClassParameters cp = _settings.For(def.Class);
                 double sigma = cp.Sigma * _settings.VolatilityMultiplier * volMult;
@@ -228,6 +240,9 @@ namespace CalradicExchange.Core.Pricing
             }
             State.LastSeason = world.Season;
 
+            double totalProsperity = 0;
+            foreach (TownSnapshot town in world.Towns) totalProsperity += Math.Max(0, town.Prosperity);
+
             foreach (TownSnapshot town in world.Towns)
             {
                 bool starving = town.FoodStocks <= 0;
@@ -235,7 +250,18 @@ namespace CalradicExchange.Core.Pricing
                 if (starving && !known)
                 {
                     State.FamineTowns.Add(town.Id);
-                    var ev = new MarketEvent { Type = MarketEventType.FamineStarted, Day = world.Day, TownId = town.Id, KingdomId = town.KingdomId };
+                    bool coolingDown = State.FamineStartDays.TryGetValue(town.Id, out int last) && world.Day - last < _settings.FamineCooldownDays;
+                    if (coolingDown) continue;
+
+                    State.FamineStartDays[town.Id] = world.Day;
+                    var ev = new MarketEvent
+                    {
+                        Type = MarketEventType.FamineStarted,
+                        Day = world.Day,
+                        TownId = town.Id,
+                        KingdomId = town.KingdomId,
+                        TownShare = totalProsperity > 0 ? Math.Max(0, town.Prosperity) / totalProsperity : 0,
+                    };
                     ApplyEvent(ev);
                     summary.GeneratedEvents.Add(ev);
                 }
@@ -259,6 +285,16 @@ namespace CalradicExchange.Core.Pricing
                 else sum += c.Value;
             }
             return sum;
+        }
+
+        /// <summary>Raw shock sum minus its slow baseline (ADR-019). The baseline moves after it is applied.</summary>
+        private double EffectiveShock(PriceState ps, double raw)
+        {
+            double halfLife = _settings.ShockBaselineHalfLifeDays;
+            if (halfLife <= 0) return raw;
+            double effective = raw - ps.ShockBaseline;
+            ps.ShockBaseline += (raw - ps.ShockBaseline) * (1 - PriceMath.DecayFactor(halfLife));
+            return effective;
         }
 
         private double ActiveVolMultiplier(PriceState ps, int day)
@@ -314,6 +350,15 @@ namespace CalradicExchange.Core.Pricing
             State.News.Add(new NewsItem { Day = ev.Day, Event = ev, AffectedInstruments = new List<string>(affected) });
             int excess = State.News.Count - _settings.NewsKeep;
             if (excess > 0) State.News.RemoveRange(0, excess);
+        }
+
+        /// <summary>Drops prices and baselines so the next tick starts the market again from the current world. News is kept.</summary>
+        private void Rebuild()
+        {
+            State.Prices.Clear();
+            State.BaseItemPrices.Clear();
+            State.BaseCategoryFactors.Clear();
+            State.Initialized = false;
         }
 
         /// <summary>Adds price states for new catalog entries; keeps states of removed ones (harmless, preserves saves).</summary>

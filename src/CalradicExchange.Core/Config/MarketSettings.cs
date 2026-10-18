@@ -15,6 +15,12 @@ namespace CalradicExchange.Core.Config
         [JsonProperty("historyDays")] public int HistoryDays { get; set; }
         [JsonProperty("newsKeep")] public int NewsKeep { get; set; }
 
+        /// <summary>Half-life of the expected-shock baseline subtracted from S (ADR-019). 0 disables it.</summary>
+        [JsonProperty("shockBaselineHalfLifeDays")] public double ShockBaselineHalfLifeDays { get; set; }
+
+        /// <summary>A town that ran out of food cannot start another famine for this many days.</summary>
+        [JsonProperty("famineCooldownDays")] public int FamineCooldownDays { get; set; }
+
         [JsonProperty("classes")] public Dictionary<InstrumentClass, ClassParameters> Classes { get; set; } = new Dictionary<InstrumentClass, ClassParameters>();
         [JsonProperty("trading")] public TradingSettings Trading { get; set; }
         [JsonProperty("limits")] public LimitSettings Limits { get; set; }

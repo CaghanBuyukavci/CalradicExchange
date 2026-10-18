@@ -1,11 +1,13 @@
 {
   "schemaVersion": 1,
-  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013, ADR-014, ADR-015).",
+  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013 to ADR-019).",
   "volatilityMultiplier": 1.0,
   "maxDailyLogReturn": 0.25,
   "maxAbsShock": 1.0,
   "historyDays": 112,
   "newsKeep": 30,
+  "famineCooldownDays": 21,
+  "shockBaselineHalfLifeDays": 42,
   "classes": {
     "Commodity": {
       "kappa": 0.2,
@@ -169,7 +171,9 @@
       {
         "target": "tag:agriculture",
         "impulse": 0.12,
-        "halfLifeDays": 14
+        "halfLifeDays": 14,
+        "scaleByTownShare": true,
+        "townShareMultiplier": 2.0
       },
       {
         "target": "guilds:eventTown",
