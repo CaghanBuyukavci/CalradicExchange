@@ -30,6 +30,7 @@ Confirmed with the user on 2026-10-18:
 - DLCs enabled: none (no War Sails / NavalDLC module installed — the mod must not hard-depend on any DLC)
 - Repo path: `C:\Users\cagha\Desktop\CalradicExchange\CalradicExchange`
 - Toolchain: .NET SDK 10.0.10x, git 2.55. Game ships `Newtonsoft.Json.dll` in `bin\Win64_Shipping_Client`.
+- Developer console: **`Alt + "`** (Turkish Q keyboard; the key left of `1`). Game language is Turkish and the `{=cx_...}` TR strings load correctly.
 - Installed (disabled) workshop mods include Harmony, ButterLib, UIExtenderEx, MCM (`Bannerlord.MBOptionScreen`) — useful for Phase 2 MCM testing.
 
 Logs and crash data:
