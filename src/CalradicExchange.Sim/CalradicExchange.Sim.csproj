@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\ModuleData\instruments.json" Link="ModuleData\instruments.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\ModuleData\settings.json" Link="ModuleData\settings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CalradicExchange.Core\CalradicExchange.Core.csproj" />
   </ItemGroup>
 

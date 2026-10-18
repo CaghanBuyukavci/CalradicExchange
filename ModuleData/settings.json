@@ -1,78 +1,181 @@
 {
   "schemaVersion": 1,
-  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md. Tuned with the simulator (PLAN 1.14).",
-
+  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013, ADR-014).",
   "volatilityMultiplier": 1.0,
   "maxDailyLogReturn": 0.25,
   "maxAbsShock": 1.0,
   "historyDays": 112,
   "newsKeep": 30,
-
   "classes": {
-    "Commodity": { "kappa": 0.12, "sigma": 0.020, "spread": 0.02,  "depth": 40000, "lambda": 0.5 },
-    "Sector":    { "kappa": 0.10, "sigma": 0.012, "spread": 0.01,  "depth": 80000, "lambda": 0.3 },
-    "Guild":     { "kappa": 0.08, "sigma": 0.025, "spread": 0.03,  "depth": 20000, "lambda": 0.7 },
-    "Kingdom":   { "kappa": 0.08, "sigma": 0.015, "spread": 0.015, "depth": 60000, "lambda": 0.4 },
-    "Bond":      { "kappa": 0.20, "sigma": 0.004, "spread": 0.01,  "depth": 30000, "lambda": 0.3 }
+    "Commodity": {
+      "kappa": 0.2,
+      "sigma": 0.03,
+      "spread": 0.01,
+      "depth": 40000,
+      "lambda": 0.1
+    },
+    "Sector": {
+      "kappa": 0.15,
+      "sigma": 0.018,
+      "spread": 0.006,
+      "depth": 80000,
+      "lambda": 0.06
+    },
+    "Guild": {
+      "kappa": 0.08,
+      "sigma": 0.025,
+      "spread": 0.015,
+      "depth": 20000,
+      "lambda": 0.14
+    },
+    "Kingdom": {
+      "kappa": 0.08,
+      "sigma": 0.015,
+      "spread": 0.008,
+      "depth": 60000,
+      "lambda": 0.08
+    },
+    "Bond": {
+      "kappa": 0.2,
+      "sigma": 0.004,
+      "spread": 0.005,
+      "depth": 30000,
+      "lambda": 0.06
+    }
   },
-
   "trading": {
-    "commissionRate": 0.01,
-    "minCommission": 10,
+    "_comment": "Commission rate falls linearly with Trade skill from commissionRateMax (skill 0) to commissionRateMin (tradeSkillCap). profitTaxRate is taken from realized profit on sells (ADR-014).",
+    "commissionRateMax": 0.05,
+    "commissionRateMin": 0.01,
+    "minCommission": 5,
     "tradeSkillCap": 300,
-    "tradeSkillMaxDiscount": 0.5,
+    "profitTaxRate": 0.1,
     "permanentImpactFactor": 0.5
   },
-
   "limits": {
-    "baseTotal": 20000,
-    "perClanTier": 20000,
+    "baseTotal": 5000,
+    "perClanTier": 15000,
     "perTradeSkill": 50,
     "perInstrumentDepthMultiple": 1.5
   },
-
   "_targetsHelp": "instrument:<id> | tag:<tag> | eventItem | guilds:eventTown | townBond:eventTown | kingdomIndex:eventKingdom | kingdomIndex:otherKingdom | kingdomIndex:both",
-
   "seasonImpulses": {
-    "Spring": 0.049,
-    "Summer": -0.051,
-    "Autumn": -0.105,
-    "Winter": 0.140
+    "Spring": 0.0735,
+    "Summer": -0.0765,
+    "Autumn": -0.1575,
+    "Winter": 0.21
   },
-
   "eventShocks": {
     "VillageLooted": [
-      { "target": "eventItem",                  "impulse": 0.06,  "halfLifeDays": 10 },
-      { "target": "kingdomIndex:eventKingdom",  "impulse": -0.02, "halfLifeDays": 10 },
-      { "target": "townBond:eventTown",         "impulse": -0.01, "halfLifeDays": 7 }
+      {
+        "target": "eventItem",
+        "impulse": 0.06,
+        "halfLifeDays": 10
+      },
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "impulse": -0.03,
+        "halfLifeDays": 10
+      },
+      {
+        "target": "townBond:eventTown",
+        "impulse": -0.015,
+        "halfLifeDays": 7
+      }
     ],
     "SiegeStarted": [
-      { "target": "guilds:eventTown",           "impulse": -0.15, "halfLifeDays": 7, "holdUntilEnd": true },
-      { "target": "townBond:eventTown",         "impulse": -0.10, "halfLifeDays": 7, "holdUntilEnd": true },
-      { "target": "instrument:cx_sector_military", "impulse": 0.03, "halfLifeDays": 14 }
+      {
+        "target": "guilds:eventTown",
+        "impulse": -0.225,
+        "halfLifeDays": 7,
+        "holdUntilEnd": true
+      },
+      {
+        "target": "townBond:eventTown",
+        "impulse": -0.15,
+        "halfLifeDays": 7,
+        "holdUntilEnd": true
+      },
+      {
+        "target": "instrument:cx_sector_military",
+        "impulse": 0.045,
+        "halfLifeDays": 14
+      }
     ],
     "SiegeEnded": [],
     "SettlementCaptured": [
-      { "target": "kingdomIndex:eventKingdom",  "impulse": -0.08, "halfLifeDays": 21 },
-      { "target": "kingdomIndex:otherKingdom",  "impulse": 0.05,  "halfLifeDays": 21 },
-      { "target": "guilds:eventTown",           "impulse": -0.05, "halfLifeDays": 14, "volMultiplier": 2.0, "volDays": 14 }
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "impulse": -0.12,
+        "halfLifeDays": 21
+      },
+      {
+        "target": "kingdomIndex:otherKingdom",
+        "impulse": 0.075,
+        "halfLifeDays": 21
+      },
+      {
+        "target": "guilds:eventTown",
+        "impulse": -0.075,
+        "halfLifeDays": 14,
+        "volMultiplier": 2.0,
+        "volDays": 14
+      }
     ],
     "WarDeclared": [
-      { "target": "instrument:cx_sector_military", "impulse": 0.05,  "halfLifeDays": 21 },
-      { "target": "instrument:cx_sector_luxury",   "impulse": -0.03, "halfLifeDays": 21 },
-      { "target": "kingdomIndex:both",             "impulse": -0.02, "halfLifeDays": 14, "volMultiplier": 1.5, "volDays": 14 }
+      {
+        "target": "instrument:cx_sector_military",
+        "impulse": 0.075,
+        "halfLifeDays": 21
+      },
+      {
+        "target": "instrument:cx_sector_luxury",
+        "impulse": -0.045,
+        "halfLifeDays": 21
+      },
+      {
+        "target": "kingdomIndex:both",
+        "impulse": -0.03,
+        "halfLifeDays": 14,
+        "volMultiplier": 1.5,
+        "volDays": 14
+      }
     ],
     "PeaceMade": [
-      { "target": "instrument:cx_sector_luxury",   "impulse": 0.03,  "halfLifeDays": 21 },
-      { "target": "instrument:cx_sector_textile",  "impulse": 0.03,  "halfLifeDays": 21 },
-      { "target": "instrument:cx_sector_military", "impulse": -0.04, "halfLifeDays": 21 }
+      {
+        "target": "instrument:cx_sector_luxury",
+        "impulse": 0.045,
+        "halfLifeDays": 21
+      },
+      {
+        "target": "instrument:cx_sector_textile",
+        "impulse": 0.045,
+        "halfLifeDays": 21
+      },
+      {
+        "target": "instrument:cx_sector_military",
+        "impulse": -0.06,
+        "halfLifeDays": 21
+      }
     ],
     "SeasonChanged": [
-      { "target": "tag:agriculture", "seasonal": true, "halfLifeDays": 21 }
+      {
+        "target": "tag:agriculture",
+        "seasonal": true,
+        "halfLifeDays": 21
+      }
     ],
     "FamineStarted": [
-      { "target": "tag:agriculture",  "impulse": 0.08,  "halfLifeDays": 14 },
-      { "target": "guilds:eventTown", "impulse": -0.06, "halfLifeDays": 14 }
+      {
+        "target": "tag:agriculture",
+        "impulse": 0.12,
+        "halfLifeDays": 14
+      },
+      {
+        "target": "guilds:eventTown",
+        "impulse": -0.09,
+        "halfLifeDays": 14
+      }
     ],
     "KingdomDestroyed": []
   }

@@ -49,22 +49,34 @@ Amaç: Tasarımın dayandığı her şeyin oyunda gerçekten var olduğunu doğr
 Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 
 ### 1A. Core (oyundan bağımsız)
-- [ ] 1.1 Veri modeli: `Instrument`, `InstrumentClass`, `PriceState (P, F, S, history)`, `Position`, `Portfolio`, `MarketEvent`, `WorldSnapshot`
-- [ ] 1.2 `instruments.json` ve `settings.json` okuyucu, doğrulama ve anlamlı hata mesajları
-- [ ] 1.3 RNG (xorshift128+), durumu serileştirilebilir
-- [ ] 1.4 Temel değer hesaplayıcıları: emtia (§2.1), sektör (§2.2)
-- [ ] 1.5 Günlük fiyat güncellemesi (§3) ve S terimi sönümü (§4)
-- [ ] 1.6 Olay → şok eşlemesi (§4.1), tablo `settings.json`'dan
-- [ ] 1.7 Emir motoru: fark, komisyon, kayma, kalıcı fiyat etkisi (§5), limitler (§6)
-- [ ] 1.8 Portföy: ortalama maliyet, gerçekleşmiş/gerçekleşmemiş kâr-zarar
-- [ ] 1.9 Kalıcılık: tüm durumun JSON'a ve geri dönüşümü, `schemaVersion`, round-trip testleri
-- [ ] 1.10 Birim testleri: her formül için en az bir test, emir motoru için kenar durumları (yetersiz para, limit aşımı, sıfır adet)
+- [x] 1.1 Veri modeli: `Instrument`, `InstrumentClass`, `PriceState (P, F, S, history)`, `Position`, `Portfolio`, `MarketEvent`, `WorldSnapshot`
+  - Model/ (Core). `MarketState`, `PriceState` (P, F, S, geçmiş), `Position`, `Portfolio`. S, her olay için ayrı yarı ömürle sönen bileşenlerin toplamı.
+- [x] 1.2 `instruments.json` ve `settings.json` okuyucu, doğrulama ve anlamlı hata mesajları
+  - Tüm hatalar tek seferde listelenir. instruments.json'a `tags` eklendi (olay hedefleri için).
+- [x] 1.3 RNG (xorshift128+), durumu serileştirilebilir
+- [x] 1.4 Temel değer hesaplayıcıları: emtia (§2.1), sektör (§2.2)
+  - Emtia fiyatı ADR-009'a göre. Kategori sepeti (askeri tedarik) savaş çarpanıyla.
+- [x] 1.5 Günlük fiyat güncellemesi (§3) ve S terimi sönümü (§4)
+- [x] 1.6 Olay → şok eşlemesi (§4.1), tablo `settings.json`'dan
+  - Mevsim değişimi ve kıtlık Core içinde snapshot'tan tespit edilir.
+- [x] 1.7 Emir motoru: fark, komisyon, kayma, kalıcı fiyat etkisi (§5), limitler (§6)
+  - Faz 1A'ya çekildi (simülatör botları maliyet istiyordu). Komisyon Trade'e göre %5→%1, %10 kâr vergisi (ADR-014).
+- [x] 1.8 Portföy: ortalama maliyet, gerçekleşmiş/gerçekleşmemiş kâr-zarar
+  - Faz 1A'ya çekildi.
+- [x] 1.9 Kalıcılık: tüm durumun JSON'a ve geri dönüşümü, `schemaVersion`, round-trip testleri
+  - Şema 2. Faz 0 kayıtları için migration ve testi var.
+- [x] 1.10 Birim testleri: her formül için en az bir test, emir motoru için kenar durumları (yetersiz para, limit aşımı, sıfır adet)
+  - 80 test.
 
 ### 1B. Simülatör
-- [ ] 1.11 Sentetik olay üreteci ve sentetik dünya (ECONOMY_MODEL §8)
-- [ ] 1.12 Strateji botları: al-tut, rastgele, olayı gören
-- [ ] 1.13 CSV çıktısı ve özet tablo; §8 hedeflerinin otomatik kontrolü (geçti/kaldı)
-- [ ] 1.14 Parametreleri hedefler tutana kadar ayarla; sonuçları kullanıcıya sayılarla raporla
+- [x] 1.11 Sentetik olay üreteci ve sentetik dünya (ECONOMY_MODEL §8)
+  - 24 şehir, 6 krallık, 72 köy. Gerçek oyunla kalibrasyonu Faz 1C'de `export_csv` verisiyle kontrol edilmeli.
+- [x] 1.12 Strateji botları: al-tut, rastgele, olayı gören
+  - Ek olarak: yağma kovalayan bot (bilgi amaçlı) ve erken/orta/geç oyuncu profilleri.
+- [x] 1.13 CSV çıktısı ve özet tablo; §8 hedeflerinin otomatik kontrolü (geçti/kaldı)
+  - Erken oyun gelir sınırı hedefi eklendi (ADR-014).
+- [x] 1.14 Parametreleri hedefler tutana kadar ayarla; sonuçları kullanıcıya sayılarla raporla
+  - ADR-013, ADR-014. 20 seed'de 8/8 hedef geçti.
 
 ### 1C. Oyun katmanı
 - [ ] 1.15 `WorldReader`: şehir fiyatları, refah, kuşatma durumu → `WorldSnapshot`

@@ -1,6 +1,6 @@
 # Calradic Exchange — Ekonomi Modeli
 
-Sürüm: 0.1 · Bu dokümandaki tüm sayılar başlangıç değerleridir. Simülatör ve oyun testleriyle ayarlanacaktır. Varsayılan parametrelerin tek kaynağı `ModuleData/settings.json` olacaktır; bu doküman onların açıklamasıdır.
+Sürüm: 0.2 (simülatörle ayarlandı, ADR-013/014) · Bu dokümandaki tüm sayılar başlangıç değerleridir. Simülatör ve oyun testleriyle ayarlanacaktır. Varsayılan parametrelerin tek kaynağı `ModuleData/settings.json` olacaktır; bu doküman onların açıklamasıdır.
 
 ---
 
@@ -129,8 +129,8 @@ r(t) ∈ [−0,25, +0,25] aralığına kırpılır
 
 | Sınıf | κ | σ (günlük) |
 |---|---|---|
-| Emtia | 0,12 | 0,020 |
-| Sektör endeksi | 0,10 | 0,012 |
+| Emtia | 0,20 | 0,030 |
+| Sektör endeksi | 0,15 | 0,018 |
 | Lonca hissesi | 0,08 | 0,025 |
 | Krallık endeksi | 0,08 | 0,015 |
 | Tahvil | 0,20 | 0,004 |
@@ -174,6 +174,8 @@ Bir araca birden çok olaydan gelen dürtüler toplanır. |S| en fazla 1,0 (yani
 
 Olay ID'leri ve değerleri `ModuleData/settings.json` içinde `eventShocks` altında tutulur.
 
+**Ayar notu (ADR-013):** Köy yağmasının emtia dürtüsü (+0,06) hariç tablodaki tüm dürtüler ve mevsim dürtüleri simülatör ayarında ×1,5 yapıldı (örneğin savaş → askeri tedarik +0,075, kış → tarım +0,21). Güncel değerler `settings.json`'dadır.
+
 ### 4.2 Haber gecikmesi (Faz 4)
 
 ```
@@ -193,24 +195,26 @@ haber_hızı = 40 harita birimi / gün       (harita ölçeğine göre Faz 4'te 
 işlem_fiyatı_alış = P × (1 + fark/2) × (1 + etki)
 işlem_fiyatı_satış = P × (1 − fark/2) × (1 − etki)
 etki = λ × (emir_değeri / derinlik)
-komisyon = max(10, oran × emir_değeri) × (1 − 0,5 × trade_yeteneği / 300)
+komisyon = max(5, oran(trade) × emir_değeri)
+oran(trade) = %5 − (%5 − %1) × min(trade, 300) / 300        (Trade 0: %5, Trade 150: %3, Trade 300+: %1)
+kâr_vergisi = %10 × max(0, satış_geliri − komisyon − satılan_payların_maliyeti)   (sadece satışta, zararda yok)
 ```
 
 | Sınıf | Fark | Derinlik (dinar) | λ |
 |---|---|---|---|
-| Emtia | %2 | 40.000 | 0,5 |
-| Sektör endeksi | %1 | 80.000 | 0,3 |
-| Lonca hissesi | %3 | 20.000 | 0,7 |
-| Krallık endeksi | %1,5 | 60.000 | 0,4 |
-| Tahvil | %1 | 30.000 | 0,3 |
+| Emtia | %1 | 40.000 | 0,10 |
+| Sektör endeksi | %0,6 | 80.000 | 0,06 |
+| Lonca hissesi | %1,5 | 20.000 | 0,14 |
+| Krallık endeksi | %0,8 | 60.000 | 0,08 |
+| Tahvil | %0,5 | 30.000 | 0,06 |
 
-- Komisyon oranı: %1.
+- Komisyon ve kâr vergisi: yukarıdaki formül (ADR-014). Lonca, krallık ve tahvil değerleri Faz 2/3'te yeniden ayarlanacak.
 - **Kalıcı fiyat etkisi:** Oyuncunun net alım satımı piyasa fiyatını da kaydırır: `P ← P × (1 ± 0,5 × etki)`. Bu etki κ ile doğal olarak temel değere geri döner. Böylece "al, fiyatı yükselt, sat" döngüsü zarar ettirir.
 
 ## 6. Limitler ve teminat
 
 ```
-toplam_limit = 20.000 + 20.000 × klan_seviyesi + 50 × trade_yeteneği
+toplam_limit = 5.000 + 15.000 × klan_seviyesi + 50 × trade_yeteneği      (ADR-014)
 araç_başı_limit = derinlik × 1,5
 ```
 
@@ -243,7 +247,8 @@ Kabul hedefleri:
 | Temel değerle korelasyon (30 günlük ortalamalar) | > 0,7 |
 | "Al ve tut" stratejisi 4 yıllık getirisi (maliyetler sonrası) | −%10 ile +%15 arası |
 | Rastgele işlem stratejisi | ortalama negatif (maliyetler yüzünden) |
-| "Olayı gören" strateji (olay sonrası ilk gün işlem) | pozitif ama yıllık %40'ı geçmemeli |
+| "Olayı gören" strateji (olay sonrası ilk gün işlem), geç oyun profili (klan 5, Trade 250) | pozitif ama yıllık %40'ı geçmemeli |
+| Erken oyun (klan 1, Trade 30): en iyi botun ilk yıl kârı | ortalama günde ≤ 50 dinar (ADR-014) |
 
 Simülatör çıktısı: `sim/out.csv` (gün, araç, P, F, S) ve konsolda özet tablo.
 

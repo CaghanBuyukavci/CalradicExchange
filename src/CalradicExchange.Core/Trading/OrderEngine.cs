@@ -33,12 +33,26 @@ namespace CalradicExchange.Core.Trading
             return (int)(Settings.For(cls).Depth * Settings.Limits.PerInstrumentDepthMultiple);
         }
 
-        public int Commission(int gross, int tradeSkill)
+        /// <summary>Commission rate for a Trade skill: linear from the max rate (skill 0) to the min rate (skill cap).</summary>
+        public double CommissionRate(int tradeSkill)
         {
             TradingSettings t = Settings.Trading;
-            double baseFee = Math.Max(t.MinCommission, t.CommissionRate * gross);
             double skill = Math.Min(Math.Max(0, tradeSkill), t.TradeSkillCap) / (double)t.TradeSkillCap;
-            return (int)Math.Ceiling(baseFee * (1.0 - t.TradeSkillMaxDiscount * skill));
+            return t.CommissionRateMax - (t.CommissionRateMax - t.CommissionRateMin) * skill;
+        }
+
+        public int Commission(int gross, int tradeSkill)
+        {
+            double fee = Math.Max(Settings.Trading.MinCommission, CommissionRate(tradeSkill) * gross);
+            return (int)Math.Ceiling(fee - 1e-9);
+        }
+
+        /// <summary>Tax on the profit of a sell: rate x max(0, proceeds after commission - cost basis).</summary>
+        public int ProfitTax(int proceedsAfterCommission, decimal removedBasis)
+        {
+            decimal profit = proceedsAfterCommission - removedBasis;
+            if (profit <= 0) return 0;
+            return (int)Math.Ceiling((double)profit * Settings.Trading.ProfitTaxRate - 1e-9);
         }
 
         public TradeQuote Quote(string instrumentId, OrderSide side, int quantity, TraderProfile trader, Portfolio portfolio)
@@ -76,7 +90,16 @@ namespace CalradicExchange.Core.Trading
             q.Impact = impact;
             q.Gross = gross;
             q.Commission = Commission(gross, trader.TradeSkill);
-            q.Total = side == OrderSide.Buy ? gross + q.Commission : Math.Max(0, gross - q.Commission);
+            if (side == OrderSide.Buy)
+            {
+                q.Total = gross + q.Commission;
+            }
+            else
+            {
+                int afterCommission = Math.Max(0, gross - q.Commission);
+                q.ProfitTax = ProfitTax(afterCommission, portfolio.BasisFor(instrumentId, quantity));
+                q.Total = afterCommission - q.ProfitTax;
+            }
 
             if (side == OrderSide.Buy)
             {
@@ -108,7 +131,7 @@ namespace CalradicExchange.Core.Trading
             }
             else
             {
-                result.RealizedPnl = portfolio.ApplySell(instrumentId, quantity, q.Total, q.Commission);
+                result.RealizedPnl = portfolio.ApplySell(instrumentId, quantity, q.Total, q.Commission, q.ProfitTax);
                 result.GoldDelta = q.Total;
             }
             _market.ApplyTradeImpact(instrumentId, side == OrderSide.Buy, q.Impact);

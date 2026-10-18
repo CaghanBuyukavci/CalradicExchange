@@ -1,3 +1,4 @@
+using System;
 using CalradicExchange.Core.Pricing;
 using CalradicExchange.Core.Random;
 using CalradicExchange.Core.Trading;
@@ -24,23 +25,33 @@ namespace CalradicExchange.Core.Tests
         {
             TradeQuote q = _orders.Quote("cx_grain", OrderSide.Buy, 10, _rich, _portfolio);
 
-            // impact = 0.5 x 1000 / 40000 = 0.0125; exec = 100 x 1.01 x 1.0125 = 102.2625
+            // impact = 0.1 x 1000 / 40000 = 0.0025; exec = 100 x 1.005 x 1.0025 = 100.75125
             Assert.True(q.IsValid);
-            Assert.Equal(0.0125, q.Impact, 9);
-            Assert.Equal(102.2625m, q.ExecutionPrice);
-            Assert.Equal(1023, q.Gross);
-            Assert.Equal(11, q.Commission); // ceil(max(10, 10.23))
-            Assert.Equal(1034, q.Total);
+            Assert.Equal(0.0025, q.Impact, 9);
+            Assert.Equal(100.7513m, q.ExecutionPrice);
+            Assert.Equal(1008, q.Gross);
+            Assert.Equal(51, q.Commission); // ceil(5% x 1008)
+            Assert.Equal(0, q.ProfitTax);
+            Assert.Equal(1059, q.Total);
+        }
+
+        [Theory]
+        [InlineData(0, 0.05)]
+        [InlineData(150, 0.03)]
+        [InlineData(300, 0.01)]
+        [InlineData(1000, 0.01)]
+        [InlineData(-10, 0.05)]
+        public void CommissionRate_FallsWithTradeSkill(int skill, double expected)
+        {
+            Assert.Equal(expected, _orders.CommissionRate(skill), 9);
         }
 
         [Fact]
-        public void Commission_HasMinimum_AndTradeSkillDiscount()
+        public void Commission_HasMinimum()
         {
-            Assert.Equal(10, _orders.Commission(100, 0));
-            Assert.Equal(20, _orders.Commission(2000, 0));
-            Assert.Equal(10, _orders.Commission(2000, 300));
-            Assert.Equal(15, _orders.Commission(2000, 150));
-            Assert.Equal(10, _orders.Commission(2000, 1000)); // capped at 300
+            Assert.Equal(5, _orders.Commission(50, 0));
+            Assert.Equal(100, _orders.Commission(2000, 0));
+            Assert.Equal(20, _orders.Commission(2000, 300));
         }
 
         [Fact]
@@ -49,24 +60,42 @@ namespace CalradicExchange.Core.Tests
             TradeResult r = _orders.Execute("cx_grain", OrderSide.Buy, 10, _rich, _portfolio);
 
             Assert.True(r.Success);
-            Assert.Equal(-1034, r.GoldDelta);
+            Assert.Equal(-1059, r.GoldDelta);
             Assert.Equal(10, _portfolio.QuantityOf("cx_grain"));
-            Assert.Equal(1034m, _portfolio.Find("cx_grain").CostBasis);
-            Assert.Equal(100.625m, _market.Get("cx_grain").Price); // 100 x (1 + 0.5 x 0.0125)
+            Assert.Equal(1059m, _portfolio.Find("cx_grain").CostBasis);
+            Assert.Equal(100.125m, _market.Get("cx_grain").Price); // 100 x (1 + 0.5 x 0.0025)
         }
 
         [Fact]
-        public void ImmediateRoundTrip_LosesMoney()
+        public void ImmediateRoundTrip_LosesMoney_AndIsNotTaxed()
         {
             _orders.Execute("cx_grain", OrderSide.Buy, 10, _rich, _portfolio);
             TradeResult sell = _orders.Execute("cx_grain", OrderSide.Sell, 10, _rich, _portfolio);
 
             Assert.True(sell.Success);
-            Assert.True(sell.GoldDelta < 1034);
-            Assert.Equal(sell.GoldDelta - 1034, sell.RealizedPnl);
-            Assert.Equal(0, _portfolio.QuantityOf("cx_grain"));
+            Assert.Equal(0, sell.Quote.ProfitTax);
+            Assert.True(sell.GoldDelta < 1059);
+            Assert.Equal(sell.GoldDelta - 1059, sell.RealizedPnl);
             Assert.Empty(_portfolio.Positions);
             Assert.Equal(sell.RealizedPnl, _portfolio.RealizedPnl);
+        }
+
+        [Fact]
+        public void ProfitableSell_PaysProfitTax()
+        {
+            _orders.Execute("cx_grain", OrderSide.Buy, 10, _rich, _portfolio);
+            _market.SetPrice("cx_grain", 150m);
+
+            TradeQuote q = _orders.Quote("cx_grain", OrderSide.Sell, 10, _rich, _portfolio);
+            int afterCommission = q.Gross - q.Commission;
+            int expectedTax = (int)Math.Ceiling((afterCommission - 1059) * 0.10);
+
+            Assert.Equal(expectedTax, q.ProfitTax);
+            Assert.Equal(afterCommission - expectedTax, q.Total);
+
+            TradeResult r = _orders.Execute("cx_grain", OrderSide.Sell, 10, _rich, _portfolio);
+            Assert.Equal(q.Total - 1059, r.RealizedPnl);
+            Assert.Equal(expectedTax, _portfolio.TotalProfitTaxPaid);
         }
 
         [Fact]
@@ -75,8 +104,8 @@ namespace CalradicExchange.Core.Tests
             _orders.Execute("cx_grain", OrderSide.Buy, 10, _rich, _portfolio);
             TradeResult sell = _orders.Execute("cx_grain", OrderSide.Sell, 4, _rich, _portfolio);
 
-            Assert.Equal(sell.GoldDelta - 1034m * 4 / 10, sell.RealizedPnl);
-            Assert.Equal(1034m * 6 / 10, _portfolio.Find("cx_grain").CostBasis);
+            Assert.Equal(sell.GoldDelta - 1059m * 4 / 10, sell.RealizedPnl);
+            Assert.Equal(1059m * 6 / 10, _portfolio.Find("cx_grain").CostBasis);
         }
 
         [Theory]
@@ -90,7 +119,7 @@ namespace CalradicExchange.Core.Tests
         [Fact]
         public void NotEnoughGold_IsRejected_AndChangesNothing()
         {
-            TradeResult r = _orders.Execute("cx_grain", OrderSide.Buy, 10, new TraderProfile(1033, 6, 0), _portfolio);
+            TradeResult r = _orders.Execute("cx_grain", OrderSide.Buy, 10, new TraderProfile(1058, 6, 0), _portfolio);
 
             Assert.Equal(TradeError.InsufficientGold, r.Quote.Error);
             Assert.Equal(0, r.GoldDelta);
@@ -115,16 +144,17 @@ namespace CalradicExchange.Core.Tests
         [Fact]
         public void TotalLimit_DependsOnTierAndSkill()
         {
-            Assert.Equal(20000, _orders.TotalLimit(new TraderProfile(0, 0, 0)));
-            Assert.Equal(20000 + 3 * 20000 + 50 * 100, _orders.TotalLimit(new TraderProfile(0, 3, 100)));
+            Assert.Equal(5000, _orders.TotalLimit(new TraderProfile(0, 0, 0)));
+            Assert.Equal(20000, _orders.TotalLimit(new TraderProfile(0, 1, 0)));
+            Assert.Equal(5000 + 3 * 15000 + 50 * 100, _orders.TotalLimit(new TraderProfile(0, 3, 100)));
         }
 
         [Fact]
         public void TotalLimit_IsEnforced()
         {
-            var poor = new TraderProfile(1_000_000, 0, 0); // limit 20,000
-            Assert.True(_orders.Execute("cx_grain", OrderSide.Buy, 150, poor, _portfolio).Success); // ~15,000
-            Assert.Equal(TradeError.TotalLimitExceeded, _orders.Quote("cx_salt", OrderSide.Buy, 20, poor, _portfolio).Error); // +8,000
+            var beginner = new TraderProfile(1_000_000, 0, 0); // limit 5,000
+            Assert.True(_orders.Execute("cx_grain", OrderSide.Buy, 40, beginner, _portfolio).Success); // ~4,000
+            Assert.Equal(TradeError.TotalLimitExceeded, _orders.Quote("cx_salt", OrderSide.Buy, 3, beginner, _portfolio).Error); // +1,200
         }
 
         [Fact]
@@ -152,8 +182,7 @@ namespace CalradicExchange.Core.Tests
             decimal price = _market.Get("cx_grain").Price;
 
             Assert.Equal(10 * price, _portfolio.MarketValue(id => _market.Get(id).Price));
-            Assert.Equal(10 * price - 1034, _portfolio.UnrealizedPnl(id => _market.Get(id).Price));
+            Assert.Equal(10 * price - 1059, _portfolio.UnrealizedPnl(id => _market.Get(id).Price));
         }
-
     }
 }

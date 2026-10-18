@@ -74,3 +74,21 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Bağlam:** Oyun `bin\Win64_Shipping_Client\Newtonsoft.Json.dll` (assembly 13.0.0.0, dosya 13.0.1) ile geliyor ve `TaleWorlds.Library` onu kullanıyor.
 - **Karar:** Core `Newtonsoft.Json 13.0.1` NuGet paketine referans verir. Oyun modülü bu DLL'i kopyalamaz; çalışma zamanında oyunun kendi kopyası yüklenir.
 - **Gerekçe:** Ek DLL dağıtmadan olgun bir serileştirici. Assembly sürümü 13.0.0.0 olduğu için 13.x paketleri bağlanır.
+
+## ADR-013 — Simülatör ayarı: ucuz işlem, güçlü olaylar (PLAN 1.14)
+
+- **Bağlam:** ECONOMY_MODEL 0.1 değerleriyle 8.000 dinarlık bir emir tek yönde %10 kayma ödüyordu (λ=0,5). Olayı takip eden bot yılda -%61 kaybediyor, oynaklık hedeflerin altında kalıyordu (emtia %19, sektör %11). Bir olayın fiyata kattığı ek getiri ≈ dürtü × 0,5; çoğu dürtü (0,03–0,08) gidiş-dönüş maliyetinin altındaydı.
+- **Karar (kullanıcı onayı 2026-10-18, "olaylar güçlü" seçeneği):** κ emtia 0,12→0,20, sektör 0,10→0,15; σ emtia 0,020→0,030, sektör 0,012→0,018; kayma λ ÷5; alış-satış farkı yarıya (emtia %1, sektör %0,6). Köy yağmasının emtia dürtüsü (0,06) hariç tüm olay ve mevsim dürtüleri ×1,5.
+- **Gerekçe:** Büyük olaylar (savaş, mevsim, kıtlık) bilgili oyuncuya fırsat verir; tek bir köy yağması vermez. Oyuncu yağmaları kendisi yapabildiği için bu aynı zamanda manipülasyonu zayıflatır.
+- **Simülatör:** Sentetik dünyada küresel emtia oynaklığı 0,012→0,02. Olay botu emir büyüklüğünü kaymayı ≤%0,5 tutacak şekilde ayarlar (bilgili oyuncu emri böler).
+
+## ADR-014 — Erken oyunda hızlı zenginleşmeye karşı kısıtlar
+
+- **Bağlam:** Kullanıcı: borsa, özellikle oyun başında, oyunu kıracak kadar hızlı para kazandırmamalı.
+- **Karar (kullanıcı, 2026-10-18):**
+  - Toplam limit = 5.000 + 15.000 × klan seviyesi + 50 × Trade (seviye 0: 5.000, seviye 1: 20.000).
+  - Komisyon her alım ve satımda %5; Trade becerisi arttıkça doğrusal azalır, Trade 300'de en az %1. Asgari komisyon 5 dinar.
+  - Satışta gerçekleşen kârın %10'u kâr vergisi olarak kesilir; zararda kesinti yok.
+  - Yeni simülatör hedefi: klan seviyesi 1, Trade 30 profilinde en iyi botun ilk yıl kârı ortalama günde ≤ 50 dinar.
+  - "Olayı gören strateji pozitif" hedefi geç oyun profilinde (klan 5, Trade 250) ölçülür.
+- **Sonuç (20 seed, 4 yıl):** Erken oyun en iyi bot ortalama 1,4 dinar/gün (en kötü seed 15,5). Olay botu: erken -%8,2/yıl, orta -%3,8, geç +%0,3. Bilgiyle kâr ancak yüksek Trade becerisiyle mümkün.

@@ -21,7 +21,10 @@ namespace CalradicExchange.Core.Trading
 
         public int Commission { get; set; }
 
-        /// <summary>Buy: gold to pay (gross + commission). Sell: gold received (gross - commission).</summary>
+        /// <summary>Sell only: tax on the realized profit of the sold shares (0 on a loss).</summary>
+        public int ProfitTax { get; set; }
+
+        /// <summary>Buy: gold to pay (gross + commission). Sell: gold received (gross - commission - profit tax).</summary>
         public int Total { get; set; }
 
         public TradeError Error { get; set; }

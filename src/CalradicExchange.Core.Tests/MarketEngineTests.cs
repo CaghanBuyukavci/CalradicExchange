@@ -75,7 +75,7 @@ namespace CalradicExchange.Core.Tests
             e.Tick(TestData.World(2));
             PriceState grain = e.Get("cx_grain");
             Assert.Equal(0.06, grain.Shock, 9);
-            Assert.Equal(100 * System.Math.Exp(0.12 * 0.06), (double)grain.Price, 3);
+            Assert.Equal(100 * System.Math.Exp(0.20 * 0.06), (double)grain.Price, 3);
 
             for (int d = 3; d <= 12; d++) e.Tick(TestData.World(d));
             Assert.Equal(0.03, grain.Shock, 6);
@@ -111,11 +111,11 @@ namespace CalradicExchange.Core.Tests
 
             e.ApplyEvent(new MarketEvent { Type = MarketEventType.SiegeStarted, Day = 1, TownId = "town_A" });
             for (int d = 2; d <= 8; d++) e.Tick(TestData.World(d));
-            Assert.Equal(-0.15, e.Get("g_A").Shock, 9);
+            Assert.Equal(-0.225, e.Get("g_A").Shock, 9);
 
             e.ApplyEvent(new MarketEvent { Type = MarketEventType.SiegeEnded, Day = 8, TownId = "town_A" });
             for (int d = 9; d <= 15; d++) e.Tick(TestData.World(d));
-            Assert.Equal(-0.075, e.Get("g_A").Shock, 6);
+            Assert.Equal(-0.1125, e.Get("g_A").Shock, 6);
         }
 
         [Fact]
@@ -134,8 +134,8 @@ namespace CalradicExchange.Core.Tests
             for (int d = 2; d <= 8; d++) e.Tick(TestData.World(d));
 
             // Released before its first tick: tick 2 applies it in full, ticks 3-8 decay it 6 times.
-            Assert.Equal(-0.15 * System.Math.Pow(0.5, 6.0 / 7), e.Get("g_A").Shock, 9);
-            Assert.Equal(-0.15, e.Get("g_B").Shock, 9);
+            Assert.Equal(-0.225 * System.Math.Pow(0.5, 6.0 / 7), e.Get("g_A").Shock, 9);
+            Assert.Equal(-0.225, e.Get("g_B").Shock, 9);
         }
 
         [Fact]
@@ -150,8 +150,8 @@ namespace CalradicExchange.Core.Tests
             MarketEvent ev = Assert.Single(s.GeneratedEvents);
             Assert.Equal(MarketEventType.SeasonChanged, ev.Type);
             Assert.Equal(Season.Winter, ev.Season);
-            Assert.Equal(0.14, e.Get("cx_grain").Shock, 9);
-            Assert.Equal(0.14, e.Get("cx_sector_agriculture").Shock, 9);
+            Assert.Equal(0.21, e.Get("cx_grain").Shock, 9);
+            Assert.Equal(0.21, e.Get("cx_sector_agriculture").Shock, 9);
             Assert.Equal(0.0, e.Get("cx_iron").Shock);
         }
 
@@ -172,7 +172,7 @@ namespace CalradicExchange.Core.Tests
             Assert.Equal(0, Famines(4, 10));
             Assert.Equal(1, Famines(5, -1));
             // First famine decayed for 3 ticks, plus the new one.
-            Assert.Equal(0.08 * System.Math.Pow(0.5, 3.0 / 14) + 0.08, e.Get("cx_grain").Shock, 9);
+            Assert.Equal(0.12 * System.Math.Pow(0.5, 3.0 / 14) + 0.12, e.Get("cx_grain").Shock, 9);
         }
 
         [Fact]

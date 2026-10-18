@@ -28,10 +28,11 @@ namespace CalradicExchange.Core.Tests
         {
             MarketSettings s = TestData.Settings();
 
-            Assert.Equal(0.12, s.For(InstrumentClass.Commodity).Kappa);
+            Assert.Equal(0.20, s.For(InstrumentClass.Commodity).Kappa);
             Assert.Equal(3, s.RulesFor(MarketEventType.VillageLooted).Count);
-            Assert.Equal(0.140, s.SeasonImpulses[Season.Winter]);
-            Assert.Equal(10, s.Trading.MinCommission);
+            Assert.Equal(0.21, s.SeasonImpulses[Season.Winter]);
+            Assert.Equal(5, s.Trading.MinCommission);
+            Assert.Equal(0.10, s.Trading.ProfitTaxRate);
         }
 
         [Fact]
@@ -71,7 +72,7 @@ namespace CalradicExchange.Core.Tests
         public void Settings_InvalidValues_AreReported()
         {
             string json = TestData.SettingsJson
-                .Replace("\"kappa\": 0.12", "\"kappa\": 1.5")
+                .Replace("\"kappa\": 0.2,", "\"kappa\": 1.5,")
                 .Replace("\"target\": \"eventItem\"", "\"target\": \"nonsense\"");
 
             var ex = Assert.Throws<ConfigException>(() => SettingsLoader.Parse(json));

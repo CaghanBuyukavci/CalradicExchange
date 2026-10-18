@@ -10,6 +10,7 @@ namespace CalradicExchange.Core.Trading
         public List<Position> Positions { get; set; } = new List<Position>();
         public decimal RealizedPnl { get; set; }
         public long TotalCommissionPaid { get; set; }
+        public long TotalProfitTaxPaid { get; set; }
         public int TradeCount { get; set; }
 
         public Position Find(string instrumentId)
@@ -37,13 +38,22 @@ namespace CalradicExchange.Core.Trading
             TradeCount++;
         }
 
+        /// <summary>Cost basis that selling <paramref name="quantity"/> shares would remove (average cost).</summary>
+        public decimal BasisFor(string instrumentId, int quantity)
+        {
+            Position pos = Find(instrumentId);
+            if (pos == null || quantity <= 0) return 0;
+            if (quantity >= pos.Quantity) return pos.CostBasis;
+            return Math.Round(pos.CostBasis * quantity / pos.Quantity, 4);
+        }
+
         /// <summary>Removes shares at average cost and returns the realized profit.</summary>
-        public decimal ApplySell(string instrumentId, int quantity, int netProceeds, int commission)
+        public decimal ApplySell(string instrumentId, int quantity, int netProceeds, int commission, int profitTax = 0)
         {
             Position pos = Find(instrumentId);
             if (pos == null || quantity <= 0 || quantity > pos.Quantity) throw new InvalidOperationException($"Cannot sell {quantity} of {instrumentId}.");
 
-            decimal removedBasis = pos.Quantity == quantity ? pos.CostBasis : Math.Round(pos.CostBasis * quantity / pos.Quantity, 4);
+            decimal removedBasis = BasisFor(instrumentId, quantity);
             pos.Quantity -= quantity;
             pos.CostBasis -= removedBasis;
             if (pos.Quantity == 0) Positions.Remove(pos);
@@ -51,6 +61,7 @@ namespace CalradicExchange.Core.Trading
             decimal realized = netProceeds - removedBasis;
             RealizedPnl += realized;
             TotalCommissionPaid += commission;
+            TotalProfitTaxPaid += profitTax;
             TradeCount++;
             return realized;
         }
