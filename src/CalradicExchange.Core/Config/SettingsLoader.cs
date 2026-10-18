@@ -43,6 +43,9 @@ namespace CalradicExchange.Core.Config
             Range(e, "newsKeep", s.NewsKeep, 0, 500);
             Range(e, "famineCooldownDays", s.FamineCooldownDays, 0, 1000);
             Range(e, "shockBaselineHalfLifeDays", s.ShockBaselineHalfLifeDays, 0, 10000);
+            Range(e, "fundamentalHalfLifeDays", s.FundamentalHalfLifeDays, 0, 1000);
+            Range(e, "fundamentalStartHalfLifeDays", s.FundamentalStartHalfLifeDays, 0, 1000);
+            Range(e, "fundamentalRampDays", s.FundamentalRampDays, 0, 10000);
 
             foreach (InstrumentClass cls in Enum.GetValues(typeof(InstrumentClass)))
             {

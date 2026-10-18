@@ -82,7 +82,8 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 1.15 `WorldReader`: şehir fiyatları, refah, kuşatma durumu → `WorldSnapshot`
   - Fiyat = item değeri × kategori çarpanı; verisi olmayan şehirler atlanır. İlk oyun testi (2026-10-18): işlenmiş mallar taban değerin 5–7 katı, temel değer günde %10–17 oynuyor (simülatörde %1–2). Stoksuz şehirlerin tavan çarpanı şüpheli.
   - [x] 1.15a Ortalama yöntemini gerçek veriyle kalibre et (`Logs/market_raw.csv`), sentetik dünyayı da buna göre ayarla.
-  - ADR-017 (hacim ağırlığı), ADR-018 (kıtlık), ADR-019 (beklenen şok tabanı). Otomatik döküm 40. borsa gününe kadar sürüyor; uzun veriyle oynaklık tekrar kontrol edilince kaldırılacak.
+  - ADR-017 (hacim ağırlığı), ADR-018 (kıtlık), ADR-019 (beklenen şok tabanı). Otomatik döküm 120. borsa gününe kadar sürüyor (2026-10-19'da 40'tan uzatıldı); uzun veriyle oynaklık ve piyasanın oturma günü kontrol edilince kaldırılacak.
+  - ADR-021: kampanya başındaki fiyat çöküşü için temel değer ilk 90 gün yumuşatılıyor (yarı ömür 45 → 0).
 - [x] 1.16 `EventBridge`: köy yağması, kuşatma başlangıcı/bitişi, şehir el değiştirme, savaş, barış, mevsim → `MarketEvent`
   - Kale kuşatmaları ve küçük fraksiyon savaşları sayılmaz. Mevsim ve kıtlık Core'da.
 - [x] 1.17 Günlük tick: snapshot al → Core'u güncelle → büyük hareketleri mesajla bildir
@@ -151,6 +152,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [ ] 3.6 Hasat sözleşmeleri: fiyat, vade, şehirde teslim veya nakit kapanış (§2.6)
 - [ ] 3.7 Sigorta: kendi kervanını sigortalama ve sigortacı havuzu (§2.8)
 - [ ] 3.8 Açığa satış: ödünç ücreti, teminat, zorla kapatma (§6)
+  - Kullanıcı istiyor (2026-10-19). ADR-021'deki yumuşatma rampasıyla birlikte risksiz kazanç açmasın: rampa süresince kapalı veya ödünç ücretiyle.
 - [ ] 3.9 Simülatöre yeni araçları ve stratejileri ekle
 - [ ] 3.10 UI: yeni araç türleri için detay panelleri
 

@@ -11,6 +11,9 @@ namespace CalradicExchange.Core.Pricing
     {
         public bool Initialized { get; set; }
 
+        /// <summary>Exchange day the current market was started (first tick or rebuild), -1 before. Added in schema 4.</summary>
+        public int StartDay { get; set; } = -1;
+
         /// <summary>Exchange day of the last processed tick, -1 before the first.</summary>
         public int LastTickDay { get; set; } = -1;
 

@@ -15,7 +15,12 @@ namespace CalradicExchange.Core.Pricing
         public bool Closed { get; set; }
 
         public decimal Price { get; set; }
+        /// <summary>Smoothed fundamental the price is pulled towards (ADR-021).</summary>
         public decimal Fundamental { get; set; }
+
+        /// <summary>Fundamental as observed in the last world snapshot, before smoothing. Added in schema 4.</summary>
+        public decimal RawFundamental { get; set; }
+
         public decimal InitialPrice { get; set; }
 
         /// <summary>Effective sentiment S after the last tick: raw shocks minus their baseline, clamped.</summary>

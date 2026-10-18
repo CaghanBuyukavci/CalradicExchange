@@ -18,7 +18,7 @@ namespace CalradicExchange.Diagnostics
     /// </summary>
     public static class MarketDump
     {
-        public const int AutoDumpDays = 40;
+        public const int AutoDumpDays = 120;
         private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 
         public static string FilePath => Path.Combine(ModulePaths.LogsFolder, "market_raw.csv");

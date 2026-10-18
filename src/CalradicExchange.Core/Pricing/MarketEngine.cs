@@ -14,6 +14,7 @@ namespace CalradicExchange.Core.Pricing
     public sealed class MarketEngine
     {
         private const double NegligibleShock = 1e-5;
+        private const double MinSmoothingHalfLife = 0.5;
 
         /// <summary>Version of the fundamental calculation. Changing it rebuilds existing markets on load (ADR-017).</summary>
         public const string FundamentalMethodId = "volume_v1";
@@ -116,6 +117,7 @@ namespace CalradicExchange.Core.Pricing
                     if (f != null && f > 0) StartPrice(ps, f.Value, world.Day);
                 }
                 State.Initialized = true;
+                State.StartDay = world.Day;
                 State.FundamentalMethod = FundamentalMethodId;
                 State.LastSeason = world.Season;
                 State.LastTickDay = world.Day;
@@ -142,7 +144,11 @@ namespace CalradicExchange.Core.Pricing
                     if (f != null && f > 0) StartPrice(ps, f.Value, world.Day);
                     continue;
                 }
-                if (f != null && f > 0) ps.Fundamental = f.Value;
+                if (f != null && f > 0)
+                {
+                    ps.RawFundamental = f.Value;
+                    ps.Fundamental = SmoothFundamental(ps.Fundamental, f.Value, world.Day);
+                }
 
                 ps.Shock = ClampShock(EffectiveShock(ps, DecayAndSumShocks(ps)));
                 double volMult = ActiveVolMultiplier(ps, world.Day);
@@ -210,8 +216,40 @@ namespace CalradicExchange.Core.Pricing
             ps.HasPrice = true;
             ps.Price = p;
             ps.Fundamental = p;
+            ps.RawFundamental = p;
             ps.InitialPrice = p;
             AddHistory(ps, day);
+        }
+
+        /// <summary>
+        /// Log-EMA step towards the observed fundamental (ADR-021). The half-life starts long, because a new
+        /// campaign opens with empty town stores and inflated prices that fall for months, and eases to the
+        /// normal half-life (default 0, no smoothing) over the ramp. Smoothing in settled play would delay
+        /// the supply effect of raids and remove the manipulation channel (simulator, ADR-021).
+        /// </summary>
+        private decimal SmoothFundamental(decimal previous, decimal observed, int day)
+        {
+            double halfLife = SmoothingHalfLife(day);
+            if (halfLife <= 0 || previous <= 0) return observed;
+            double alpha = 1 - PriceMath.DecayFactor(halfLife);
+            double log = Math.Log((double)previous) + alpha * (Math.Log((double)observed) - Math.Log((double)previous));
+            return PriceMath.Round(Math.Exp(log));
+        }
+
+        /// <summary>Fundamental smoothing half-life on an exchange day; 0 when smoothing is off.</summary>
+        public double SmoothingHalfLife(int day)
+        {
+            double normal = Math.Max(0, _settings.FundamentalHalfLifeDays);
+            double start = _settings.FundamentalStartHalfLifeDays;
+            int ramp = _settings.FundamentalRampDays;
+            double halfLife = normal;
+            if (ramp > 0 && start > 0 && State.StartDay >= 0)
+            {
+                double t = Math.Min(1.0, Math.Max(0.0, (day - State.StartDay) / (double)ramp));
+                halfLife = start + (normal - start) * t;
+            }
+            // Below half a day the EMA is within noise of the raw value; treat it as off.
+            return halfLife < MinSmoothingHalfLife ? 0 : halfLife;
         }
 
         private void UpdateBaselines(WorldSnapshot world)

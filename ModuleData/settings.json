@@ -1,6 +1,6 @@
-{
+﻿{
   "schemaVersion": 1,
-  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013 to ADR-019).",
+  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013 to ADR-021).",
   "volatilityMultiplier": 1.0,
   "maxDailyLogReturn": 0.25,
   "maxAbsShock": 1.0,
@@ -8,6 +8,9 @@
   "newsKeep": 30,
   "famineCooldownDays": 21,
   "shockBaselineHalfLifeDays": 42,
+  "fundamentalHalfLifeDays": 0,
+  "fundamentalStartHalfLifeDays": 45,
+  "fundamentalRampDays": 90,
   "classes": {
     "Commodity": {
       "kappa": 0.2,

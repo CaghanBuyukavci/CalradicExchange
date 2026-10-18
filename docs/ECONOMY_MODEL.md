@@ -26,6 +26,7 @@ w_town = arz_town(c) + stok_town(c)     (pazar hacmi, ADR-017; hiçbir şehirde 
 
 - `price_town(c)`: Şehir pazarında malın satış fiyatı. Hangi API'nin bunu verdiği Faz 0'da doğrulanacak (API_NOTES).
 - Kuşatma altındaki şehirler hesaba katılmaz.
+- Kampanya başı yumuşatma (ADR-021): fiyatın çekildiği F, bu değerin log-üstel ortalamasıdır; yarı ömür piyasa açılınca 45 gün, 90 günde 0'a iner. Sektör endeksleri için de geçerlidir.
 - Hacmi sıfır olan şehirler (stoğu ve arzı yok) katılmaz: oyun orada sadece teorik, tavana yakın bir fiyat gösterir (gerçek veri: kadifede şehirlerin %87'si).
 
 ### 2.2 Sektör endeksi

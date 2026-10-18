@@ -24,10 +24,42 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // Schema 3 adds market.famineStartDays and market.fundamentalMethod. Both default when
                         // missing; a missing method makes the engine rebuild prices with the new averaging (ADR-017).
                         break;
+                    case 3:
+                        root = Migrate3To4(root);
+                        break;
                 }
             }
 
             root["schemaVersion"] = toVersion;
+            return root;
+        }
+
+        /// <summary>
+        /// Schema 4 adds market.startDay and prices[].rawFundamental (ADR-021). The start day is taken from the
+        /// oldest history point; the raw fundamental starts as the last fundamental.
+        /// </summary>
+        private static JObject Migrate3To4(JObject root)
+        {
+            if (!(root["market"] is JObject market)) return root;
+            int start = int.MaxValue;
+            if (market["prices"] is JArray prices)
+            {
+                foreach (JToken price in prices)
+                {
+                    if (!(price is JObject ps)) continue;
+                    if (ps["rawFundamental"] == null && ps["fundamental"] != null) ps["rawFundamental"] = ps["fundamental"];
+                    if (ps["history"] is JArray history)
+                    {
+                        foreach (JToken point in history)
+                        {
+                            JToken day = point?["day"];
+                            if (day != null && day.Type == JTokenType.Integer) start = System.Math.Min(start, (int)day);
+                        }
+                    }
+                }
+            }
+            bool initialized = market["initialized"]?.Type == JTokenType.Boolean && (bool)market["initialized"];
+            if (market["startDay"] == null) market["startDay"] = initialized && start != int.MaxValue ? start : -1;
             return root;
         }
 

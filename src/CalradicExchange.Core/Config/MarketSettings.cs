@@ -18,6 +18,18 @@ namespace CalradicExchange.Core.Config
         /// <summary>Half-life of the expected-shock baseline subtracted from S (ADR-019). 0 disables it.</summary>
         [JsonProperty("shockBaselineHalfLifeDays")] public double ShockBaselineHalfLifeDays { get; set; }
 
+        /// <summary>
+        /// Half-life of the log-EMA that smooths observed fundamentals after the start ramp (ADR-021).
+        /// 0 means no smoothing in settled play: F follows the world snapshot each day.
+        /// </summary>
+        [JsonProperty("fundamentalHalfLifeDays")] public double FundamentalHalfLifeDays { get; set; }
+
+        /// <summary>Smoothing half-life on the market's first day; moves linearly to the normal one over the ramp.</summary>
+        [JsonProperty("fundamentalStartHalfLifeDays")] public double FundamentalStartHalfLifeDays { get; set; }
+
+        /// <summary>Days after the market starts over which the start half-life eases to the normal one.</summary>
+        [JsonProperty("fundamentalRampDays")] public int FundamentalRampDays { get; set; }
+
         /// <summary>A town that ran out of food cannot start another famine for this many days.</summary>
         [JsonProperty("famineCooldownDays")] public int FamineCooldownDays { get; set; }
 

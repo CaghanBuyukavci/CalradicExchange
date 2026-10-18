@@ -28,7 +28,7 @@ namespace CalradicExchange.Core.Tests
         public static MarketSettings Settings() => SettingsLoader.Parse(SettingsJson);
 
         /// <summary>
-        /// Settings with sigma = 0 for every class and no shock baseline: prices move only through kappa and
+        /// Settings with sigma = 0 for every class, no shock baseline and no fundamental smoothing: prices move only through kappa and
         /// raw shocks, so expected values can be computed by hand.
         /// </summary>
         public static MarketSettings NoNoiseSettings()
@@ -36,6 +36,8 @@ namespace CalradicExchange.Core.Tests
             MarketSettings s = Settings();
             foreach (ClassParameters p in s.Classes.Values) p.Sigma = 0;
             s.ShockBaselineHalfLifeDays = 0;
+            s.FundamentalHalfLifeDays = 0;
+            s.FundamentalStartHalfLifeDays = 0;
             return s;
         }
 
