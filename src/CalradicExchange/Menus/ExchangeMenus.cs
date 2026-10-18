@@ -1,28 +1,62 @@
 using System;
+using CalradicExchange.Behaviors;
 using CalradicExchange.Diagnostics;
 using CalradicExchange.Localization;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.Library;
+using TaleWorlds.Localization;
 
 namespace CalradicExchange.Menus
 {
-    /// <summary>Adds the exchange entry to the town menu. Phase 0: placeholder message only.</summary>
+    /// <summary>
+    /// Town menu entry and the exchange submenu (PLAN 1.18, ADR-006: menus and inquiries until the Gauntlet screen).
+    /// </summary>
     public static class ExchangeMenus
     {
         /// <summary>Vanilla town menu id (PlayerTownVisitCampaignBehavior, v1.4.8).</summary>
         public const string TownMenuId = "town";
+        public const string ExchangeMenuId = "cx_exchange";
         public const string VisitOptionId = "cx_visit_exchange";
 
         /// <summary>Position among the town options; vanilla puts "Go to alley" at 4.</summary>
         private const int VisitOptionIndex = 5;
 
+        private const string MenuTextVariable = "CX_EXCHANGE_TEXT";
+
         public static void AddTo(CampaignGameStarter starter)
         {
             starter.AddGameMenuOption(TownMenuId, VisitOptionId, Strings.MenuVisitExchange,
-                OnVisitCondition, OnVisitConsequence, isLeave: false, index: VisitOptionIndex);
-            ExchangeLog.Info("Town menu option added.");
+                OnVisitCondition, args => Guard("visit", () => GameMenu.SwitchToMenu(ExchangeMenuId)), isLeave: false, index: VisitOptionIndex);
+
+            starter.AddGameMenu(ExchangeMenuId, "{=!}{" + MenuTextVariable + "}", OnExchangeInit, GameMenu.MenuOverlayType.SettlementWithBoth);
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_market", Strings.OptMarket,
+                args => Option(args, GameMenuOption.LeaveType.Submenu), args => Guard("market", MarketReport.ShowMarket));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_buy", Strings.OptBuy,
+                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("buy", TradeFlow.StartBuy));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_sell", Strings.OptSell, OnSellCondition, args => Guard("sell", TradeFlow.StartSell));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_portfolio", Strings.OptPortfolio,
+                args => Option(args, GameMenuOption.LeaveType.Manage), args => Guard("portfolio", MarketReport.ShowPortfolio));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_news", Strings.OptNews,
+                args => Option(args, GameMenuOption.LeaveType.Submenu), args => Guard("news", MarketReport.ShowNews));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_leave", Strings.OptLeave,
+                args => { args.optionLeaveType = GameMenuOption.LeaveType.Leave; return true; },
+                args => Guard("leave", () => GameMenu.SwitchToMenu(TownMenuId)), isLeave: true);
+
+            ExchangeLog.Info("Exchange menus added.");
+        }
+
+        /// <summary>Re-enters the exchange menu so its text shows fresh numbers.</summary>
+        public static void Refresh()
+        {
+            try
+            {
+                if (Campaign.Current?.CurrentMenuContext?.GameMenu?.StringId == ExchangeMenuId) GameMenu.SwitchToMenu(ExchangeMenuId);
+            }
+            catch (Exception ex)
+            {
+                ExchangeLog.Error("Menu refresh failed", ex);
+            }
         }
 
         private static bool OnVisitCondition(MenuCallbackArgs args)
@@ -31,7 +65,7 @@ namespace CalradicExchange.Menus
             {
                 args.optionLeaveType = GameMenuOption.LeaveType.Trade;
                 Settlement settlement = Settlement.CurrentSettlement;
-                return settlement != null && settlement.IsTown;
+                return settlement != null && settlement.IsTown && ExchangeCampaignBehavior.Current != null;
             }
             catch (Exception ex)
             {
@@ -40,16 +74,52 @@ namespace CalradicExchange.Menus
             }
         }
 
-        private static void OnVisitConsequence(MenuCallbackArgs args)
+        private static void OnExchangeInit(MenuCallbackArgs args)
         {
             try
             {
-                ExchangeLog.Info($"Player opened the exchange in {Settlement.CurrentSettlement?.StringId}.");
-                InformationManager.DisplayMessage(new InformationMessage(Strings.ComingSoon.ToString()));
+                MBTextManager.SetTextVariable(MenuTextVariable, MarketReport.MenuText());
             }
             catch (Exception ex)
             {
-                ExchangeLog.Error("Visit consequence failed", ex);
+                ExchangeLog.Error("Exchange menu init failed", ex);
+                MBTextManager.SetTextVariable(MenuTextVariable, "Calradic Exchange");
+            }
+        }
+
+        private static bool Option(MenuCallbackArgs args, GameMenuOption.LeaveType icon)
+        {
+            args.optionLeaveType = icon;
+            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
+            if (b == null || !b.IsReady)
+            {
+                args.IsEnabled = false;
+                args.Tooltip = Strings.ExchangeClosedText.SetTextVariable("REASON", b?.DisabledReason ?? Strings.ClosedReasonPrices.ToString());
+            }
+            return true;
+        }
+
+        private static bool OnSellCondition(MenuCallbackArgs args)
+        {
+            Option(args, GameMenuOption.LeaveType.Trade);
+            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
+            if (args.IsEnabled && (b.Portfolio == null || b.Portfolio.Positions.Count == 0))
+            {
+                args.IsEnabled = false;
+                args.Tooltip = Strings.NothingToSell;
+            }
+            return true;
+        }
+
+        private static void Guard(string what, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                ExchangeLog.Error($"Menu action '{what}' failed", ex);
             }
         }
     }

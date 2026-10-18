@@ -121,6 +121,22 @@ Sources: `Modules\SandBoxCore\ModuleData\items\horses_and_others.xml`, `TaleWorl
 
 **Workshop types:** `brewery`, `velvet_weavery`, `linen_weavery`, `wine_press`, `pottery_shop`, `olive_press`, `wool_weavery`, `tannery`, `wood_WorkshopType` (sic), `smithy`, `silversmithy`. Hidden: `artisans` (skip). `stable` is commented out in the XML — not in the game.
 
+## 8b. Additional APIs used by the Phase 1C game layer (verified v1.4.8)
+
+| API | Real form | Status | Notes |
+|---|---|---|---|
+| `MBObjectManager.Instance.GetObject<T>(string)` | `T GetObject<T>(string objectName) where T : MBObjectBase` | VERIFIED | Item and item category lookup by StringId |
+| `ItemObject.Value`, `ItemObject.ItemCategory`, `ItemObject.Name` | `int`, `ItemCategory`, `TextObject` | VERIFIED | |
+| `TownMarketData.GetCategoryData(ItemCategory)` | returns `ItemData` struct (`Supply`, `Demand`, `InStore`, `InStoreValue`) | VERIFIED | Missing category = default struct; its price factor is the 0.1 floor, so WorldReader skips towns without data |
+| `Village.Settlement`, `Village.Bound`, `Village.VillageType` | `Settlement`, `Settlement`, field `VillageType` | VERIFIED | |
+| `SiegeEvent.BesiegedSettlement` | `Settlement` | VERIFIED | Castles filtered out with `Settlement.IsTown` |
+| `Hero.MapFaction`, `IFaction.IsKingdomFaction`, `IFaction.StringId` | | VERIFIED | Wars with bandits/minor factions ignored |
+| `GiveGoldAction.ApplyBetweenCharacters(giver, null, ...)` | null recipient/giver = gold leaves/enters the world | VERIFIED | Amount is clamped to the giver's gold |
+| `InquiryElement(object, string, ImageIdentifier, bool, string)` | null image is allowed (`GenericImageIdentifierVM` uses `EmptyImageIdentifier`) | VERIFIED | Commodity rows use `ItemImageIdentifier(item)` (`TaleWorlds.Core.ImageIdentifiers`) |
+| `MBTextManager.SetTextVariable(string, string)` | | VERIFIED | Menu text `{=!}{CX_EXCHANGE_TEXT}` |
+| `Campaign.Current.CurrentMenuContext.GameMenu.StringId` | | VERIFIED | Used to refresh the exchange menu after a trade |
+| `Colors.Green/Red/Yellow` | `static readonly Color` | VERIFIED | |
+
 ## 9. After every game update
 
 1. Re-run the decompile.

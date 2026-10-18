@@ -79,16 +79,23 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - ADR-013, ADR-014, ADR-015. 20 seed'de 8/8 hedef geçti. Manipülatör bot eklendi (oyuncunun kendi yağmaları).
 
 ### 1C. Oyun katmanı
-- [ ] 1.15 `WorldReader`: şehir fiyatları, refah, kuşatma durumu → `WorldSnapshot`
-- [ ] 1.16 `EventBridge`: köy yağması, kuşatma başlangıcı/bitişi, şehir el değiştirme, savaş, barış, mevsim → `MarketEvent`
-- [ ] 1.17 Günlük tick: snapshot al → Core'u güncelle → büyük hareketleri mesajla bildir
-- [ ] 1.18 Borsa alt menüsü: Piyasaya bak, Al, Sat, Portföy, Haberler, Ayrıl
-- [ ] 1.19 Al/Sat akışı: araç seçimi (çoktan seçmeli inquiry) → adet (metin inquiry) → onay penceresi (fiyat, fark, komisyon, toplam)
-- [ ] 1.20 Altın işlemleri oyuncunun parasıyla bağlantılı; yetersiz parada anlaşılır uyarı
-- [ ] 1.21 Kampanya ortasında mod eklenirse başlangıç değerlerini o günden kur
-- [ ] 1.22 Debug komutları: `dump_prices`, `dump_portfolio`, `fire_event`, `set_price`, `export_csv`
-- [ ] 1.23 Tüm handler'larda try/catch ve log
-- [ ] 1.24 Metinler `TextObject` ile; şimdilik İngilizce + Türkçe taslak
+- [x] 1.15 `WorldReader`: şehir fiyatları, refah, kuşatma durumu → `WorldSnapshot`
+  - Fiyat = item değeri × kategori çarpanı; verisi olmayan şehirler atlanır. Oyun içi test bekleniyor.
+- [x] 1.16 `EventBridge`: köy yağması, kuşatma başlangıcı/bitişi, şehir el değiştirme, savaş, barış, mevsim → `MarketEvent`
+  - Kale kuşatmaları ve küçük fraksiyon savaşları sayılmaz. Mevsim ve kıtlık Core'da.
+- [x] 1.17 Günlük tick: snapshot al → Core'u güncelle → büyük hareketleri mesajla bildir
+  - Gün sayacı borsanın kendi sayacı (API_NOTES, 09:00 tick notu). Elde tutulan araçta ≥%3, herhangi bir araçta ≥%8 harekette mesaj.
+- [x] 1.18 Borsa alt menüsü: Piyasaya bak, Al, Sat, Portföy, Haberler, Ayrıl
+- [x] 1.19 Al/Sat akışı: araç seçimi (çoktan seçmeli inquiry) → adet (metin inquiry) → onay penceresi (fiyat, fark, komisyon, toplam)
+- [x] 1.20 Altın işlemleri oyuncunun parasıyla bağlantılı; yetersiz parada anlaşılır uyarı
+  - Altın `GiveGoldAction` ile; işlemi Core onaylamadan altın değişmez.
+- [x] 1.21 Kampanya ortasında mod eklenirse başlangıç değerlerini o günden kur
+  - İlk session'da açılış fiyatları hemen kurulur; Faz 0 kayıtları şema 2'ye taşınır.
+- [x] 1.22 Debug komutları: `dump_prices`, `dump_portfolio`, `fire_event`, `set_price`, `export_csv`
+  - Ek: `exchange.tick [n]` (oyun zamanını ilerletmeden borsa günü çalıştırır).
+- [x] 1.23 Tüm handler'larda try/catch ve log
+- [x] 1.24 Metinler `TextObject` ile; şimdilik İngilizce + Türkçe taslak
+  - 97 metin, Türkçe tam. İngilizce kodda varsayılan.
 
 **Kabul kriterleri**
 - Simülatör §8 hedeflerinin hepsini geçiyor.

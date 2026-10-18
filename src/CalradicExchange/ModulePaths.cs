@@ -16,5 +16,7 @@ namespace CalradicExchange
         }
 
         public static string LogsFolder => Path.Combine(ModuleRoot, "Logs");
+
+        public static string ModuleDataFolder => Path.Combine(ModuleRoot, "ModuleData");
     }
 }
