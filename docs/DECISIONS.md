@@ -126,6 +126,7 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 
 - **Bağlam:** Kullanıcı tabloların okunaklı olmasını, artışların yeşil, azalışların kırmızı yazılmasını ve sütunların hizalı olmasını istedi. Vanilla inquiry metni `Popup.Description.Text` fırçasında yalnızca `Default` stili var (renk yok), yazı tipi orantılı ve sekme durağı yok (hizalama mümkün değil).
 - **Karar:** Kendi Gauntlet prefablarımız (`GUI/Prefabs/CxMarketTable.xml`, `CxPortfolioTable.xml`) ve `ExchangeTableVM`. Sütunlar sabit genişlikli, sayılar sağa hizalı, renk `Brush.FontColor="@..."` bağlamasıyla. Vanilla fırçaları ve sprite'ları kullanılır; kendi fırçamız yok. Katman açılamazsa eski metin penceresine düşülür (ADR-006).
+- **Ek (2026-10-19, kullanıcı isteği):** Al/Sat adet penceresi de aynı yolla yapıldı: `CxQuantityPopup.xml` + `QuantityVM`. Slider (`SliderWidget`) ve sayı kutusu (`IntegerInputTextWidget`) aynı `Quantity` özelliğine bağlı; ikisi de v1.4.8 vanilla prefablarında (pazarlık ekranı) kullanılıyor. Sprite'lar `ui_group1` kategorisinde (vanilla metin penceresiyle aynı), haritada yüklü.
 
 ## ADR-021 — Kampanya başında temel değer yumuşatılır
 

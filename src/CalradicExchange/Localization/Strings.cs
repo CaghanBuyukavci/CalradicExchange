@@ -61,6 +61,8 @@ namespace CalradicExchange.Localization
         public static TextObject SellElement => new TextObject("{=cx_sell_element}{NAME} - {QTY} shares at {PRICE}");
         public static TextObject QuantityBuy => new TextObject("{=cx_qty_buy}{NAME} costs {PRICE} per share before fees.\nHow many shares? (at most {MAX})");
         public static TextObject QuantitySell => new TextObject("{=cx_qty_sell}You hold {QTY} shares of {NAME}.\nHow many do you sell?");
+        public static TextObject QuantityEstimateBuy => new TextObject("{=cx_qty_estimate_buy}To pay: {TOTAL} denars (broker's fee {FEE})");
+        public static TextObject QuantityEstimateSell => new TextObject("{=cx_qty_estimate_sell}You receive: {TOTAL} denars (broker's fee {FEE}, tax {TAX})");
         public static TextObject QuantityInvalid => new TextObject("{=cx_qty_invalid}Enter a whole number from 1 to {MAX}.");
         public static TextObject ConfirmBuy => new TextObject("{=cx_confirm_buy}Buy {QTY} x {NAME}\n \nMarket price: {PRICE}\nAfter spread and slippage: {EXEC}\nShares: {GROSS} denars\nBroker's fee: {FEE} denars\n \nTotal to pay: {TOTAL} denars");
         public static TextObject ConfirmSell => new TextObject("{=cx_confirm_sell}Sell {QTY} x {NAME}\n \nMarket price: {PRICE}\nAfter spread and slippage: {EXEC}\nShares: {GROSS} denars\nBroker's fee: {FEE} denars\nTax on profit: {TAX} denars\n \nYou receive: {TOTAL} denars");

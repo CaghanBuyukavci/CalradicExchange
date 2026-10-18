@@ -112,5 +112,7 @@
     <string id="cx_col_profit" text="Kâr/zarar" />
     <string id="cx_col_profit_pct" text="Kâr/zarar %" />
     <string id="cx_no_price_short" text="-" />
+    <string id="cx_qty_estimate_buy" text="Ödenecek: {TOTAL} dinar (komisyon {FEE})" />
+    <string id="cx_qty_estimate_sell" text="Eline geçecek: {TOTAL} dinar (komisyon {FEE}, vergi {TAX})" />
   </strings>
 </base>

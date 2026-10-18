@@ -7,15 +7,16 @@ using TaleWorlds.ScreenSystem;
 namespace CalradicExchange.UI
 {
     /// <summary>
-    /// Shows one of our Gauntlet table prefabs on top of the current screen (PLAN 2.6 spike, pulled forward).
-    /// Returns false when the layer cannot be created so the caller can fall back to a text inquiry (ADR-006).
+    /// Shows one of our Gauntlet popups (tables, quantity picker) on top of the current screen (PLAN 2.6 spike,
+    /// pulled forward). One at a time. Returns false when the layer cannot be created so the caller can fall back
+    /// to a vanilla inquiry (ADR-006).
     /// </summary>
     public static class TablePopup
     {
         private static GauntletLayer _layer;
         private static ScreenBase _screen;
 
-        public static bool Show(string movieName, Func<Action, ExchangeTableVM> buildViewModel)
+        public static bool Show(string movieName, Func<Action, ViewModel> buildViewModel)
         {
             Close();
             try

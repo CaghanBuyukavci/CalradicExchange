@@ -1,0 +1,97 @@
+<Prefab>
+  <!-- Calradic Exchange: share quantity for buy/sell. Slider and number box share @Quantity. Data source: QuantityVM. -->
+  <Window>
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000ff" AlphaFactor="0.7">
+      <Children>
+
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="600" SuggestedHeight="500" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Children>
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="StdAssets\Popup\canvas" />
+
+            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalTopToBottom">
+              <Children>
+
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="56" MarginTop="8" Brush="Popup.Title.Text" Text="@Title" />
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="23" Sprite="StdAssets\Popup\divider" />
+
+                <!-- Prompt -->
+                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="12" Brush="Popup.Description.Text" Text="@Prompt" />
+
+                <!-- Number row: - [ box ] + -->
+                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="56" HorizontalAlignment="Center" MarginTop="16" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="56" SuggestedHeight="52" VerticalAlignment="Center" Brush="Popup.Done.Button.NineGrid" Command.Click="ExecuteDecrease">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Brush.FontSize="32" Text="-" />
+                      </Children>
+                    </ButtonWidget>
+
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="56" MarginLeft="14" MarginRight="14" Sprite="General\CharacterCreation\name_input_area">
+                      <Children>
+                        <IntegerInputTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="10" MarginRight="10" MarginTop="6" MarginBottom="6" Brush="Review.NameInput.Text" Brush.FontSize="32" IntText="@Quantity" MinInt="@Min" MaxInt="@Max" EnableClamp="true" />
+                      </Children>
+                    </Widget>
+
+                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="56" SuggestedHeight="52" VerticalAlignment="Center" Brush="Popup.Done.Button.NineGrid" Command.Click="ExecuteIncrease">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Brush.FontSize="32" Text="+" />
+                      </Children>
+                    </ButtonWidget>
+                  </Children>
+                </ListPanel>
+
+                <!-- Slider row: 1 ===o=== max (click max to jump there) -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="44" MarginLeft="40" MarginRight="40" MarginTop="16" StackLayout.LayoutMethod="HorizontalLeftToRight" IsVisible="@HasSlider">
+                  <Children>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="50" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.TextHorizontalAlignment="Left" Text="@MinText" />
+
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+                      <Children>
+                        <SliderWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" VerticalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="true" MinValueInt="@Min" MaxValueInt="@Max" ValueInt="@Quantity">
+                          <Children>
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="14" VerticalAlignment="Center" Sprite="General\Slider\slider_inner_canvas" />
+                            <BrushWidget Id="Filler" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="21" VerticalAlignment="Center" PositionYOffset="2" Sprite="General\Slider\slider_fill" />
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="5" MarginBottom="5" Brush="Slider" Brush.SaturationFactor="25" Brush.ValueFactor="-15" />
+                            <ImageWidget Id="SliderHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="38" SuggestedHeight="46" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="SliderHandle" />
+                          </Children>
+                        </SliderWidget>
+                      </Children>
+                    </Widget>
+
+                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70" Command.Click="ExecuteSetMax">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.TextHorizontalAlignment="Right" Text="@MaxText" />
+                      </Children>
+                    </ButtonWidget>
+                  </Children>
+                </ListPanel>
+
+                <!-- Live cost estimate -->
+                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="16" Brush="Popup.Description.Text" Brush.FontColor="#E4C59BFF" Text="@EstimateText" />
+
+              </Children>
+            </ListPanel>
+
+            <!-- Buttons -->
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="14" StackLayout.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="240" SuggestedHeight="64" MarginRight="10" Brush="Popup.Cancel.Button" Command.Click="ExecuteCancel">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="30" MarginRight="30" Brush="Popup.Button.Text" Text="@CancelText" />
+                  </Children>
+                </ButtonWidget>
+                <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="240" SuggestedHeight="64" MarginLeft="10" Brush="Popup.Done.Button" Command.Click="ExecuteConfirm">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="30" MarginRight="30" Brush="Popup.Button.Text" Text="@ConfirmText" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </ListPanel>
+
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="frame_9" ExtendLeft="18" ExtendTop="18" ExtendRight="18" ExtendBottom="18" IsEnabled="false" />
+          </Children>
+        </Widget>
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

@@ -8,6 +8,7 @@ using CalradicExchange.Core.Pricing;
 using CalradicExchange.Core.Trading;
 using CalradicExchange.Diagnostics;
 using CalradicExchange.Localization;
+using CalradicExchange.UI;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
@@ -18,8 +19,8 @@ using TaleWorlds.Localization;
 namespace CalradicExchange.Menus
 {
     /// <summary>
-    /// Buy and sell flow (PLAN 1.19, 1.20): pick an instrument (multi-selection inquiry) -> quantity (text inquiry)
-    /// -> confirmation with the full cost breakdown -> execute in Core and move the hero's gold.
+    /// Buy and sell flow (PLAN 1.19, 1.20): pick an instrument (multi-selection inquiry) -> quantity (slider popup,
+    /// text inquiry as fallback) -> confirmation with the full cost breakdown -> execute in Core and move the hero's gold.
     /// </summary>
     public static class TradeFlow
     {
@@ -109,6 +110,15 @@ namespace CalradicExchange.Menus
             }
             prompt.SetTextVariable("NAME", name);
             prompt.SetTextVariable("MAX", max);
+            string title = side == OrderSide.Buy ? Strings.BuyTitle.ToString() : Strings.SellTitle.ToString();
+            int initial = side == OrderSide.Sell ? max : 1;
+
+            bool shown = TablePopup.Show("CxQuantityPopup", close => new QuantityVM(title, prompt.ToString(), max, initial,
+                Strings.Continue.ToString(), Strings.Cancel.ToString(),
+                qty => Estimate(id, side, qty),
+                qty => Guard("quantity", () => { close(); ShowConfirmation(id, side, qty); }),
+                close));
+            if (shown) return;
 
             InformationManager.ShowTextInquiry(new TextInquiryData(
                 side == OrderSide.Buy ? Strings.BuyTitle.ToString() : Strings.SellTitle.ToString(),
@@ -117,6 +127,20 @@ namespace CalradicExchange.Menus
                 null, false,
                 text => ValidateQuantity(text, max),
                 "", side == OrderSide.Sell ? max.ToString() : ""));
+        }
+
+        /// <summary>One-line cost preview for the quantity popup.</summary>
+        private static string Estimate(string id, OrderSide side, int quantity)
+        {
+            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
+            if (b == null || !b.IsReady) return "";
+            TradeQuote q = b.Orders.Quote(id, side, quantity, b.CurrentTrader(), b.Portfolio);
+            if (!q.IsValid) return Strings.TradeErrorText(q.Error).ToString();
+            TextObject t = side == OrderSide.Buy ? Strings.QuantityEstimateBuy : Strings.QuantityEstimateSell;
+            t.SetTextVariable("TOTAL", q.Total);
+            t.SetTextVariable("FEE", q.Commission);
+            t.SetTextVariable("TAX", q.ProfitTax);
+            return t.ToString();
         }
 
         private static Tuple<bool, string> ValidateQuantity(string text, int max)
