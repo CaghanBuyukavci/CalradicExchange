@@ -85,6 +85,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - ADR-017 (hacim ağırlığı), ADR-018 (kıtlık), ADR-019 (beklenen şok tabanı). Otomatik döküm 120. borsa gününe kadar sürüyor (2026-10-19'da 40'tan uzatıldı); uzun veriyle oynaklık ve piyasanın oturma günü kontrol edilince kaldırılacak.
   - ADR-021: kampanya başındaki fiyat çöküşü için temel değer ilk 90 gün yumuşatılıyor (yarı ömür 45 → 0).
   - ADR-022 (2026-10-19) ADR-021'in yerine geçti: F = taban × e^E (göreli, sönen ekonomi sinyali), haber şokları ×2, komisyon en fazla %2,5, yağma birikme sınırı.
+  - 2026-10-19 oyun testi (43 gün): yeşil gün oranı %54–58 ve sabit, oyuncu +375 dinar kâr etti, Tüccar becerisine göre komisyon doğru, slider çalışıyor. Açık konu: ortalama +%15 yükseliş (bkz. ADR-022 test notu). Kalibrasyon bitince otomatik piyasa dökümü (120. gün) kaldırılacak.
 - [x] 1.16 `EventBridge`: köy yağması, kuşatma başlangıcı/bitişi, şehir el değiştirme, savaş, barış, mevsim → `MarketEvent`
   - Kale kuşatmaları ve küçük fraksiyon savaşları sayılmaz. Mevsim ve kıtlık Core'da.
 - [x] 1.17 Günlük tick: snapshot al → Core'u güncelle → büyük hareketleri mesajla bildir

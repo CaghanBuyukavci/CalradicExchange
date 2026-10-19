@@ -157,3 +157,11 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Gerçek veri (35 gün, gürültü ve şoklar hariç): yeşil gün oranı dönemlere göre %53 / %62 / %62. 35 günlük değişim ortalama +%9, aralık −%14 … +%46 (eskiden +%40, −%29 … +%175).
 - **Bedeli:** Hisse fiyatı artık "10 birim malın şehirdeki fiyatı" değil; ona sadece yavaşça yaklaşan bir endeks.
 - **Kayıt:** Şema 5: `prices[].anchor`, `prices[].economySignal`, `shocks[].source`. Göç: taban mevcut F'den başlar, sinyal 0.
+- **Oyun testi (2026-10-19, yeni kampanya, 43 gün, Tüccar 30–34):**
+  - Yeşil gün oranı dönemlere göre %58 / %54 / %55 / %55; her gün 17 hissenin 5–15'i yeşil kapandı.
+  - Oyuncu satılan işlemlerden +375 dinar gerçekleşmiş kâr etti (8 işlemin 6'sı kârlı; komisyon 535, vergi 47). Haberle yapılan 4 işlemin 3'ü kazandı.
+  - Komisyon her işlemde Tüccar becerisinden doğru hesaplandı (30 → %2,30, 33 → %2,28, 34 → %2,27). Oturum açılışında log Tüccar 0 yazar, çünkü yeni kampanyada karakter henüz oluşturulmamıştır.
+  - Slider'lı miktar penceresi görünüyor ve çalışıyor (kullanıcı onayı).
+  - Hurma yağma haberi yine zarar etti. Sebep: yaz şokunun sona ermesiyle fiyat hedefin üstünde kalmıştı; yağma sadece +%5 getirdi, bu da alıp satma maliyetinin (~%5,6) altında kaldı. Bu bir hata değil, şans payı sayıldı.
+  - **İzlenecek:** Hisseler 43 günde ortalama +%15 yükseldi. Yaklaşık yarısı geçici şoklardan (kış başlangıcı, savaşlar), kalanı tabanın kampanya başındaki fiyat yükselişini izlemesinden geliyor. Gerçek fiyatlar çoğu malda tabanın altında, bu yüzden taban geri inmeli. Uzun oyunda al-tut stratejisi hâlâ bu kadar kazandırıyorsa `anchorHalfLifeDays` veya mevsim dürtüleri ayarlanacak.
+  - Kayıttan borsa durumu okunabiliyor: `.sav` dosyası 4 baytlık başlık uzunluğu + JSON başlık + ham deflate gövdeden oluşuyor. Durum JSON'u `"schemaVersion"` aranarak bulunur.
