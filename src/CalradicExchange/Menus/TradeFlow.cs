@@ -119,6 +119,15 @@ namespace CalradicExchange.Menus
                 () => Guard("fallback sell", () => AskQuantity(id, OrderSide.Sell, back))));
         }
 
+        /// <summary>
+        /// Starts a buy or sell from another table (portfolio). <paramref name="back"/> reopens that table after the
+        /// trade or when the player backs out.
+        /// </summary>
+        public static void StartTrade(string id, OrderSide side, Action back)
+        {
+            Guard(side == OrderSide.Buy ? "buy" : "sell", () => AskQuantity(id, side, back));
+        }
+
         /// <summary>Quantity step. <paramref name="back"/> runs after the trade or when the player backs out.</summary>
         private static void AskQuantity(string id, OrderSide side, Action back)
         {

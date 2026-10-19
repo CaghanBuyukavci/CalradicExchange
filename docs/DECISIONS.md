@@ -223,6 +223,11 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   3. O da yetmezse kalan tutar borç olarak kayda yazılır. Borç, oyuncunun bir sonraki herhangi bir lonca kâr dağıtımından düşülür.
   - Başka loncaların payları ve emtia/sepet hisseleri bu borç için satılmaz.
   - Borç portföy penceresinde ve borsa menüsü metninde görünür.
+  - Borç lonca bazında tutulur; hangi loncanın zararından doğduğu bilinir.
+- **Borç cezası (kullanıcı, 2026-10-19):** Bir loncaya bekleyen borç varken her hafta (dağıtım günü), o loncanın şehrinin bağlı olduğu krallığın hükümdarıyla oyuncunun ilişkisi 2 azalır.
+  - Uygulama: `ChangeRelationAction.ApplyPlayerRelation(ruler, -2, showQuickNotification: false)`.
+  - Uyarı: ekranın üstünden çıkan panel, `MBInformationManager.AddQuickInformation(metin, 0, ruler.CharacterObject)`. Metinde kişi, neden (hangi loncaya borç) ve miktar yazar.
+  - Şehir bir krallığa bağlı değilse, şehrin sahibi klanın lideri kullanılır.
 - **Varsayılan ölçek (2.2'de simülatörle kontrol edilecek):**
   - Her lonca 100 pay.
   - Örnek: ortanca 174 dinar/gün kârda pay fiyatı ≈ 174 × 84 / 0,25 / 100 ≈ 585 dinar. Haftalık dağıtım pay başına ≈ 12 dinar (%2/hafta).

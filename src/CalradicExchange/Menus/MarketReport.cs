@@ -42,6 +42,7 @@ namespace CalradicExchange.Menus
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
+            ButtonSkins.EnsureApplied();
             if (TablePopup.Show("CxPortfolioTable", close => PortfolioTable(b, close))) return;
             Portfolio pf = b.Portfolio;
 
@@ -88,14 +89,22 @@ namespace CalradicExchange.Menus
                 },
                 footer, Strings.Close.ToString(), close);
 
+            string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString();
+            Action back = ShowPortfolio;
             bool alternate = false;
             foreach (Position pos in pf.Positions)
             {
                 decimal price = PriceOf(b, pos.InstrumentId);
                 decimal pnl = pos.Quantity * price - pos.CostBasis;
                 double pct = pos.CostBasis > 0 ? (double)(pnl / pos.CostBasis) : 0;
-                vm.PortfolioRows.Add(new PortfolioRowVM(Names.Instrument(b.Catalog.Find(pos.InstrumentId)), pos.Quantity.ToString(),
-                    Fmt.Price(pos.AverageCost), Fmt.Price(price), Fmt.SignedDenars(pnl), Fmt.Pct(pct), TableColors.ForAmount(pnl), alternate));
+                PriceState ps = b.Market.Get(pos.InstrumentId);
+                bool open = ps != null && ps.HasPrice && !ps.Closed;
+                string id = pos.InstrumentId;
+                vm.PortfolioRows.Add(new PortfolioRowVM(Names.Instrument(b.Catalog.Find(id)), pos.Quantity.ToString(),
+                    Fmt.Price(pos.AverageCost), Fmt.Price(price), Fmt.SignedDenars(pnl), Fmt.Pct(pct), TableColors.ForAmount(pnl), alternate,
+                    open, open, buyText, sellText,
+                    () => TradeFlow.StartTrade(id, OrderSide.Buy, back),
+                    () => TradeFlow.StartTrade(id, OrderSide.Sell, back)));
                 alternate = !alternate;
             }
             return vm;
