@@ -19,19 +19,76 @@ using TaleWorlds.Localization;
 namespace CalradicExchange.Menus
 {
     /// <summary>
-    /// Buy and sell flow (PLAN 1.19, 1.20): pick an instrument (multi-selection inquiry) -> quantity (slider popup,
-    /// text inquiry as fallback) -> confirmation with the full cost breakdown -> execute in Core and move the hero's gold.
+    /// Buy and sell flow (PLAN 1.19, 1.20, ADR-025): a market table per instrument class with Buy / Sell buttons on
+    /// every row -> quantity (slider popup, text inquiry as fallback) -> confirmation with the full cost breakdown ->
+    /// execute in Core and move the hero's gold -> back to the same market table.
     /// </summary>
     public static class TradeFlow
     {
-        public static void StartBuy()
+        /// <summary>Commodity market (InstrumentClass.Commodity) or basket market (InstrumentClass.Sector).</summary>
+        public static void ShowMarket(InstrumentClass cls)
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
-            TraderProfile trader = b.CurrentTrader();
+            if (TablePopup.Show("CxTradeTable", close => MarketTable(b, cls, close))) return;
+            ShowMarketFallback(b, cls);
+        }
 
+        private static ExchangeTableVM MarketTable(ExchangeCampaignBehavior b, InstrumentClass cls, Action close)
+        {
+            TraderProfile trader = b.CurrentTrader();
+            decimal held = b.Portfolio.MarketValue(id => MarketReport.PriceOf(b, id));
+            TextObject desc = Strings.TradeDescription;
+            desc.SetTextVariable("GOLD", trader.Gold);
+            desc.SetTextVariable("LEFT", Fmt.Denars(Math.Max(0, b.Orders.TotalLimit(trader) - held)));
+            string description = desc.ToString();
+            if (cls == InstrumentClass.Commodity)
+            {
+                description = Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare) + "\n" + description;
+            }
+
+            var vm = new ExchangeTableVM(MarketTitle(cls),
+                new[]
+                {
+                    Strings.ColInstrument.ToString(), Strings.ColPrice.ToString(), Strings.ColToday.ToString(),
+                    Strings.ColWeek.ToString(), Strings.ColHeld.ToString(),
+                },
+                null, Strings.Close.ToString(), close, description);
+
+            string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString(), none = Strings.NoPrice.ToString();
+            Action back = () => ShowMarket(cls);
+            bool alternate = false;
+            foreach (InstrumentDefinition def in b.Catalog.Instruments.Where(i => i.Class == cls))
+            {
+                PriceState ps = b.Market.Get(def.Id);
+                bool priced = ps != null && ps.HasPrice;
+                bool open = priced && !ps.Closed;
+                int qty = b.Portfolio.QuantityOf(def.Id);
+                double day = priced ? ps.ChangeOver(1) : 0, week = priced ? ps.ChangeOver(7) : 0;
+                string id = def.Id;
+                vm.TradeRows.Add(new TradeRowVM(Names.Instrument(def),
+                    priced ? Fmt.Price(ps.Price) : none,
+                    priced ? Fmt.Pct(day) : none, TableColors.ForChange(day),
+                    priced ? Fmt.Pct(week) : none, TableColors.ForChange(week),
+                    qty > 0 ? qty.ToString() : none,
+                    open, open && qty > 0, alternate, buyText, sellText,
+                    () => Guard("buy pick", () => AskQuantity(id, OrderSide.Buy, back)),
+                    () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell, back))));
+                alternate = !alternate;
+            }
+            return vm;
+        }
+
+        private static string MarketTitle(InstrumentClass cls)
+        {
+            return (cls == InstrumentClass.Commodity ? Strings.CommodityMarketTitle : Strings.BasketMarketTitle).ToString();
+        }
+
+        /// <summary>Vanilla fallback when the Gauntlet table cannot be shown (ADR-006): pick an instrument, then buy or sell.</summary>
+        private static void ShowMarketFallback(ExchangeCampaignBehavior b, InstrumentClass cls)
+        {
             var elements = new List<InquiryElement>();
-            foreach (InstrumentDefinition def in b.Catalog.Instruments)
+            foreach (InstrumentDefinition def in b.Catalog.Instruments.Where(i => i.Class == cls))
             {
                 PriceState ps = b.Market.Get(def.Id);
                 if (ps == null || !ps.HasPrice || ps.Closed) continue;
@@ -40,92 +97,29 @@ namespace CalradicExchange.Menus
                 title.SetTextVariable("PRICE", Fmt.Price(ps.Price));
                 elements.Add(new InquiryElement(def.Id, title.ToString(), Icon(def), true, Fmt.Pct(ps.ChangeOver(7))));
             }
-
-            decimal held = b.Portfolio.MarketValue(id => MarketReport.PriceOf(b, id));
-            TextObject desc = Strings.BuyDescription;
-            desc.SetTextVariable("GOLD", trader.Gold);
-            desc.SetTextVariable("LEFT", Fmt.Denars(Math.Max(0, b.Orders.TotalLimit(trader) - held)));
-
-            if (TablePopup.Show("CxPickTable", close => BuyPicker(b, desc.ToString(), close))) return;
-            MBInformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
-                Strings.BuyTitle.ToString(), desc.ToString(), elements, true, 1, 1,
-                Strings.Continue.ToString(), Strings.Cancel.ToString(),
-                chosen => Guard("buy pick", () => AskQuantity((string)chosen.First().Identifier, OrderSide.Buy)),
-                null, "", true));
-        }
-
-        public static void StartSell()
-        {
-            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
-            if (b == null || !b.IsReady) return;
-
-            var elements = new List<InquiryElement>();
-            foreach (Position pos in b.Portfolio.Positions)
-            {
-                InstrumentDefinition def = b.Catalog.Find(pos.InstrumentId);
-                PriceState ps = b.Market.Get(pos.InstrumentId);
-                if (def == null || ps == null) continue;
-                TextObject title = Strings.SellElement;
-                title.SetTextVariable("NAME", Names.Instrument(def));
-                title.SetTextVariable("QTY", pos.Quantity);
-                title.SetTextVariable("PRICE", Fmt.Price(ps.Price));
-                string hint = Fmt.SignedDenars(pos.Quantity * ps.Price - pos.CostBasis);
-                elements.Add(new InquiryElement(def.Id, title.ToString(), Icon(def), !ps.Closed, hint));
-            }
             if (elements.Count == 0) return;
 
-            if (TablePopup.Show("CxPickTable", close => SellPicker(b, close))) return;
             MBInformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
-                Strings.SellTitle.ToString(), Strings.SellDescription.ToString(), elements, true, 1, 1,
-                Strings.Continue.ToString(), Strings.Cancel.ToString(),
-                chosen => Guard("sell pick", () => AskQuantity((string)chosen.First().Identifier, OrderSide.Sell)),
+                MarketTitle(cls), "", elements, true, 1, 1, Strings.Continue.ToString(), Strings.Cancel.ToString(),
+                chosen => Guard("fallback pick", () => ChooseSide(b, (string)chosen.First().Identifier, () => ShowMarket(cls))),
                 null));
         }
 
-        /// <summary>Clickable buy list: a click opens the quantity step directly, no Continue button.</summary>
-        private static ExchangeTableVM BuyPicker(ExchangeCampaignBehavior b, string description, Action close)
+        private static void ChooseSide(ExchangeCampaignBehavior b, string id, Action back)
         {
-            var vm = new ExchangeTableVM(Strings.BuyTitle.ToString(),
-                new[] { Strings.ColInstrument.ToString(), Strings.ColPrice.ToString(), Strings.ColToday.ToString(), Strings.ColWeek.ToString() },
-                null, Strings.Cancel.ToString(), close, description);
-            bool alternate = false;
-            foreach (InstrumentDefinition def in b.Catalog.Instruments)
+            if (b.Portfolio.QuantityOf(id) <= 0)
             {
-                PriceState ps = b.Market.Get(def.Id);
-                if (ps == null || !ps.HasPrice || ps.Closed) continue;
-                string id = def.Id;
-                double day = ps.ChangeOver(1), week = ps.ChangeOver(7);
-                vm.Rows.Add(new GridRowVM(new[] { Names.Instrument(def), Fmt.Price(ps.Price), Fmt.Pct(day), Fmt.Pct(week) }, alternate,
-                        () => Guard("buy pick", () => AskQuantity(id, OrderSide.Buy)))
-                    .WithColor(3, TableColors.ForChange(day))
-                    .WithColor(4, TableColors.ForChange(week)));
-                alternate = !alternate;
+                AskQuantity(id, OrderSide.Buy, back);
+                return;
             }
-            return vm;
+            InformationManager.ShowInquiry(new InquiryData(Names.Instrument(b.Catalog.Find(id)), "", true, true,
+                Strings.BtnBuy.ToString(), Strings.BtnSell.ToString(),
+                () => Guard("fallback buy", () => AskQuantity(id, OrderSide.Buy, back)),
+                () => Guard("fallback sell", () => AskQuantity(id, OrderSide.Sell, back))));
         }
 
-        private static ExchangeTableVM SellPicker(ExchangeCampaignBehavior b, Action close)
-        {
-            var vm = new ExchangeTableVM(Strings.SellTitle.ToString(),
-                new[] { Strings.ColInstrument.ToString(), Strings.ColQuantity.ToString(), Strings.ColNow.ToString(), Strings.ColProfit.ToString() },
-                null, Strings.Cancel.ToString(), close, Strings.SellDescription.ToString());
-            bool alternate = false;
-            foreach (Position pos in b.Portfolio.Positions)
-            {
-                InstrumentDefinition def = b.Catalog.Find(pos.InstrumentId);
-                PriceState ps = b.Market.Get(pos.InstrumentId);
-                if (def == null || ps == null) continue;
-                string id = def.Id;
-                decimal pnl = pos.Quantity * ps.Price - pos.CostBasis;
-                vm.Rows.Add(new GridRowVM(new[] { Names.Instrument(def), pos.Quantity.ToString(), Fmt.Price(ps.Price), Fmt.SignedDenars(pnl) }, alternate,
-                        () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell)), !ps.Closed)
-                    .WithColor(4, TableColors.ForAmount(pnl)));
-                alternate = !alternate;
-            }
-            return vm;
-        }
-
-        private static void AskQuantity(string id, OrderSide side)
+        /// <summary>Quantity step. <paramref name="back"/> runs after the trade or when the player backs out.</summary>
+        private static void AskQuantity(string id, OrderSide side, Action back)
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             InstrumentDefinition def = b.Catalog.Find(id);
@@ -139,7 +133,7 @@ namespace CalradicExchange.Menus
                 max = b.Orders.MaxBuyQuantity(id, trader, b.Portfolio);
                 if (max <= 0)
                 {
-                    // Explain the first blocking reason using a one-share quote.
+                    // Explain the first blocking reason using a one-share quote; the market table stays open.
                     ShowError(b.Orders.Quote(id, OrderSide.Buy, 1, trader, b.Portfolio).Error);
                     return;
                 }
@@ -161,15 +155,14 @@ namespace CalradicExchange.Menus
             bool shown = TablePopup.Show("CxQuantityPopup", close => new QuantityVM(title, prompt.ToString(), max, initial,
                 Strings.Continue.ToString(), Strings.Cancel.ToString(),
                 qty => Estimate(id, side, qty),
-                qty => Guard("quantity", () => { close(); ShowConfirmation(id, side, qty); }),
-                close));
+                qty => Guard("quantity", () => { close(); ShowConfirmation(id, side, qty, back); }),
+                () => Guard("quantity cancel", () => { close(); back(); })));
             if (shown) return;
 
-            InformationManager.ShowTextInquiry(new TextInquiryData(
-                side == OrderSide.Buy ? Strings.BuyTitle.ToString() : Strings.SellTitle.ToString(),
+            InformationManager.ShowTextInquiry(new TextInquiryData(title,
                 prompt.ToString(), true, true, Strings.Continue.ToString(), Strings.Cancel.ToString(),
-                text => Guard("quantity", () => ShowConfirmation(id, side, int.Parse(text.Trim()))),
-                null, false,
+                text => Guard("quantity", () => ShowConfirmation(id, side, int.Parse(text.Trim()), back)),
+                () => Guard("quantity cancel", back), false,
                 text => ValidateQuantity(text, max),
                 "", side == OrderSide.Sell ? max.ToString() : ""));
         }
@@ -194,13 +187,14 @@ namespace CalradicExchange.Menus
             return new Tuple<bool, string>(ok, ok ? "" : Strings.QuantityInvalid.SetTextVariable("MAX", max).ToString());
         }
 
-        private static void ShowConfirmation(string id, OrderSide side, int quantity)
+        private static void ShowConfirmation(string id, OrderSide side, int quantity, Action back)
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             TradeQuote q = b.Orders.Quote(id, side, quantity, b.CurrentTrader(), b.Portfolio);
             if (!q.IsValid)
             {
                 ShowError(q.Error);
+                back();
                 return;
             }
 
@@ -217,7 +211,8 @@ namespace CalradicExchange.Menus
             InformationManager.ShowInquiry(new InquiryData(
                 side == OrderSide.Buy ? Strings.BuyTitle.ToString() : Strings.SellTitle.ToString(),
                 text.ToString(), true, true, Strings.Confirm.ToString(), Strings.Cancel.ToString(),
-                () => Guard("execute", () => Execute(id, side, quantity)), null));
+                () => Guard("execute", () => { Execute(id, side, quantity); back(); }),
+                () => Guard("confirm cancel", back)));
         }
 
         private static void Execute(string id, OrderSide side, int quantity)

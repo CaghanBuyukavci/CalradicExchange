@@ -8,7 +8,6 @@
     <string id="cx_btn_close" text="Kapat" />
     <string id="cx_btn_confirm" text="Onayla" />
     <string id="cx_btn_continue" text="Devam" />
-    <string id="cx_buy_desc" text="Almak istediğin hisseye tıkla. Altın: {GOLD} dinar. Kalan limit: {LEFT} dinar." />
     <string id="cx_buy_element" text="{NAME} - {PRICE}" />
     <string id="cx_buy_title" text="Hisse al" />
     <string id="cx_closed_data" text="defterler okunamadı, exchange.log dosyasına bak" />
@@ -75,12 +74,10 @@
     <string id="cx_news_title" text="Borsadaki haberler" />
     <string id="cx_news_today" text="Bugün" />
     <string id="cx_no_price" text="{NAME}: henüz fiyat yok" />
-    <string id="cx_opt_buy" text="Hisse al" />
     <string id="cx_opt_leave" text="Ayrıl" />
     <string id="cx_opt_market" text="Piyasaya bak" />
     <string id="cx_opt_news" text="Haberler" />
     <string id="cx_opt_portfolio" text="Portföyün" />
-    <string id="cx_opt_sell" text="Hisse sat" />
     <string id="cx_portfolio_empty" text="Elinde hiç hisse yok." />
     <string id="cx_portfolio_line" text="{NAME}: {QTY} adet, alış {AVG}, şimdi {PRICE}, {PNL}" />
     <string id="cx_portfolio_title" text="Portföyün" />
@@ -97,10 +94,7 @@
     <string id="cx_sector_metal" text="Maden ve metal sepeti" />
     <string id="cx_sector_military" text="Askeri tedarik sepeti" />
     <string id="cx_sector_textile" text="Tekstil sepeti" />
-    <string id="cx_sell_desc" text="Satmak istediğin hisseye tıkla." />
-    <string id="cx_sell_element" text="{NAME} - {QTY} adet, fiyat {PRICE}" />
     <string id="cx_sell_title" text="Hisse sat" />
-    <string id="cx_tip_nothing_to_sell" text="Elinde hiç hisse yok." />
     <string id="cx_unknown" text="bilinmeyen bir yer" />
     <string id="cx_col_instrument" text="Hisse" />
     <string id="cx_col_price" text="Fiyat" />
@@ -125,5 +119,13 @@
     <string id="cx_col_side" text="İşlem" />
     <string id="cx_col_total" text="Tutar" />
     <string id="cx_col_costs" text="Masraf" />
+    <string id="cx_opt_commodity_market" text="Emtia Piyasası" />
+    <string id="cx_opt_basket_market" text="Sepet Piyasası" />
+    <string id="cx_commodity_market_title" text="Emtia Piyasası" />
+    <string id="cx_basket_market_title" text="Sepet Piyasası" />
+    <string id="cx_trade_desc" text="Altın: {GOLD} dinar. Kalan limit: {LEFT} dinar." />
+    <string id="cx_btn_buy" text="AL" />
+    <string id="cx_btn_sell" text="SAT" />
+    <string id="cx_col_held" text="Elde" />
   </strings>
 </base>

@@ -1,5 +1,6 @@
 using System;
 using CalradicExchange.Behaviors;
+using CalradicExchange.Core.Model;
 using CalradicExchange.Diagnostics;
 using CalradicExchange.Localization;
 using CalradicExchange.UI;
@@ -33,9 +34,10 @@ namespace CalradicExchange.Menus
             starter.AddGameMenu(ExchangeMenuId, "{=!}{" + MenuTextVariable + "}", OnExchangeInit, GameMenu.MenuOverlayType.SettlementWithBoth);
             starter.AddGameMenuOption(ExchangeMenuId, "cx_market", Strings.OptMarket,
                 args => Option(args, GameMenuOption.LeaveType.Submenu), args => Guard("market", MarketReport.ShowMarket));
-            starter.AddGameMenuOption(ExchangeMenuId, "cx_buy", Strings.OptBuy,
-                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("buy", TradeFlow.StartBuy));
-            starter.AddGameMenuOption(ExchangeMenuId, "cx_sell", Strings.OptSell, OnSellCondition, args => Guard("sell", TradeFlow.StartSell));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_commodity_market", Strings.OptCommodityMarket,
+                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("commodity market", () => TradeFlow.ShowMarket(InstrumentClass.Commodity)));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_basket_market", Strings.OptBasketMarket,
+                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("basket market", () => TradeFlow.ShowMarket(InstrumentClass.Sector)));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_portfolio", Strings.OptPortfolio,
                 args => Option(args, GameMenuOption.LeaveType.Manage), args => Guard("portfolio", MarketReport.ShowPortfolio));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_news", Strings.OptNews,
@@ -99,18 +101,6 @@ namespace CalradicExchange.Menus
             {
                 args.IsEnabled = false;
                 args.Tooltip = Strings.ExchangeClosedText.SetTextVariable("REASON", b?.DisabledReason ?? Strings.ClosedReasonPrices.ToString());
-            }
-            return true;
-        }
-
-        private static bool OnSellCondition(MenuCallbackArgs args)
-        {
-            Option(args, GameMenuOption.LeaveType.Trade);
-            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
-            if (args.IsEnabled && (b.Portfolio == null || b.Portfolio.Positions.Count == 0))
-            {
-                args.IsEnabled = false;
-                args.Tooltip = Strings.NothingToSell;
             }
             return true;
         }

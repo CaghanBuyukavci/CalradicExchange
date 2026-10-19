@@ -183,3 +183,9 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Takas Geçmişim: `CxHistoryTable`, en yeni işlem üstte. Sütunlar: Tarih, İşlem, Hisse, Adet, Fiyat, Tutar (altın akışı, işaretli), Masraf (komisyon + vergi), Kâr/zarar (sadece satışlarda).
 - **Bedel:** Seçim tablosunda vanilla penceredeki eşya ikonları yok. Karşılığında bugün/7 gün değişimi (alımda) ve kâr/zarar (satımda) sütunları var.
 
+## ADR-025 — Emtia ve Sepet piyasası; her satırda AL / SAT
+
+- **Bağlam (2026-10-19):** Kullanıcı borsa menüsünden "Hisse al" ve "Hisse sat"ın kaldırılmasını istedi. Yerine "Emtia Piyasası" (sadece emtia hisseleri) ve "Sepet Piyasası" (sadece sepetler) gelecek. Her satırda kendi AL ve SAT butonu olacak; SAT sadece elde o hisse varsa görünecek. Butonlar doğrudan miktar penceresini açacak. Kullanıcı bunu bir taslak görselle (`piyasa.png`, depoya alınmadı) gösterdi.
+- **Karar:** Yeni tablo `CxTradeTable` (sütunlar: Hisse, Fiyat, Bugün, 7 gün, Elde, AL, SAT). Butonlar `GUI/Brushes/CxBrushes.xml`'deki `Cx.RowButton.Buy/Sell` brush'larını kullanır (yeşil/kırmızı, hover ve basılı durumları var). İşlem bitince veya miktar/onay adımında vazgeçilince aynı piyasa tablosu yeniden açılır; böylece art arda işlem yapılabilir. Fiyatı olmayan veya kapanmış araçta AL gizlenir. ADR-024'teki seçim tablosu (`CxPickTable`) kaldırıldı. Tablo açılamazsa yedek akış devreye girer: vanilla seçim penceresi, ardından elde varsa Al/Sat sorusu.
+- **Kullanıcıya sorulmadan eklenen:** "Elde" sütunu (eldeki adet). Bu sütun SAT butonunun neden görünüp görünmediğini açıklıyor. "Piyasaya bak" menüde genel bakış olarak kaldı.
+

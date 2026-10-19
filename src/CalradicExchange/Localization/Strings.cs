@@ -18,13 +18,12 @@ namespace CalradicExchange.Localization
         public static TextObject ExchangeMenuText => new TextObject("{=cx_menu_exchange_text}Money changers sit behind their tables in the back room of the inn, calling out prices for shares and baskets.\n \nYour holdings: {VALUE} denars ({PNL}).\nInvestment limit used: {USED} / {LIMIT} denars.\nBroker's fee: {FEE}. Tax on profit: {TAX}.");
         public static TextObject ExchangeClosedText => new TextObject("{=cx_menu_exchange_closed}The exchange is closed today. ({REASON})");
         public const string OptMarket = "{=cx_opt_market}Look at the market";
-        public const string OptBuy = "{=cx_opt_buy}Buy shares";
-        public const string OptSell = "{=cx_opt_sell}Sell shares";
+        public const string OptCommodityMarket = "{=cx_opt_commodity_market}Commodity market";
+        public const string OptBasketMarket = "{=cx_opt_basket_market}Basket market";
         public const string OptPortfolio = "{=cx_opt_portfolio}Your portfolio";
         public const string OptNews = "{=cx_opt_news}News";
         public const string OptHistory = "{=cx_opt_history}Your trade history";
         public const string OptLeave = "{=cx_opt_leave}Leave";
-        public static TextObject NothingToSell => new TextObject("{=cx_tip_nothing_to_sell}You hold no shares.");
         public static TextObject ClosedReasonData => new TextObject("{=cx_closed_data}its ledgers could not be read, see exchange.log");
         public static TextObject ClosedReasonPrices => new TextObject("{=cx_closed_prices}no prices yet");
 
@@ -49,6 +48,7 @@ namespace CalradicExchange.Localization
         public static TextObject ColNow => new TextObject("{=cx_col_now}Now");
         public static TextObject ColProfit => new TextObject("{=cx_col_profit}Profit");
         public static TextObject ColProfitPct => new TextObject("{=cx_col_profit_pct}Profit %");
+        public static TextObject ColHeld => new TextObject("{=cx_col_held}Held");
         public static TextObject ColDate => new TextObject("{=cx_col_date}Date");
         public static TextObject ColSide => new TextObject("{=cx_col_side}Trade");
         public static TextObject ColTotal => new TextObject("{=cx_col_total}Total");
@@ -59,11 +59,13 @@ namespace CalradicExchange.Localization
 
         // Buy / sell flow
         public static TextObject BuyTitle => new TextObject("{=cx_buy_title}Buy shares");
-        public static TextObject BuyDescription => new TextObject("{=cx_buy_desc}Click a share to buy it. Gold: {GOLD} denars. Limit left: {LEFT} denars.");
+        public static TextObject CommodityMarketTitle => new TextObject("{=cx_commodity_market_title}Commodity market");
+        public static TextObject BasketMarketTitle => new TextObject("{=cx_basket_market_title}Basket market");
+        public static TextObject TradeDescription => new TextObject("{=cx_trade_desc}Gold: {GOLD} denars. Limit left: {LEFT} denars.");
+        public static TextObject BtnBuy => new TextObject("{=cx_btn_buy}BUY");
+        public static TextObject BtnSell => new TextObject("{=cx_btn_sell}SELL");
         public static TextObject SellTitle => new TextObject("{=cx_sell_title}Sell shares");
-        public static TextObject SellDescription => new TextObject("{=cx_sell_desc}Click a share to sell it.");
         public static TextObject BuyElement => new TextObject("{=cx_buy_element}{NAME} - {PRICE}");
-        public static TextObject SellElement => new TextObject("{=cx_sell_element}{NAME} - {QTY} shares at {PRICE}");
         public static TextObject QuantityBuy => new TextObject("{=cx_qty_buy}{NAME} costs {PRICE} per share before fees.\nHow many shares? (at most {MAX})");
         public static TextObject QuantitySell => new TextObject("{=cx_qty_sell}You hold {QTY} shares of {NAME}.\nHow many do you sell?");
         public static TextObject QuantityEstimateBuy => new TextObject("{=cx_qty_estimate_buy}To pay: {TOTAL} denars (broker's fee {FEE})");
