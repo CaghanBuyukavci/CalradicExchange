@@ -75,8 +75,10 @@ if ((Test-Path $guiSource) -and (Get-ChildItem $guiSource -Recurse -File | Where
     Copy-Item $guiSource $guiTarget -Recurse -Force
 }
 
-# Runtime-loaded textures (ADR-023). Texture.LoadTextureFromPath reads PNGs with red and blue swapped, so we
-# write a pre-swapped copy into the game folder and keep the original in Assets\Textures.
+# Runtime-loaded textures (ADR-023). Every PNG in Assets\Textures is rewritten as 32-bit RGBA into the game's
+# GUI\Textures. A 24-bit RGB PNG showed up blue in game (red/blue swapped); a red/blue pre-swapped 32-bit copy was
+# still blue, so the engine seems to swap only 24-bit files. Flip $swapRedBlue if testing proves otherwise.
+$swapRedBlue = $false
 Add-Type -AssemblyName System.Drawing
 $texSource = Join-Path $repo 'Assets\Textures'
 $texTarget = Join-Path $guiTarget 'Textures'
@@ -84,18 +86,20 @@ New-Item -ItemType Directory -Force $texTarget | Out-Null
 foreach ($png in Get-ChildItem $texSource -Filter *.png) {
     $src = [System.Drawing.Bitmap]::FromFile($png.FullName)
     $bmp = New-Object System.Drawing.Bitmap($src.Width, $src.Height, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
-    # Color matrix rows are input R, G, B, A, offset; columns are output R, G, B, A.
-    $swap = New-Object System.Drawing.Imaging.ColorMatrix(,[single[][]]@(
-        [single[]]@(0, 0, 1, 0, 0), [single[]]@(0, 1, 0, 0, 0), [single[]]@(1, 0, 0, 0, 0),
-        [single[]]@(0, 0, 0, 1, 0), [single[]]@(0, 0, 0, 0, 1)))
     $attrs = New-Object System.Drawing.Imaging.ImageAttributes
-    $attrs.SetColorMatrix($swap)
+    if ($swapRedBlue) {
+        # Color matrix rows are input R, G, B, A, offset; columns are output R, G, B, A.
+        $swap = New-Object System.Drawing.Imaging.ColorMatrix(,[single[][]]@(
+            [single[]]@(0, 0, 1, 0, 0), [single[]]@(0, 1, 0, 0, 0), [single[]]@(1, 0, 0, 0, 0),
+            [single[]]@(0, 0, 0, 1, 0), [single[]]@(0, 0, 0, 0, 1)))
+        $attrs.SetColorMatrix($swap)
+    }
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.DrawImage($src, (New-Object System.Drawing.Rectangle(0, 0, $src.Width, $src.Height)), 0, 0, $src.Width, $src.Height, [System.Drawing.GraphicsUnit]::Pixel, $attrs)
     $g.Dispose(); $attrs.Dispose(); $src.Dispose()
     $bmp.Save((Join-Path $texTarget $png.Name), [System.Drawing.Imaging.ImageFormat]::Png)
     $bmp.Dispose()
-    Write-Host "Texture $($png.Name) written with red/blue swapped"
+    Write-Host "Texture $($png.Name) written as 32-bit RGBA (red/blue swapped: $swapRedBlue)"
 }
 
 Write-Host "Deployed $moduleId to $target" -ForegroundColor Green

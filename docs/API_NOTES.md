@@ -139,7 +139,7 @@ Sources: `Modules\SandBoxCore\ModuleData\items\horses_and_others.xml`, `TaleWorl
 | `MenuContext.SetBackgroundMeshName(string)` | name is a Gauntlet **sprite** name (`GameMenuWidget Sprite="@Background"`, `GameMenuVM.Background`) | VERIFIED | Exchange menu background `cx_exchange_bg` |
 | `UIResourceManager.SpriteData.Sprites` | `Dictionary<string, Sprite>`, looked up by `SpriteData.GetSprite(name)` | VERIFIED | We add our runtime sprite here |
 | `abstract Sprite(string, int, int, SpriteNinePatchParameters)` + `Texture`, `GetMinUvs`, `GetMaxUvs` | subclassable | VERIFIED | `UI/TextureSprite` |
-| `TaleWorlds.Engine.Texture.LoadTextureFromPath(fileName, folder)`, `CreateFromMemory(byte[])` | native; no vanilla caller | VERIFIED (signature) | PNG loads from path (in-game test), but **red and blue come out swapped**; deploy pre-swaps the file |
+| `TaleWorlds.Engine.Texture.LoadTextureFromPath(fileName, folder)`, `CreateFromMemory(byte[])` | native; no vanilla caller | VERIFIED (signature) | PNG loads from path (in-game test). A 24-bit RGB PNG showed blue; a pre-swapped 32-bit copy too. Deploy now writes unswapped 32-bit RGBA (pending test) |
 
 ## 9. After every game update
 
