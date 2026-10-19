@@ -188,5 +188,17 @@
     <string id="cx_inst_velvet_short" text="Kadife" />
     <string id="cx_inst_wine_short" text="Şarap" />
     <string id="cx_inst_wool_short" text="Yün" />
+    <string id="cx_cf_heading_buy" text="{QTY} x {NAME} al" />
+    <string id="cx_cf_heading_sell" text="{QTY} x {NAME} sat" />
+    <string id="cx_cf_market" text="Piyasa fiyatı" />
+    <string id="cx_cf_exec" text="Fark ve kayma sonrası" />
+    <string id="cx_cf_avg" text="Ortalama maliyetin" />
+    <string id="cx_cf_gross" text="Paylar" />
+    <string id="cx_cf_fee" text="Komisyon" />
+    <string id="cx_cf_tax" text="Kâr vergisi" />
+    <string id="cx_cf_pay" text="Ödenecek toplam" />
+    <string id="cx_cf_receive" text="Eline geçecek" />
+    <string id="cx_cf_profit" text="Kâr / zarar" />
+    <string id="cx_denars_amount" text="{AMOUNT} dinar" />
   </strings>
 </base>

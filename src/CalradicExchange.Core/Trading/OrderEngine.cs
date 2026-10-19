@@ -99,8 +99,10 @@ namespace CalradicExchange.Core.Trading
             else
             {
                 int afterCommission = Math.Max(0, gross - q.Commission);
-                q.ProfitTax = ProfitTax(afterCommission, portfolio.BasisFor(instrumentId, quantity));
+                q.CostBasis = portfolio.BasisFor(instrumentId, quantity);
+                q.ProfitTax = ProfitTax(afterCommission, q.CostBasis);
                 q.Total = afterCommission - q.ProfitTax;
+                q.RealizedPnl = q.Total - q.CostBasis;
             }
 
             if (side == OrderSide.Buy)

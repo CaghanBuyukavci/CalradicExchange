@@ -326,6 +326,13 @@ namespace CalradicExchange.Menus
                 return;
             }
 
+            string title = side == OrderSide.Buy ? Strings.BuyTitle.ToString() : Strings.SellTitle.ToString();
+            string name = Names.Instrument(b.Market.Find(id));
+            bool shown = TablePopup.Show("CxConfirmPopup", close => ConfirmTable(q, title, name,
+                () => Guard("execute", () => { close(); Execute(id, side, quantity); back(); }),
+                () => Guard("confirm cancel", () => { close(); back(); })));
+            if (shown) return;
+
             TextObject text = side == OrderSide.Buy ? Strings.ConfirmBuy : Strings.ConfirmSell;
             text.SetTextVariable("QTY", q.Quantity);
             text.SetTextVariable("NAME", Names.Instrument(b.Market.Find(id)));
@@ -342,6 +349,32 @@ namespace CalradicExchange.Menus
                 () => Guard("execute", () => { Execute(id, side, quantity); back(); }),
                 () => Guard("confirm cancel", back)));
         }
+
+        /// <summary>The cost breakdown as a label | value list; a sell also shows the average cost and the profit or loss.</summary>
+        private static ConfirmVM ConfirmTable(TradeQuote q, string title, string name, Action onConfirm, Action onCancel)
+        {
+            bool buy = q.Side == OrderSide.Buy;
+            TextObject heading = buy ? Strings.ConfirmBuyHeading : Strings.ConfirmSellHeading;
+            heading.SetTextVariable("QTY", q.Quantity);
+            heading.SetTextVariable("NAME", name);
+
+            var vm = new ConfirmVM(title, heading.ToString(), Strings.Confirm.ToString(), Strings.Cancel.ToString(), onConfirm, onCancel);
+            vm.Add(Strings.CfMarketPrice.ToString(), Fmt.Price(q.MarketPrice));
+            vm.Add(Strings.CfExecPrice.ToString(), Fmt.Price(q.ExecutionPrice));
+            if (!buy) vm.Add(Strings.CfAverageCost.ToString(), Fmt.Price(q.Quantity > 0 ? q.CostBasis / q.Quantity : 0));
+            vm.Add(Strings.CfGross.ToString(), DenarsText(q.Gross));
+            vm.Add(Strings.CfFee.ToString(), DenarsText(q.Commission));
+            if (!buy) vm.Add(Strings.CfTax.ToString(), DenarsText(q.ProfitTax), q.ProfitTax > 0 ? TableColors.Down : (Color?)null);
+            vm.Add((buy ? Strings.CfTotalPay : Strings.CfTotalReceive).ToString(), DenarsText(q.Total), null, true);
+            if (!buy)
+            {
+                vm.Add(Strings.CfProfit.ToString(), Strings.DenarsAmount.SetTextVariable("AMOUNT", Fmt.SignedDenars(q.RealizedPnl)).ToString(),
+                    TableColors.ForAmount(q.RealizedPnl), true);
+            }
+            return vm;
+        }
+
+        private static string DenarsText(long amount) => Strings.DenarsAmount.SetTextVariable("AMOUNT", Fmt.Denars(amount)).ToString();
 
         private static void Execute(string id, OrderSide side, int quantity)
         {

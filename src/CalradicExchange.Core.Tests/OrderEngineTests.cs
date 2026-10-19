@@ -133,6 +133,8 @@ namespace CalradicExchange.Core.Tests
 
             TradeResult r = _orders.Execute("cx_grain", OrderSide.Sell, 10, _rich, _portfolio);
             Assert.Equal(q.Total - 1034, r.RealizedPnl);
+            Assert.Equal(1034m, q.CostBasis);
+            Assert.Equal(r.RealizedPnl, q.RealizedPnl);
             Assert.Equal(expectedTax, _portfolio.TotalProfitTaxPaid);
         }
 

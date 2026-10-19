@@ -84,6 +84,18 @@ namespace CalradicExchange.Localization
         public static TextObject QuantityEstimateBuy => new TextObject("{=cx_qty_estimate_buy}To pay: {TOTAL} denars (broker's fee {FEE})");
         public static TextObject QuantityEstimateSell => new TextObject("{=cx_qty_estimate_sell}You receive: {TOTAL} denars (broker's fee {FEE}, tax {TAX})");
         public static TextObject QuantityInvalid => new TextObject("{=cx_qty_invalid}Enter a whole number from 1 to {MAX}.");
+        public static TextObject ConfirmBuyHeading => new TextObject("{=cx_cf_heading_buy}Buy {QTY} x {NAME}");
+        public static TextObject ConfirmSellHeading => new TextObject("{=cx_cf_heading_sell}Sell {QTY} x {NAME}");
+        public static TextObject CfMarketPrice => new TextObject("{=cx_cf_market}Market price");
+        public static TextObject CfExecPrice => new TextObject("{=cx_cf_exec}After spread and slippage");
+        public static TextObject CfAverageCost => new TextObject("{=cx_cf_avg}Your average cost");
+        public static TextObject CfGross => new TextObject("{=cx_cf_gross}Shares");
+        public static TextObject CfFee => new TextObject("{=cx_cf_fee}Broker's fee");
+        public static TextObject CfTax => new TextObject("{=cx_cf_tax}Tax on profit");
+        public static TextObject CfTotalPay => new TextObject("{=cx_cf_pay}Total to pay");
+        public static TextObject CfTotalReceive => new TextObject("{=cx_cf_receive}You receive");
+        public static TextObject CfProfit => new TextObject("{=cx_cf_profit}Profit / loss");
+        public static TextObject DenarsAmount => new TextObject("{=cx_denars_amount}{AMOUNT} denars");
         public static TextObject ConfirmBuy => new TextObject("{=cx_confirm_buy}Buy {QTY} x {NAME}\n \nMarket price: {PRICE}\nAfter spread and slippage: {EXEC}\nShares: {GROSS} denars\nBroker's fee: {FEE} denars\n \nTotal to pay: {TOTAL} denars");
         public static TextObject ConfirmSell => new TextObject("{=cx_confirm_sell}Sell {QTY} x {NAME}\n \nMarket price: {PRICE}\nAfter spread and slippage: {EXEC}\nShares: {GROSS} denars\nBroker's fee: {FEE} denars\nTax on profit: {TAX} denars\n \nYou receive: {TOTAL} denars");
         public static TextObject Bought => new TextObject("{=cx_msg_bought}Bought {QTY} {NAME} for {TOTAL} denars.");

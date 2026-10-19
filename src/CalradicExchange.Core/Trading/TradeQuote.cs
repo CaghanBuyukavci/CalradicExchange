@@ -27,6 +27,12 @@ namespace CalradicExchange.Core.Trading
         /// <summary>Buy: gold to pay (gross + commission). Sell: gold received (gross - commission - profit tax).</summary>
         public int Total { get; set; }
 
+        /// <summary>Sell only: average cost of the sold shares (fees of the buys included).</summary>
+        public decimal CostBasis { get; set; }
+
+        /// <summary>Sell only: profit the sale would realize, Total - CostBasis (same as TradeResult.RealizedPnl).</summary>
+        public decimal RealizedPnl { get; set; }
+
         public TradeError Error { get; set; }
 
         public bool IsValid => Error == TradeError.None;
