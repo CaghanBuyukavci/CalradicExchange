@@ -30,6 +30,7 @@ namespace CalradicExchange.Menus
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
+            ButtonSkins.EnsureApplied();
             if (TablePopup.Show("CxTradeTable", close => MarketTable(b, cls, close))) return;
             ShowMarketFallback(b, cls);
         }

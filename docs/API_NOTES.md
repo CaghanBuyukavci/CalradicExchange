@@ -138,8 +138,9 @@ Sources: `Modules\SandBoxCore\ModuleData\items\horses_and_others.xml`, `TaleWorl
 | `Colors.Green/Red/Yellow` | `static readonly Color` | VERIFIED | |
 | `MenuContext.SetBackgroundMeshName(string)` | name is a Gauntlet **sprite** name (`GameMenuWidget Sprite="@Background"`, `GameMenuVM.Background`) | VERIFIED | Exchange menu background `cx_exchange_bg` |
 | `UIResourceManager.SpriteData.Sprites` | `Dictionary<string, Sprite>`, looked up by `SpriteData.GetSprite(name)` | VERIFIED | We add our runtime sprite here |
+| `UIResourceManager.BrushFactory.GetBrush(name)`, `BrushLayer.Sprite/Color`, `Style.GetLayer(name)` → `StyleLayer.Sprite/Color/ColorFactor` | settable at runtime; `StyleLayer` falls back to its brush layer unless set | VERIFIED (signature) | `UI/ButtonSkins` |
 | `abstract Sprite(string, int, int, SpriteNinePatchParameters)` + `Texture`, `GetMinUvs`, `GetMaxUvs` | subclassable | VERIFIED | `UI/TextureSprite` |
-| `TaleWorlds.Engine.Texture.LoadTextureFromPath(fileName, folder)`, `CreateFromMemory(byte[])` | native; no vanilla caller | VERIFIED (signature) | PNG loads from path (in-game test). A 24-bit RGB PNG showed blue; a pre-swapped 32-bit copy too. Deploy now writes unswapped 32-bit RGBA (pending test) |
+| `TaleWorlds.Engine.Texture.LoadTextureFromPath(fileName, folder)`, `CreateFromMemory(byte[])` | native; no vanilla caller | VERIFIED (signature) | PNG loads from path. **24-bit RGB PNGs show red/blue swapped; 32-bit RGBA PNGs are correct** (in-game test). Deploy writes 32-bit RGBA |
 
 ## 9. After every game update
 
