@@ -10,6 +10,8 @@ namespace CalradicExchange.UI
     public sealed class ExchangeTableVM : ViewModel
     {
         private readonly Action _onClose;
+        private string _h1;
+        private string _emptyText = "";
 
         public ExchangeTableVM(string title, string[] headers, string footer, string closeText, Action onClose, string description = null)
         {
@@ -25,7 +27,18 @@ namespace CalradicExchange.UI
         [DataSourceProperty] public string Title { get; }
         [DataSourceProperty] public string Description { get; }
         [DataSourceProperty] public bool HasDescription => Description.Length > 0;
-        [DataSourceProperty] public string H1 { get; }
+        [DataSourceProperty]
+        public string H1
+        {
+            get => _h1;
+            set
+            {
+                if (_h1 == value) return;
+                _h1 = value;
+                OnPropertyChanged();
+            }
+        }
+
         [DataSourceProperty] public string H2 { get; }
         [DataSourceProperty] public string H3 { get; }
         [DataSourceProperty] public string H4 { get; }
@@ -36,6 +49,24 @@ namespace CalradicExchange.UI
         [DataSourceProperty] public string Footer { get; }
         [DataSourceProperty] public bool HasFooter => Footer.Length > 0;
         [DataSourceProperty] public string CloseText { get; }
+
+        /// <summary>Shown in place of the rows when the current list is empty.</summary>
+        [DataSourceProperty]
+        public string EmptyText
+        {
+            get => _emptyText;
+            set
+            {
+                value = value ?? "";
+                if (_emptyText == value) return;
+                _emptyText = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsEmpty));
+            }
+        }
+
+        [DataSourceProperty] public bool IsEmpty => _emptyText.Length > 0;
+        [DataSourceProperty] public MBBindingList<TabVM> Tabs { get; } = new MBBindingList<TabVM>();
         [DataSourceProperty] public MBBindingList<PortfolioRowVM> PortfolioRows { get; } = new MBBindingList<PortfolioRowVM>();
         [DataSourceProperty] public MBBindingList<GridRowVM> Rows { get; } = new MBBindingList<GridRowVM>();
         [DataSourceProperty] public MBBindingList<TradeRowVM> TradeRows { get; } = new MBBindingList<TradeRowVM>();

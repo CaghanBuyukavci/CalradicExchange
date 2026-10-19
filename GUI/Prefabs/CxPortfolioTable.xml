@@ -1,10 +1,10 @@
 <Prefab>
-  <!-- Calradic Exchange: portfolio table. Columns: name | qty | bought at | now | profit | profit % | Buy | Sell (ADR-025 buttons). Data source: ExchangeTableVM. -->
+  <!-- Calradic Exchange: portfolio table. Tabs: shares | baskets | guilds (TabVM). Columns: name | qty | bought at | now | profit | profit % | Buy | Sell (ADR-025 buttons). Data source: ExchangeTableVM. -->
   <Window>
     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000ff" AlphaFactor="0.7">
       <Children>
 
-        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="1040" SuggestedHeight="660" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="1040" SuggestedHeight="700" HorizontalAlignment="Center" VerticalAlignment="Center">
           <Children>
             <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="StdAssets\Popup\canvas" />
 
@@ -13,6 +13,19 @@
 
                 <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="56" MarginTop="8" Brush="Popup.Title.Text" Text="@Title" />
                 <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="23" Sprite="StdAssets\Popup\divider" />
+
+                <ListPanel DataSource="{Tabs}" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="42" HorizontalAlignment="Center" MarginBottom="10" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <ItemTemplate>
+                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="210" SuggestedHeight="42" MarginLeft="6" MarginRight="6" Command.Click="ExecuteSelect">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.18" IsVisible="@IsSelected" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#FFFFFFFF" AlphaFactor="0.05" IsVisible="@IsNotSelected" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="3" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" IsVisible="@IsSelected" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="@TextColor" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@Text" />
+                      </Children>
+                    </ButtonWidget>
+                  </ItemTemplate>
+                </ListPanel>
 
                 <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="34" MarginLeft="40" MarginRight="40" StackLayout.LayoutMethod="HorizontalLeftToRight">
                   <Children>
@@ -46,16 +59,24 @@
                                         <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="120" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Right" Brush.FontColor="@PnlColor" Text="@Pnl" />
                                         <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Right" Brush.FontColor="@PnlColor" Text="@PnlPercent" />
 
-                                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="64" SuggestedHeight="30" MarginLeft="24" VerticalAlignment="Center" Brush="Cx.RowButton.Buy" IsVisible="@CanBuy" Command.Click="ExecuteBuy">
+                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="64" MarginLeft="24">
                                           <Children>
-                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#FFFFFFFF" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@BuyText" />
+                                            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="64" SuggestedHeight="30" VerticalAlignment="Center" Brush="Cx.RowButton.Buy" IsVisible="@CanBuy" Command.Click="ExecuteBuy">
+                                              <Children>
+                                                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#FFFFFFFF" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@BuyText" />
+                                              </Children>
+                                            </ButtonWidget>
                                           </Children>
-                                        </ButtonWidget>
-                                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="64" SuggestedHeight="30" MarginLeft="8" VerticalAlignment="Center" Brush="Cx.RowButton.Sell" IsVisible="@CanSell" Command.Click="ExecuteSell">
+                                        </Widget>
+                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="64" MarginLeft="8">
                                           <Children>
-                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#FFFFFFFF" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@SellText" />
+                                            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="64" SuggestedHeight="30" VerticalAlignment="Center" Brush="Cx.RowButton.Sell" IsVisible="@CanSell" Command.Click="ExecuteSell">
+                                              <Children>
+                                                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#FFFFFFFF" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@SellText" />
+                                              </Children>
+                                            </ButtonWidget>
                                           </Children>
-                                        </ButtonWidget>
+                                        </Widget>
                                       </Children>
                                     </ListPanel>
                                   </Children>
@@ -66,6 +87,8 @@
                         </Widget>
                       </Children>
                     </ScrollablePanel>
+
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginTop="20" VerticalAlignment="Top" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Text="@EmptyText" IsVisible="@IsEmpty" />
 
                     <ScrollbarWidget Id="VerticalScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="8" HorizontalAlignment="Right" VerticalAlignment="Top" AlignmentAxis="Vertical" Handle="VerticalScrollbarHandle" MaxValue="100" MinValue="0">
                       <Children>

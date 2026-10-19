@@ -136,7 +136,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [ ] 2.9 Araç detay penceresi: tablolarda hisse adına tıklanınca fiyat grafiği ve temel değer bileşenleri
 - [x] 2.10 Emir paneli: adet girişi, maliyet önizlemesi, onay
   - Slider'lı miktar penceresi + onay penceresi; satırdaki AL/SAT butonlarından açılıyor (ADR-025).
-- [ ] 2.11 Portföy ve Haberler pencereleri: portföy tablo oldu; Haberler hâlâ metin penceresi, tabloya çevrilecek
+- [x] 2.11 Portföy ve Haberler pencereleri: portföy tablo (Hisseler / Sepetler / Loncalar sekmeleri), Haberler renkli tablo (olay türüne göre renk)
 - [x] 2.12 Menü tabanlı arayüzü yedek olarak tut (Gauntlet hata verirse ona düş)
   - Her tablo penceresi açılamazsa vanilla inquiry'ye düşüyor.
 

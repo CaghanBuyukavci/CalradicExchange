@@ -98,11 +98,65 @@ namespace CalradicExchange.Menus
                 },
                 footer, Strings.Close.ToString(), close);
 
+            foreach (InstrumentClass tab in PortfolioTabs)
+            {
+                InstrumentClass cls = tab;
+                int count = pf.Positions.Count(p => TabOf(b, p.InstrumentId) == cls);
+                vm.Tabs.Add(new TabVM(TabLabel(cls).SetTextVariable("COUNT", count).ToString(), cls == _portfolioTab, () =>
+                {
+                    _portfolioTab = cls;
+                    FillPortfolio(b, vm);
+                }));
+            }
+            FillPortfolio(b, vm);
+            return vm;
+        }
+
+        /// <summary>Portfolio tabs; instruments of other classes (none yet) are listed under the first one.</summary>
+        private static readonly InstrumentClass[] PortfolioTabs = { InstrumentClass.Commodity, InstrumentClass.Sector, InstrumentClass.Guild };
+
+        /// <summary>The selected portfolio tab, kept while the game runs so a trade from the portfolio comes back to it.</summary>
+        private static InstrumentClass _portfolioTab = InstrumentClass.Commodity;
+
+        private static InstrumentClass TabOf(ExchangeCampaignBehavior b, string id)
+        {
+            InstrumentClass cls = b.Market.Find(id)?.Class ?? InstrumentClass.Commodity;
+            return Array.IndexOf(PortfolioTabs, cls) >= 0 ? cls : PortfolioTabs[0];
+        }
+
+        private static TextObject TabLabel(InstrumentClass cls)
+        {
+            switch (cls)
+            {
+                case InstrumentClass.Sector: return Strings.TabBaskets;
+                case InstrumentClass.Guild: return Strings.TabGuilds;
+                default: return Strings.TabShares;
+            }
+        }
+
+        private static string NameHeader(InstrumentClass cls)
+        {
+            switch (cls)
+            {
+                case InstrumentClass.Sector: return Strings.ColBasket.ToString();
+                case InstrumentClass.Guild: return Strings.ColGuild.ToString();
+                default: return Strings.ColInstrument.ToString();
+            }
+        }
+
+        /// <summary>Fills the rows of the selected tab.</summary>
+        private static void FillPortfolio(ExchangeCampaignBehavior b, ExchangeTableVM vm)
+        {
+            Portfolio pf = b.Portfolio;
+            for (int i = 0; i < vm.Tabs.Count; i++) vm.Tabs[i].IsSelected = PortfolioTabs[i] == _portfolioTab;
+            vm.H1 = NameHeader(_portfolioTab);
+            vm.PortfolioRows.Clear();
+
             string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString();
             string here = b.CurrentTrader().TownId;
             Action back = ShowPortfolio;
             bool alternate = false;
-            foreach (Position pos in pf.Positions)
+            foreach (Position pos in pf.Positions.Where(p => TabOf(b, p.InstrumentId) == _portfolioTab))
             {
                 decimal price = PriceOf(b, pos.InstrumentId);
                 decimal pnl = pos.Quantity * price - pos.CostBasis;
@@ -119,13 +173,14 @@ namespace CalradicExchange.Menus
                     () => TradeFlow.StartTrade(id, OrderSide.Sell, back)));
                 alternate = !alternate;
             }
-            return vm;
+            vm.EmptyText = vm.PortfolioRows.Count == 0 ? Strings.PortfolioTabEmpty.ToString() : "";
         }
 
         public static void ShowNews()
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
+            if (TablePopup.Show("CxNewsTable", close => NewsTable(b, close))) return;
 
             List<NewsItem> news = b.Market.State.News;
             var sb = new StringBuilder();
@@ -141,6 +196,30 @@ namespace CalradicExchange.Menus
                 sb.AppendLine(line.ToString());
             }
             Show(Strings.NewsTitle.ToString(), sb.ToString());
+        }
+
+        /// <summary>All kept news, newest first; kind and text in the color of the event's category.</summary>
+        private static ExchangeTableVM NewsTable(ExchangeCampaignBehavior b, Action close)
+        {
+            var vm = new ExchangeTableVM(Strings.NewsTitle.ToString(),
+                new[] { Strings.ColWhen.ToString(), Strings.ColNewsKind.ToString(), Strings.ColNews.ToString() },
+                null, Strings.Close.ToString(), close);
+
+            int today = b.NextDay;
+            bool alternate = false;
+            foreach (NewsItem item in Enumerable.Reverse(b.Market.State.News))
+            {
+                int ago = Math.Max(0, today - item.Day);
+                TextObject when = ago == 0 ? Strings.NewsToday : Strings.NewsDaysAgo.SetTextVariable("DAYS", ago);
+                Color color = NewsColors.For(item.Event.Type);
+                vm.Rows.Add(new GridRowVM(new[] { when.ToString(), Strings.NewsCategory(item.Event.Type).ToString(), Describe(item.Event) }, alternate)
+                    .WithColor(1, TableColors.Muted)
+                    .WithColor(2, color)
+                    .WithColor(3, color));
+                alternate = !alternate;
+            }
+            vm.EmptyText = vm.Rows.Count == 0 ? Strings.NewsEmpty.ToString() : "";
+            return vm;
         }
 
         /// <summary>One-line description of an event, used by the news list.</summary>

@@ -88,12 +88,7 @@ namespace CalradicExchange.Menus
             totals.SetTextVariable("REALIZED", Fmt.SignedDenars(pf.RealizedPnl));
             totals.SetTextVariable("FEES", Fmt.Denars(pf.TotalCommissionPaid));
             totals.SetTextVariable("TAXES", Fmt.Denars(pf.TotalProfitTaxPaid));
-            string text = totals.ToString();
-
-            // Older trades (beyond the window, the saved history limit, or from before schema 6) are counted but not listed.
-            int missing = pf.TradeCount - Math.Min(pf.History.Count, MaxRows);
-            if (missing > 0) text += "\n" + Strings.HistoryMissing.SetTextVariable("COUNT", missing);
-            return text;
+            return totals.ToString();
         }
     }
 }

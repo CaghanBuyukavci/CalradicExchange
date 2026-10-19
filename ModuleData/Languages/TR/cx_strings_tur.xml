@@ -107,7 +107,6 @@
     <string id="cx_history_title" text="Takas Geçmişim" />
     <string id="cx_history_empty" text="Henüz hiç işlem yapmadın." />
     <string id="cx_history_totals" text="{COUNT} işlem. Gerçekleşmiş kâr/zarar {REALIZED}. Ödenen komisyon {FEES}, vergi {TAXES} dinar." />
-    <string id="cx_history_missing" text="Daha eski {COUNT} işlem bu listede yok." />
     <string id="cx_side_buy" text="Alış" />
     <string id="cx_side_sell" text="Satış" />
     <string id="cx_col_date" text="Tarih" />
@@ -147,5 +146,21 @@
     <string id="cx_portfolio_guild_totals" text="Loncalardan alınan kâr {INCOME} dinar, biriken {PENDING}. Lonca borcu {DEBT} dinar." />
     <string id="cx_err_guild_town" text="Bir loncanın ortaklık payları sadece kendi şehrinde satılır." />
     <string id="cx_err_guild_shares" text="Loncanın sana satabileceği bu kadar payı yok." />
+    <string id="cx_col_when" text="Zaman" />
+    <string id="cx_col_news_kind" text="Tür" />
+    <string id="cx_col_news" text="Haber" />
+    <string id="cx_news_cat_raid" text="Yağma" />
+    <string id="cx_news_cat_siege" text="Kuşatma" />
+    <string id="cx_news_cat_conquest" text="Fetih" />
+    <string id="cx_news_cat_war" text="Savaş" />
+    <string id="cx_news_cat_peace" text="Barış" />
+    <string id="cx_news_cat_season" text="Mevsim" />
+    <string id="cx_news_cat_famine" text="Kıtlık" />
+    <string id="cx_news_cat_fall" text="Çöküş" />
+    <string id="cx_portfolio_tab_empty" text="Bu türden elinde bir şey yok." />
+    <string id="cx_tab_shares" text="Hisseler ({COUNT})" />
+    <string id="cx_tab_baskets" text="Sepetler ({COUNT})" />
+    <string id="cx_tab_guilds" text="Loncalar ({COUNT})" />
+    <string id="cx_col_basket" text="Sepet" />
   </strings>
 </base>

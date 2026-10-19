@@ -89,6 +89,11 @@ namespace CalradicExchange.Localization
         // Portfolio
         public static TextObject PortfolioTitle => new TextObject("{=cx_portfolio_title}Your portfolio");
         public static TextObject PortfolioEmpty => new TextObject("{=cx_portfolio_empty}You hold no shares.");
+        public static TextObject PortfolioTabEmpty => new TextObject("{=cx_portfolio_tab_empty}You hold nothing of this kind.");
+        public static TextObject TabShares => new TextObject("{=cx_tab_shares}Shares ({COUNT})");
+        public static TextObject TabBaskets => new TextObject("{=cx_tab_baskets}Baskets ({COUNT})");
+        public static TextObject TabGuilds => new TextObject("{=cx_tab_guilds}Guilds ({COUNT})");
+        public static TextObject ColBasket => new TextObject("{=cx_col_basket}Basket");
         public static TextObject PortfolioLine => new TextObject("{=cx_portfolio_line}{NAME}: {QTY} shares, bought at {AVG}, now {PRICE}, {PNL}");
         public static TextObject PortfolioTotals => new TextObject("{=cx_portfolio_totals}Value {VALUE} denars, open profit {OPEN}.\nRealized profit {REALIZED}. Fees paid {FEES}, taxes paid {TAXES} denars.");
 
@@ -96,7 +101,6 @@ namespace CalradicExchange.Localization
         public static TextObject HistoryTitle => new TextObject("{=cx_history_title}Your trade history");
         public static TextObject HistoryEmpty => new TextObject("{=cx_history_empty}You have not traded yet.");
         public static TextObject HistoryTotals => new TextObject("{=cx_history_totals}{COUNT} trades. Realized profit {REALIZED}. Fees paid {FEES}, taxes paid {TAXES} denars.");
-        public static TextObject HistoryMissing => new TextObject("{=cx_history_missing}{COUNT} older trades are not in this list.");
         public static TextObject SideBuy => new TextObject("{=cx_side_buy}Buy");
         public static TextObject SideSell => new TextObject("{=cx_side_sell}Sell");
         public static TextObject SideForced => new TextObject("{=cx_side_forced}Forced sale");
@@ -118,6 +122,26 @@ namespace CalradicExchange.Localization
         public static TextObject NewsToday => new TextObject("{=cx_news_today}Today");
         public static TextObject NewsDaysAgo => new TextObject("{=cx_news_days_ago}{DAYS} days ago");
         public static TextObject NewsLine => new TextObject("{=cx_news_line}{WHEN}: {TEXT}");
+        public static TextObject ColWhen => new TextObject("{=cx_col_when}When");
+        public static TextObject ColNewsKind => new TextObject("{=cx_col_news_kind}Kind");
+        public static TextObject ColNews => new TextObject("{=cx_col_news}News");
+
+        public static TextObject NewsCategory(MarketEventType type)
+        {
+            switch (type)
+            {
+                case MarketEventType.VillageLooted: return new TextObject("{=cx_news_cat_raid}Raid");
+                case MarketEventType.SiegeStarted:
+                case MarketEventType.SiegeEnded: return new TextObject("{=cx_news_cat_siege}Siege");
+                case MarketEventType.SettlementCaptured: return new TextObject("{=cx_news_cat_conquest}Conquest");
+                case MarketEventType.WarDeclared: return new TextObject("{=cx_news_cat_war}War");
+                case MarketEventType.PeaceMade: return new TextObject("{=cx_news_cat_peace}Peace");
+                case MarketEventType.SeasonChanged: return new TextObject("{=cx_news_cat_season}Season");
+                case MarketEventType.FamineStarted: return new TextObject("{=cx_news_cat_famine}Famine");
+                case MarketEventType.KingdomDestroyed: return new TextObject("{=cx_news_cat_fall}Fall");
+                default: return new TextObject(type.ToString());
+            }
+        }
 
         public static TextObject EventText(MarketEventType type)
         {

@@ -8,6 +8,7 @@ namespace CalradicExchange.UI
         public static readonly Color Up = Color.ConvertStringToColor("#7CD67CFF");
         public static readonly Color Down = Color.ConvertStringToColor("#E87070FF");
         public static readonly Color Neutral = Color.ConvertStringToColor("#F1E9DAFF");
+        public static readonly Color Muted = Color.ConvertStringToColor("#B8AE9EFF");
 
         /// <summary>Green above +0.05%, red below -0.05%, otherwise the normal text color.</summary>
         public static Color ForChange(double fraction)
