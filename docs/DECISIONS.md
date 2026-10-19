@@ -217,6 +217,12 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - İlk okumada (yüklemeden sonra) ve sahip ya da tür değişince kasa sıfırlandığı için o atölye o gün ölçülmez.
   - Ölçüm doğrulaması için günlük log'a bütün atölyelerin net kâr toplamı ile sahip geliri toplamı birlikte yazılır. Uzun vadede ikisi yakın olmalı.
   - Şema 8: eski ölçüyle toplanan seriler silinir, 28 günde yeniden dolar. ADR-010'un "sahip geliri = lonca kârı" kısmının yerine bu geçer.
+- **Zarar ödemesi, altın yetmezse (kullanıcı, 2026-10-19):**
+  1. Önce oyuncunun altınından alınır.
+  2. Eksik kalırsa, zararı yazan loncanın payları piyasa fiyatından, komisyonsuz ve vergisiz satılır; borç bu satıştan ödenir. Satılan paylar Takas Geçmişim'e "zorunlu satış" olarak yazılır.
+  3. O da yetmezse kalan tutar borç olarak kayda yazılır. Borç, oyuncunun bir sonraki herhangi bir lonca kâr dağıtımından düşülür.
+  - Başka loncaların payları ve emtia/sepet hisseleri bu borç için satılmaz.
+  - Borç portföy penceresinde ve borsa menüsü metninde görünür.
 - **Varsayılan ölçek (2.2'de simülatörle kontrol edilecek):**
   - Her lonca 100 pay.
   - Örnek: ortanca 174 dinar/gün kârda pay fiyatı ≈ 174 × 84 / 0,25 / 100 ≈ 585 dinar. Haftalık dağıtım pay başına ≈ 12 dinar (%2/hafta).

@@ -64,6 +64,7 @@ F_lonca          = taban × e^E      (ADR-022 gibi göreli sinyal; sınıf = tü
 taban_başlangıç  = kâr_ort × 84 / r_guild / 100,   r_guild = 0,25 (yıllık hedef getiri)
 ```
 
+- Zarar ödemesi: altın → aynı loncanın payları piyasa fiyatından (masrafsız) satılır → kalan borç sonraki herhangi bir lonca kâr dağıtımından düşülür (ADR-027).
 - 2.1 verisi (58 gün): kâr_ort ortanca 174, %10–%90 aralığı 61–297 dinar/gün. Örnek pay fiyatı ≈ 585 dinar, haftalık dağıtım ≈ 12 dinar/pay.
 
 ### 2.4 Krallık endeksi (Faz 2)
