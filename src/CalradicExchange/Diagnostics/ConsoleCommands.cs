@@ -9,6 +9,8 @@ using CalradicExchange.Core;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Pricing;
 using CalradicExchange.Core.Trading;
+using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Library;
 
 namespace CalradicExchange.Diagnostics
@@ -156,6 +158,24 @@ namespace CalradicExchange.Diagnostics
                 string path = Path.Combine(ModulePaths.LogsFolder, $"prices_day{b.State.Market.LastTickDay}.csv");
                 File.WriteAllText(path, sb.ToString());
                 return "Wrote " + path;
+            });
+        }
+
+        /// <summary>
+        /// Test helper: gives the player gold without cheat mode (vanilla campaign.add_gold_to_hero needs it).
+        /// Usage: exchange.give_gold [amount, default 10000]. A negative amount takes gold away.
+        /// </summary>
+        [CommandLineFunctionality.CommandLineArgumentFunction("give_gold", Group)]
+        public static string GiveGold(List<string> args)
+        {
+            return Run("give_gold", args, () =>
+            {
+                Hero hero = Hero.MainHero;
+                if (Campaign.Current == null || hero == null) return "No campaign running.";
+                int amount = args != null && args.Count > 0 && int.TryParse(args[0], out int n) ? n : 10000;
+                if (amount > 0) GiveGoldAction.ApplyBetweenCharacters(null, hero, amount, true);
+                else if (amount < 0) GiveGoldAction.ApplyBetweenCharacters(hero, null, Math.Min(-amount, hero.Gold), true);
+                return $"Gold now {hero.Gold}.";
             });
         }
 
