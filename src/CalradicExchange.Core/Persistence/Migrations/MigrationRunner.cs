@@ -40,6 +40,10 @@ namespace CalradicExchange.Core.Persistence.Migrations
                     case 7:
                         root = Migrate7To8(root);
                         break;
+                    case 8:
+                        // Schema 9 adds guild instruments (PLAN 2.2): portfolio.guildAccruals, portfolio.guildDebts,
+                        // portfolio.guildIncomeTotal, history[].forced and guilds[].lastProfitDay. All default when missing.
+                        break;
                 }
             }
 

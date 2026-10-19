@@ -12,5 +12,11 @@ namespace CalradicExchange.Core.Trading
         InsufficientShares,
         TotalLimitExceeded,
         InstrumentLimitExceeded,
+
+        /// <summary>Guild shares are bought only in the guild's own town (ADR-026).</summary>
+        NotInGuildTown,
+
+        /// <summary>A guild has a fixed number of partnership shares (guilds.sharesPerGuild).</summary>
+        GuildSharesExceeded,
     }
 }

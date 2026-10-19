@@ -241,3 +241,20 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Eksik ya da bozuk parçada kampanya bozulmaz; borsa sıfırdan başlar ve log'a hata yazılır.
 - **Kurtarma:** `tools/repair_save.py` bozuk kaydı açıyor; durumu (lonca serileri çıkarılarak) tek sıkıştırılmış parça hâlinde yazıyor, boyut alanlarını düzeltip `*_onarildi.sav` olarak kaydediyor. Orijinaller `Game Saves/cx_backup/` klasöründe. `save009`, `saveauto2` ve `save008` onarıldı; durumlarının mod kodu (net472) ile okunduğu doğrulandı.
 
+## ADR-029 — Lonca ortaklık payının uygulanışı (PLAN 2.2–2.3a)
+
+- **Dinamik araçlar:** Lonca araçları `instruments.json`'da değil; `MarketState.Guilds` serilerinden her gün yeniden kurulur. Kimlik: `cx_guild_<şehir>_<tür>`.
+  - Fiyat motoru önce katalogu (dosya sırasıyla), sonra loncaları (kimlik sırasıyla) işler.
+  - Bir lonca listelendiğinde sonraki günlerin rastgele sayı sırası değişir. Bu sadece gürültünün hangi sayıyı aldığını etkiler; determinizm korunur.
+  - Atölyesiz sentetik dünyada (simülatör) çıktı önceki sürümle bayt bayt aynı.
+- **Listeleme:** En az 7 günlük kâr verisi (`minListingDays`) gerekir. Yeni kampanyada loncalar 7. günde açılır.
+- **Fiyat:** Gözlenen değer = max(28 günlük ortalama, 10 dinar/gün) × 84 / 0,25 / 100. Alt sınır, 28 günlük ortalaması eksi olan 14 loncaya yine de küçük ama pozitif bir fiyat verir. Üstüne ADR-022 göreli modeli uygulanır, sınıf olarak bütün loncalarla. Olay kuralları (kuşatma −0,45 ve kuşatma bitene kadar tutulur, el değiştirme −0,15, kıtlık −0,18) `guilds:eventTown` ile zaten tanımlıydı.
+- **Hak ediş pay-gün üzerinden:** Günlük kâr × eldeki pay / 100, her gün `Portfolio.GuildAccruals`'a eklenir. Kapanış 7 günde bir yapılır (borsa günü % 7 = 0). Böylece dağıtımdan bir gün önce alıp haftanın kârını almak ya da zarar haftasından önce satıp kaçmak işe yaramaz.
+- **İşlem kuralları:** Alım sadece loncanın şehrinde yapılır (`NotInGuildTown`). Bir loncadan en fazla 100 pay tutulabilir (`GuildSharesExceeded`). Satış her yerde yapılabilir. Portföy penceresinde AL butonu sadece o şehrin loncalarında görünür.
+- **Kapanma ve yeniden açılma (2.3):** Şehirde o türden atölye kalmazsa araç kapanır. Paylar son fiyattan, masrafsız geri alınır ve Takas Geçmişim'e "Zorunlu satış" olarak yazılır. Birikmiş hak ediş bir sonraki kapanışta ödenir. Atölye geri gelirse lonca yeni bir fiyatla yeniden açılır.
+- **Lonca Piyasası (2.3a):**
+  - Sütunlar: Lonca, Fiyat, 7 gün, Hafta kârı/pay, Elde.
+  - Önce "{şehir} loncaları" bölümü (AL/SAT), sonra "Başka şehirlerdeki payların" bölümü (sadece SAT).
+  - Elde pay varken lonca büyük hareket ederse ekrana bildirim düşer. Elde olmayan loncalar için bildirim yok, çünkü yaklaşık 150 lonca var.
+- **Şema 9:** `portfolio.guildAccruals`, `guildDebts`, `guildIncomeTotal`, `history[].forced` ve `guilds[].lastProfitDay` eklendi. Hepsinin varsayılanı var, bu yüzden geçiş adımı boş.
+

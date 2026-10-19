@@ -20,6 +20,8 @@ namespace CalradicExchange.Core.Trading
 
         private MarketSettings Settings => _market.Settings;
 
+        private int GuildShares => Settings.Guilds?.SharesPerGuild ?? 100;
+
         /// <summary>Total investment limit: base + per clan tier + per trade skill point.</summary>
         public int TotalLimit(TraderProfile trader)
         {
@@ -58,7 +60,7 @@ namespace CalradicExchange.Core.Trading
         public TradeQuote Quote(string instrumentId, OrderSide side, int quantity, TraderProfile trader, Portfolio portfolio)
         {
             var q = new TradeQuote { InstrumentId = instrumentId, Side = side, Quantity = quantity };
-            InstrumentDefinition def = _market.Catalog.Find(instrumentId);
+            InstrumentDefinition def = _market.Find(instrumentId);
             PriceState ps = _market.Get(instrumentId);
 
             if (quantity <= 0) return Fail(q, TradeError.InvalidQuantity);
@@ -108,6 +110,11 @@ namespace CalradicExchange.Core.Trading
                 if ((double)held + orderValue > TotalLimit(trader)) return Fail(q, TradeError.TotalLimitExceeded);
                 double heldHere = portfolio.QuantityOf(instrumentId) * p;
                 if (heldHere + orderValue > InstrumentLimit(def.Class)) return Fail(q, TradeError.InstrumentLimitExceeded);
+                if (def.Class == InstrumentClass.Guild)
+                {
+                    if (def.TownId != trader.TownId) return Fail(q, TradeError.NotInGuildTown);
+                    if (portfolio.QuantityOf(instrumentId) + quantity > GuildShares) return Fail(q, TradeError.GuildSharesExceeded);
+                }
             }
             else if (quantity > portfolio.QuantityOf(instrumentId))
             {

@@ -92,12 +92,12 @@ namespace CalradicExchange.Core.Config
                 }
             }
 
-            var guildTypes = new List<string>();
+            var guildTypes = new List<GuildTypeDefinition>();
             foreach (JToken g in (root["guildTypes"] as JArray) ?? new JArray())
             {
                 string type = g.Value<string>("workshopTypeId");
                 if (string.IsNullOrEmpty(type)) errors.Add("guildTypes: entry without workshopTypeId.");
-                else guildTypes.Add(type);
+                else guildTypes.Add(new GuildTypeDefinition { WorkshopTypeId = type, NameId = g.Value<string>("nameId"), Name = g.Value<string>("name") ?? type });
             }
 
             if (errors.Count > 0) throw new ConfigException(FileName, errors);

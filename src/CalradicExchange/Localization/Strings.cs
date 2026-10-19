@@ -19,6 +19,7 @@ namespace CalradicExchange.Localization
         public static TextObject ExchangeClosedText => new TextObject("{=cx_menu_exchange_closed}The exchange is closed today. ({REASON})");
         public const string OptCommodityMarket = "{=cx_opt_commodity_market}Commodity market";
         public const string OptBasketMarket = "{=cx_opt_basket_market}Basket market";
+        public const string OptGuildMarket = "{=cx_opt_guild_market}Guild market";
         public const string OptPortfolio = "{=cx_opt_portfolio}Your portfolio";
         public const string OptNews = "{=cx_opt_news}News";
         public const string OptHistory = "{=cx_opt_history}Your trade history";
@@ -45,6 +46,8 @@ namespace CalradicExchange.Localization
         public static TextObject ColProfit => new TextObject("{=cx_col_profit}Profit");
         public static TextObject ColProfitPct => new TextObject("{=cx_col_profit_pct}Profit %");
         public static TextObject ColHeld => new TextObject("{=cx_col_held}Held");
+        public static TextObject ColGuild => new TextObject("{=cx_col_guild}Guild");
+        public static TextObject ColWeekProfitPerShare => new TextObject("{=cx_col_week_profit}Week profit/share");
         public static TextObject ColDate => new TextObject("{=cx_col_date}Date");
         public static TextObject ColSide => new TextObject("{=cx_col_side}Trade");
         public static TextObject ColTotal => new TextObject("{=cx_col_total}Total");
@@ -56,6 +59,16 @@ namespace CalradicExchange.Localization
         public static TextObject BuyTitle => new TextObject("{=cx_buy_title}Buy shares");
         public static TextObject CommodityMarketTitle => new TextObject("{=cx_commodity_market_title}Commodity market");
         public static TextObject BasketMarketTitle => new TextObject("{=cx_basket_market_title}Basket market");
+        public static TextObject GuildMarketTitle => new TextObject("{=cx_guild_market_title}Guild market");
+        public static TextObject GuildMarketDescription => new TextObject("{=cx_guild_market_desc}Partnership shares in the workshops of this town. Every 7 days each share brings its part of the guild's profit, or of its loss. Shares of other towns can be sold anywhere.");
+        public static TextObject GuildSectionLocal => new TextObject("{=cx_guild_section_local}Guilds of {TOWN}");
+        public static TextObject GuildSectionOther => new TextObject("{=cx_guild_section_other}Your shares in other towns");
+        public static TextObject GuildNoneHere => new TextObject("{=cx_guild_none_here}No guild of this town is listed yet.");
+        public static TextObject GuildName => new TextObject("{=cx_guild_name}{TOWN} {GUILD}");
+        public static TextObject BuyGuildTitle => new TextObject("{=cx_buy_guild_title}Buy partnership shares");
+        public static TextObject SellGuildTitle => new TextObject("{=cx_sell_guild_title}Sell partnership shares");
+        public static TextObject QuantityBuyGuild => new TextObject("{=cx_qty_buy_guild}A partnership share of {NAME} costs {PRICE} before fees.\nHow many shares? (at most {MAX})");
+        public static TextObject QuantitySellGuild => new TextObject("{=cx_qty_sell_guild}You hold {QTY} partnership shares of {NAME}.\nHow many do you sell?");
         public static TextObject TradeDescription => new TextObject("{=cx_trade_desc}Gold: {GOLD} denars. Limit left: {LEFT} denars.");
         public static TextObject BtnBuy => new TextObject("{=cx_btn_buy}BUY");
         public static TextObject BtnSell => new TextObject("{=cx_btn_sell}SELL");
@@ -86,6 +99,18 @@ namespace CalradicExchange.Localization
         public static TextObject HistoryMissing => new TextObject("{=cx_history_missing}{COUNT} older trades are not in this list.");
         public static TextObject SideBuy => new TextObject("{=cx_side_buy}Buy");
         public static TextObject SideSell => new TextObject("{=cx_side_sell}Sell");
+        public static TextObject SideForced => new TextObject("{=cx_side_forced}Forced sale");
+
+        // Guild payouts (ADR-027)
+        public static TextObject GuildPayoutProfit => new TextObject("{=cx_guild_payout_profit}Your weekly share of guild profits: {AMOUNT} denars.");
+        public static TextObject GuildPayoutLoss => new TextObject("{=cx_guild_payout_loss}Your share of guild losses this week: {AMOUNT} denars.");
+        public static TextObject GuildDebtRepaid => new TextObject("{=cx_guild_debt_repaid}{AMOUNT} denars of guild profit went to your guild debts.");
+        public static TextObject GuildForcedSale => new TextObject("{=cx_guild_forced_sale}{NAME}: {QTY} of your shares were sold for {GOLD} denars to cover its loss.");
+        public static TextObject GuildNewDebt => new TextObject("{=cx_guild_new_debt}You now owe {NAME} {DEBT} denars. It will be taken from your next guild profits.");
+        public static TextObject GuildRelationLost => new TextObject("{=cx_guild_relation_lost}Your relation with {HERO} decreased by {CHANGE}: you owe {GUILD} {DEBT} denars.");
+        public static TextObject GuildClosed => new TextObject("{=cx_guild_closed}{NAME} has closed: no such workshop is left in the town. Your {QTY} shares were bought back for {GOLD} denars.");
+        public static TextObject MenuGuildDebt => new TextObject("{=cx_menu_guild_debt}Guild debt: {DEBT} denars.");
+        public static TextObject PortfolioGuildTotals => new TextObject("{=cx_portfolio_guild_totals}Guild profit received {INCOME} denars, still accruing {PENDING}. Guild debt {DEBT} denars.");
 
         // News
         public static TextObject NewsTitle => new TextObject("{=cx_news_title}News at the exchange");
@@ -136,6 +161,8 @@ namespace CalradicExchange.Localization
                 case TradeError.InsufficientShares: return new TextObject("{=cx_err_shares}You do not hold that many shares.");
                 case TradeError.TotalLimitExceeded: return new TextObject("{=cx_err_total_limit}The money changers will not take more of your money. Raise your clan's renown or your trade skill.");
                 case TradeError.InstrumentLimitExceeded: return new TextObject("{=cx_err_instrument_limit}The market is too thin to take that much of one instrument.");
+                case TradeError.NotInGuildTown: return new TextObject("{=cx_err_guild_town}Partnership shares of a guild are only sold in its own town.");
+                case TradeError.GuildSharesExceeded: return new TextObject("{=cx_err_guild_shares}The guild does not have that many shares left for you.");
                 default: return new TextObject("{=cx_err_generic}The trade could not be made.");
             }
         }

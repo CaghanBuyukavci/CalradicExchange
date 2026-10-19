@@ -66,12 +66,12 @@ namespace CalradicExchange.Menus
         /// <summary>date | side | name | qty | price | total (signed gold flow) | fees + tax | realized profit.</summary>
         private static string[] Cells(ExchangeCampaignBehavior b, TradeRecord t)
         {
-            InstrumentDefinition def = b.Catalog.Find(t.InstrumentId);
+            InstrumentDefinition def = b.Market.Find(t.InstrumentId);
             bool buy = t.Side == OrderSide.Buy;
             return new[]
             {
                 CampaignTime.Days(t.Day).ToString(),
-                (buy ? Strings.SideBuy : Strings.SideSell).ToString(),
+                (buy ? Strings.SideBuy : t.Forced ? Strings.SideForced : Strings.SideSell).ToString(),
                 def != null ? Names.Instrument(def) : t.InstrumentId,
                 t.Quantity.ToString(),
                 Fmt.Price(t.ExecutionPrice),

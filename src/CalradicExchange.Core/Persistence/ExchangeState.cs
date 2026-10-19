@@ -10,7 +10,7 @@ namespace CalradicExchange.Core.Persistence
     /// </summary>
     public sealed class ExchangeState
     {
-        public const int CurrentSchemaVersion = 8;
+        public const int CurrentSchemaVersion = 9;
 
         [JsonProperty("schemaVersion")]
         public int SchemaVersion { get; set; } = CurrentSchemaVersion;

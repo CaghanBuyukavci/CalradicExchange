@@ -9,11 +9,12 @@ namespace CalradicExchange.Core.Config
     {
         private readonly Dictionary<string, InstrumentDefinition> _byId;
 
-        public InstrumentCatalog(int unitsPerShare, IEnumerable<InstrumentDefinition> instruments, IEnumerable<string> guildWorkshopTypes)
+        public InstrumentCatalog(int unitsPerShare, IEnumerable<InstrumentDefinition> instruments, IEnumerable<GuildTypeDefinition> guildTypes)
         {
             UnitsPerShare = unitsPerShare;
             Instruments = instruments.ToList();
-            GuildWorkshopTypes = guildWorkshopTypes.ToList();
+            GuildTypes = guildTypes.ToList();
+            GuildWorkshopTypes = GuildTypes.Select(g => g.WorkshopTypeId).ToList();
             _byId = Instruments.ToDictionary(i => i.Id);
 
             var items = new List<string>();
@@ -39,8 +40,16 @@ namespace CalradicExchange.Core.Config
 
         public IReadOnlyList<InstrumentDefinition> Instruments { get; }
 
-        /// <summary>Workshop type ids eligible for guild shares (Phase 2).</summary>
+        /// <summary>Workshop types eligible for guild shares (PLAN 2.2), in file order.</summary>
+        public IReadOnlyList<GuildTypeDefinition> GuildTypes { get; }
+
+        /// <summary>Ids of <see cref="GuildTypes"/>.</summary>
         public IReadOnlyList<string> GuildWorkshopTypes { get; }
+
+        public GuildTypeDefinition FindGuildType(string workshopTypeId)
+        {
+            return GuildTypes.FirstOrDefault(g => g.WorkshopTypeId == workshopTypeId);
+        }
 
         /// <summary>Item ids whose town prices the game layer must put in the snapshot.</summary>
         public IReadOnlyList<string> RequiredItemIds { get; }

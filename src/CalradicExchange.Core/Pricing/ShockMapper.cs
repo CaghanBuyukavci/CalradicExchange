@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CalradicExchange.Core.Config;
 using CalradicExchange.Core.Model;
@@ -29,17 +30,19 @@ namespace CalradicExchange.Core.Pricing
                 || (target.StartsWith("tag:") && target.Length > "tag:".Length);
         }
 
-        public static IEnumerable<InstrumentDefinition> Resolve(string target, MarketEvent ev, InstrumentCatalog catalog)
+        /// <summary>Resolves against every listed instrument (catalog plus dynamic guilds) in their fixed order.</summary>
+        public static IEnumerable<InstrumentDefinition> Resolve(string target, MarketEvent ev, IEnumerable<InstrumentDefinition> instruments,
+            Func<string, InstrumentDefinition> find)
         {
             if (target.StartsWith("instrument:"))
             {
-                InstrumentDefinition def = catalog.Find(target.Substring("instrument:".Length));
+                InstrumentDefinition def = find(target.Substring("instrument:".Length));
                 if (def != null) yield return def;
                 yield break;
             }
 
             string tag = target.StartsWith("tag:") ? target.Substring("tag:".Length) : null;
-            foreach (InstrumentDefinition def in catalog.Instruments)
+            foreach (InstrumentDefinition def in instruments)
             {
                 if (Matches(target, tag, def, ev)) yield return def;
             }

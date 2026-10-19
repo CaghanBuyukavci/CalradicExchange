@@ -15,6 +15,11 @@ namespace CalradicExchange.Adapters
         public static string Instrument(InstrumentDefinition def)
         {
             if (def == null) return "?";
+            if (def.Class == InstrumentClass.Guild)
+            {
+                string guild = string.IsNullOrEmpty(def.NameId) ? def.Name : new TextObject("{=" + def.NameId + "}" + def.Name).ToString();
+                return Strings.GuildName.SetTextVariable("TOWN", Settlement(def.TownId)).SetTextVariable("GUILD", guild).ToString();
+            }
             return string.IsNullOrEmpty(def.NameId)
                 ? def.Name ?? def.Id
                 : new TextObject("{=" + def.NameId + "}" + (def.Name ?? def.Id)).ToString();

@@ -44,7 +44,7 @@ namespace CalradicExchange.Diagnostics
             {
                 var sb = new StringBuilder($"Exchange day {b.State.Market.LastTickDay}\n");
                 sb.AppendLine("id                       P          F          S        1d       7d");
-                foreach (InstrumentDefinition def in b.Catalog.Instruments)
+                foreach (InstrumentDefinition def in b.Market.Instruments)
                 {
                     PriceState ps = b.Market.Get(def.Id);
                     if (ps == null || !ps.HasPrice) { sb.AppendLine($"{def.Id,-22} (no price)"); continue; }

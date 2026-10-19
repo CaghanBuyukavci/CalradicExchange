@@ -24,18 +24,42 @@ namespace CalradicExchange.Core.Pricing
         private readonly IRandom _rng;
         private readonly Dictionary<string, PriceState> _byId = new Dictionary<string, PriceState>();
 
+        /// <summary>Guild instruments built from <see cref="MarketState.Guilds"/> (PLAN 2.2), ordered by id.</summary>
+        private readonly List<InstrumentDefinition> _guildDefs = new List<InstrumentDefinition>();
+        private readonly Dictionary<string, InstrumentDefinition> _guildById = new Dictionary<string, InstrumentDefinition>();
+        private readonly Dictionary<string, GuildProfitSeries> _seriesById = new Dictionary<string, GuildProfitSeries>();
+
         public MarketEngine(InstrumentCatalog catalog, MarketSettings settings, MarketState state, IRandom rng)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             State = state ?? new MarketState();
             _rng = rng ?? throw new ArgumentNullException(nameof(rng));
+            RefreshGuilds();
             SyncPriceStates();
         }
 
         public MarketState State { get; }
         public InstrumentCatalog Catalog => _catalog;
         public MarketSettings Settings => _settings;
+
+        /// <summary>Every listed instrument: the catalog in file order, then guilds ordered by id. Order matters for determinism.</summary>
+        public IEnumerable<InstrumentDefinition> Instruments => _catalog.Instruments.Concat(_guildDefs);
+
+        /// <summary>Listed guild instruments (open and closed).</summary>
+        public IReadOnlyList<InstrumentDefinition> Guilds => _guildDefs;
+
+        public InstrumentDefinition Find(string instrumentId)
+        {
+            if (instrumentId == null) return null;
+            return _catalog.Find(instrumentId) ?? (_guildById.TryGetValue(instrumentId, out InstrumentDefinition def) ? def : null);
+        }
+
+        /// <summary>Profit series behind a guild instrument; null for other instruments.</summary>
+        public GuildProfitSeries GuildSeries(string instrumentId)
+        {
+            return instrumentId != null && _seriesById.TryGetValue(instrumentId, out GuildProfitSeries s) ? s : null;
+        }
 
         /// <summary>
         /// True when the saved prices were set with an older fundamental method. The next tick rebuilds the market;
@@ -69,7 +93,7 @@ namespace CalradicExchange.Core.Pricing
                 }
                 if (rule.ScaleByTownShare) impulse *= (ev.TownShare ?? 0) * rule.TownShareMultiplier;
 
-                foreach (InstrumentDefinition def in ShockMapper.Resolve(rule.Target, ev, _catalog))
+                foreach (InstrumentDefinition def in ShockMapper.Resolve(rule.Target, ev, Instruments, Find))
                 {
                     PriceState ps = Get(def.Id);
                     if (ps == null || ps.Closed) continue;
@@ -108,13 +132,14 @@ namespace CalradicExchange.Core.Pricing
             summary.Processed = true;
 
             if (NeedsRebase) Rebuild();
+            GuildProfitTracker.Record(State.Guilds, world, _settings.Guilds?.ProfitWindowDays ?? 28);
+            RefreshGuilds();
             SyncPriceStates();
             UpdateBaselines(world);
-            GuildProfitTracker.Record(State.Guilds, world, _settings.Guilds?.ProfitWindowDays ?? 28);
 
             if (!State.Initialized)
             {
-                foreach (InstrumentDefinition def in _catalog.Instruments)
+                foreach (InstrumentDefinition def in Instruments)
                 {
                     PriceState ps = _byId[def.Id];
                     decimal? f = ComputeFundamental(def, world);
@@ -138,11 +163,12 @@ namespace CalradicExchange.Core.Pricing
 
             summary.MinMove = double.MaxValue;
             summary.MaxMove = double.MinValue;
-            foreach (InstrumentDefinition def in _catalog.Instruments)
+            foreach (InstrumentDefinition def in Instruments)
             {
                 PriceState ps = _byId[def.Id];
                 // Always draw, so one instrument's data gap does not shift the noise of all the others.
                 double eps = _rng.NextGaussian();
+                if (def.Class == InstrumentClass.Guild) UpdateGuildLifecycle(def, ps, summary);
                 if (ps.Closed) continue;
 
                 bool seen = observed.TryGetValue(def.Id, out decimal f);
@@ -210,8 +236,12 @@ namespace CalradicExchange.Core.Pricing
                     return FundamentalCalculator.Commodity(world, def.ItemId, _catalog.UnitsPerShare);
                 case InstrumentClass.Sector:
                     return FundamentalCalculator.Sector(world, def, State);
+                case InstrumentClass.Guild:
+                    GuildProfitSeries series = GuildSeries(def.Id);
+                    if (series == null || series.WorkshopCount <= 0 || series.DailyProfit.Count == 0) return null;
+                    return GuildInstruments.ObservedValue(series, _settings.Guilds ?? new GuildSettings(), world.Calendar.DaysInYear);
                 default:
-                    return null; // Guild, kingdom and bond fundamentals arrive in Phase 2/3.
+                    return null; // Kingdom and bond fundamentals arrive later.
             }
         }
 
@@ -232,7 +262,7 @@ namespace CalradicExchange.Core.Pricing
         private Dictionary<string, decimal> ObserveFundamentals(WorldSnapshot world)
         {
             var observed = new Dictionary<string, decimal>();
-            foreach (InstrumentDefinition def in _catalog.Instruments)
+            foreach (InstrumentDefinition def in Instruments)
             {
                 PriceState ps = _byId[def.Id];
                 if (ps.Closed) continue;
@@ -249,7 +279,7 @@ namespace CalradicExchange.Core.Pricing
         private Dictionary<InstrumentClass, double> CommonMoves(Dictionary<string, decimal> observed)
         {
             var moves = new Dictionary<InstrumentClass, List<double>>();
-            foreach (InstrumentDefinition def in _catalog.Instruments)
+            foreach (InstrumentDefinition def in Instruments)
             {
                 PriceState ps = _byId[def.Id];
                 if (!ps.HasPrice || ps.RawFundamental <= 0 || !observed.TryGetValue(def.Id, out decimal f)) continue;
@@ -442,7 +472,7 @@ namespace CalradicExchange.Core.Pricing
         private void CloseKingdom(string kingdomId, List<string> affected)
         {
             if (kingdomId == null) return;
-            foreach (InstrumentDefinition def in _catalog.Instruments)
+            foreach (InstrumentDefinition def in Instruments)
             {
                 if (def.Class != InstrumentClass.Kingdom || def.KingdomId != kingdomId) continue;
                 PriceState ps = Get(def.Id);
@@ -479,12 +509,59 @@ namespace CalradicExchange.Core.Pricing
             {
                 if (ps?.InstrumentId != null) _byId[ps.InstrumentId] = ps;
             }
-            foreach (InstrumentDefinition def in _catalog.Instruments)
+            foreach (InstrumentDefinition def in Instruments)
             {
                 if (_byId.ContainsKey(def.Id)) continue;
                 var ps = new PriceState { InstrumentId = def.Id };
                 State.Prices.Add(ps);
                 _byId[def.Id] = ps;
+            }
+        }
+
+        /// <summary>
+        /// Rebuilds the guild instrument list: every series of an eligible workshop type that has a price state already
+        /// or at least minListingDays of profit data (PLAN 2.2). Ordered by id for determinism.
+        /// </summary>
+        private void RefreshGuilds()
+        {
+            _guildDefs.Clear();
+            _guildById.Clear();
+            _seriesById.Clear();
+            int minDays = _settings.Guilds?.MinListingDays ?? 7;
+            var known = new HashSet<string>(State.Prices.Where(p => p?.InstrumentId != null).Select(p => p.InstrumentId));
+            foreach (GuildProfitSeries series in State.Guilds.OrderBy(g => GuildInstruments.IdFor(g.TownId, g.WorkshopTypeId), StringComparer.Ordinal))
+            {
+                GuildTypeDefinition type = _catalog.FindGuildType(series.WorkshopTypeId);
+                if (type == null || string.IsNullOrEmpty(series.TownId)) continue;
+                string id = GuildInstruments.IdFor(series.TownId, series.WorkshopTypeId);
+                if (!known.Contains(id) && series.DailyProfit.Count < minDays) continue;
+                InstrumentDefinition def = GuildInstruments.Define(series, type);
+                _guildDefs.Add(def);
+                _guildById[id] = def;
+                _seriesById[id] = series;
+            }
+        }
+
+        /// <summary>
+        /// Closes a guild whose last workshop is gone (positions are paid out at the last price by the caller, PLAN 2.3)
+        /// and reopens it when workshops of the type come back: it then starts from a fresh price.
+        /// </summary>
+        private void UpdateGuildLifecycle(InstrumentDefinition def, PriceState ps, TickSummary summary)
+        {
+            GuildProfitSeries series = GuildSeries(def.Id);
+            if (series == null) return;
+            if (series.WorkshopCount <= 0 && !ps.Closed && ps.HasPrice)
+            {
+                ps.Closed = true;
+                ps.Shocks.Clear();
+                ps.VolBoosts.Clear();
+                summary.ClosedInstruments.Add(def.Id);
+            }
+            else if (series.WorkshopCount > 0 && ps.Closed)
+            {
+                ps.Closed = false;
+                ps.HasPrice = false;
+                summary.ReopenedInstruments.Add(def.Id);
             }
         }
 

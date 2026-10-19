@@ -122,5 +122,30 @@
     <string id="cx_btn_buy" text="AL" />
     <string id="cx_btn_sell" text="SAT" />
     <string id="cx_col_held" text="Elde" />
+    <string id="cx_opt_guild_market" text="Lonca Piyasası" />
+    <string id="cx_guild_market_title" text="Lonca Piyasası" />
+    <string id="cx_guild_market_desc" text="Bu şehrin atölyelerinde ortaklık payları. Her 7 günde bir her pay, loncanın kârından ya da zararından payına düşeni getirir. Başka şehirlerdeki paylarını her yerde satabilirsin." />
+    <string id="cx_guild_section_local" text="{TOWN} loncaları" />
+    <string id="cx_guild_section_other" text="Başka şehirlerdeki payların" />
+    <string id="cx_guild_none_here" text="Bu şehrin hiçbir loncası henüz listelenmedi." />
+    <string id="cx_guild_name" text="{TOWN} {GUILD}" />
+    <string id="cx_buy_guild_title" text="Ortaklık payı al" />
+    <string id="cx_sell_guild_title" text="Ortaklık payı sat" />
+    <string id="cx_qty_buy_guild" text="{NAME} ortaklık payının biri masraflar hariç {PRICE} dinar.&#10;Kaç pay alacaksın? (en fazla {MAX})" />
+    <string id="cx_qty_sell_guild" text="Elinde {QTY} adet {NAME} ortaklık payı var.&#10;Kaçını satacaksın?" />
+    <string id="cx_col_guild" text="Lonca" />
+    <string id="cx_col_week_profit" text="Hafta kârı/pay" />
+    <string id="cx_side_forced" text="Zorunlu satış" />
+    <string id="cx_guild_payout_profit" text="Loncalardan haftalık kâr payın: {AMOUNT} dinar." />
+    <string id="cx_guild_payout_loss" text="Bu hafta lonca zararlarından payına düşen: {AMOUNT} dinar." />
+    <string id="cx_guild_debt_repaid" text="Lonca kârından {AMOUNT} dinar lonca borcuna sayıldı." />
+    <string id="cx_guild_forced_sale" text="{NAME}: zararı karşılamak için {QTY} payın {GOLD} dinara satıldı." />
+    <string id="cx_guild_new_debt" text="{NAME} loncasına {DEBT} dinar borçlandın. Borç, sonraki lonca kârlarından düşülecek." />
+    <string id="cx_guild_relation_lost" text="{HERO} ile ilişkin {CHANGE} azaldı: {GUILD} loncasına {DEBT} dinar borcun var." />
+    <string id="cx_guild_closed" text="{NAME} kapandı: şehirde bu türden atölye kalmadı. {QTY} payın {GOLD} dinara geri alındı." />
+    <string id="cx_menu_guild_debt" text="Lonca borcun: {DEBT} dinar." />
+    <string id="cx_portfolio_guild_totals" text="Loncalardan alınan kâr {INCOME} dinar, biriken {PENDING}. Lonca borcu {DEBT} dinar." />
+    <string id="cx_err_guild_town" text="Bir loncanın ortaklık payları sadece kendi şehrinde satılır." />
+    <string id="cx_err_guild_shares" text="Loncanın sana satabileceği bu kadar payı yok." />
   </strings>
 </base>

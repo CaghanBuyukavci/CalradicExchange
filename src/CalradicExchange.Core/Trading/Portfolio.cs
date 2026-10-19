@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace CalradicExchange.Core.Trading
 {
@@ -12,6 +13,20 @@ namespace CalradicExchange.Core.Trading
         public long TotalCommissionPaid { get; set; }
         public long TotalProfitTaxPaid { get; set; }
         public int TradeCount { get; set; }
+
+        /// <summary>
+        /// Guild profit (or loss, negative) earned since the last payout, per guild instrument (ADR-027). Accrued daily
+        /// by share-days held, settled every week. Added in schema 9.
+        /// </summary>
+        public Dictionary<string, decimal> GuildAccruals { get; set; } = new Dictionary<string, decimal>();
+
+        /// <summary>Unpaid guild losses per guild instrument, repaid from later guild profits (ADR-027). Schema 9.</summary>
+        public Dictionary<string, decimal> GuildDebts { get; set; } = new Dictionary<string, decimal>();
+
+        /// <summary>Net guild profit paid out so far (negative when losses dominated). Schema 9.</summary>
+        public decimal GuildIncomeTotal { get; set; }
+
+        [JsonIgnore] public decimal TotalGuildDebt => GuildDebts.Values.Sum();
 
         /// <summary>Executed trades, oldest first, trimmed to the configured limit. Added in schema 6.</summary>
         public List<TradeRecord> History { get; set; } = new List<TradeRecord>();
@@ -75,6 +90,31 @@ namespace CalradicExchange.Core.Trading
             TotalProfitTaxPaid += profitTax;
             TradeCount++;
             return realized;
+        }
+
+        /// <summary>
+        /// Sells <paramref name="quantity"/> shares at <paramref name="price"/> without commission or tax, outside the
+        /// market (guild closure, forced sale for a guild loss). Records the trade as forced. Returns the proceeds.
+        /// </summary>
+        public int ForceSell(string instrumentId, int quantity, decimal price, int day, int historyLimit)
+        {
+            Position pos = Find(instrumentId);
+            if (pos == null || quantity <= 0) return 0;
+            quantity = Math.Min(quantity, pos.Quantity);
+            int proceeds = (int)Math.Round(quantity * price, MidpointRounding.AwayFromZero);
+            decimal realized = ApplySell(instrumentId, quantity, proceeds, 0);
+            Record(new TradeRecord
+            {
+                Day = day,
+                InstrumentId = instrumentId,
+                Side = OrderSide.Sell,
+                Quantity = quantity,
+                ExecutionPrice = price,
+                Total = proceeds,
+                RealizedPnl = realized,
+                Forced = true,
+            }, historyLimit);
+            return proceeds;
         }
 
         /// <summary>

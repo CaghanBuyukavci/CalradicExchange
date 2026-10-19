@@ -40,6 +40,7 @@ namespace CalradicExchange.Core.Guilds
                     series.LastDay = world.Day;
                     if (!pair.Value.HasProfit) continue;
                     series.DailyProfit.Add(pair.Value.DailyProfit);
+                    series.LastProfitDay = world.Day;
                     int excess = series.DailyProfit.Count - window;
                     if (excess > 0) series.DailyProfit.RemoveRange(0, excess);
                 }

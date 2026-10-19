@@ -62,8 +62,13 @@
     "tradeHistoryLimit": 500
   },
   "guilds": {
-    "_comment": "Guild shares (PLAN 2.1-2.3). profitWindowDays: days of workshop profit averaged into a guild's daily profit.",
-    "profitWindowDays": 28
+    "_comment": "Guild partnership shares (PLAN 2.1-2.3, ADR-027, ADR-029). Share value = max(avg daily profit, minValuedDailyProfit) x days per year / annualYield / sharesPerGuild. Profit and loss accrue per share-day and are settled every 7 days; debts cost debtRelationPenalty relation with the town's ruler each week.",
+    "profitWindowDays": 28,
+    "sharesPerGuild": 100,
+    "annualYield": 0.25,
+    "minListingDays": 7,
+    "minValuedDailyProfit": 10,
+    "debtRelationPenalty": 2
   },
   "limits": {
     "baseTotal": 5000,

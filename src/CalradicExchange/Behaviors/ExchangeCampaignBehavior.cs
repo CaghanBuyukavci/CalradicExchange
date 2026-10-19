@@ -15,6 +15,7 @@ using CalradicExchange.Localization;
 using CalradicExchange.Menus;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -41,6 +42,7 @@ namespace CalradicExchange.Behaviors
         private MarketSettings _settings;
         private MarketEngine _market;
         private OrderEngine _orders;
+        private GuildPayouts _guildPayouts;
         private WorldReader _reader;
 
         public static ExchangeCampaignBehavior Current => Campaign.Current?.GetCampaignBehavior<ExchangeCampaignBehavior>();
@@ -119,7 +121,9 @@ namespace CalradicExchange.Behaviors
         public TraderProfile CurrentTrader()
         {
             Hero hero = Hero.MainHero;
-            return new TraderProfile(hero.Gold, Clan.PlayerClan?.Tier ?? 0, hero.GetSkillValue(DefaultSkills.Trade));
+            Settlement here = Settlement.CurrentSettlement;
+            return new TraderProfile(hero.Gold, Clan.PlayerClan?.Tier ?? 0, hero.GetSkillValue(DefaultSkills.Trade),
+                here != null && here.IsTown ? here.StringId : null);
         }
 
         /// <summary>Applies an event now (also used by the console). Returns affected instrument ids.</summary>
@@ -146,6 +150,17 @@ namespace CalradicExchange.Behaviors
             {
                 ExchangeLog.Info("Guilds: " + GuildReport.Summary(_state.Market.Guilds));
                 ExchangeLog.Info($"Workshops: {_reader.LastMeasured} measured, {_reader.LastUnmeasured} not measured, net profit {_reader.LastNetTotal:0} vs owner income {_reader.LastIncomeTotal:0} (all workshops).");
+            }
+            if (summary.Processed && !summary.Initialized)
+            {
+                try
+                {
+                    _guildPayouts?.AfterTick(summary, world);
+                }
+                catch (Exception ex)
+                {
+                    ExchangeLog.Error("Guild payouts failed", ex);
+                }
             }
             if (summary.Processed && !summary.Initialized) NotifyBigMoves();
             if (summary.Processed && _state.Market.LastTickDay <= MarketDump.AutoDumpDays) MarketDump.Append(this);
@@ -229,6 +244,7 @@ namespace CalradicExchange.Behaviors
             var rng = new XorShift128Plus((ulong)DateTime.UtcNow.Ticks ^ ((ulong)Environment.TickCount << 32));
             _market = new MarketEngine(_catalog, _settings, _state.Market, rng);
             _orders = new OrderEngine(_market);
+            _guildPayouts = new GuildPayouts(this);
             _reader = new WorldReader(_catalog);
             ExchangeLog.Info($"Market ready: {_catalog.Instruments.Count} instruments, history {_settings.HistoryDays} days.");
 
@@ -263,7 +279,8 @@ namespace CalradicExchange.Behaviors
         private void NotifyBigMoves()
         {
             var notices = new List<(PriceState Price, InstrumentDefinition Def)>();
-            foreach (InstrumentDefinition def in _catalog.Instruments)
+            // Guilds only when held: there are about 150 of them.
+            foreach (InstrumentDefinition def in _catalog.Instruments.Concat(_market.Guilds.Where(g => _state.Portfolio.QuantityOf(g.Id) > 0)))
             {
                 PriceState ps = _market.Get(def.Id);
                 if (ps == null || !ps.HasPrice || ps.Closed) continue;

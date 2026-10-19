@@ -23,6 +23,12 @@ namespace CalradicExchange.Core.Pricing
         /// <summary>Events Core generated itself (season change, famine).</summary>
         public List<MarketEvent> GeneratedEvents { get; set; } = new List<MarketEvent>();
 
+        /// <summary>Instruments closed today (a guild whose last workshop is gone). Positions are paid out by the caller.</summary>
+        public List<string> ClosedInstruments { get; set; } = new List<string>();
+
+        /// <summary>Guild instruments reopened today (workshops of the type came back).</summary>
+        public List<string> ReopenedInstruments { get; set; } = new List<string>();
+
         public override string ToString()
         {
             if (!Processed) return $"day {Day}: skipped";

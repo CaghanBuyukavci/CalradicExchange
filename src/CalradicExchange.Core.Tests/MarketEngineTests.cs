@@ -327,7 +327,7 @@ namespace CalradicExchange.Core.Tests
         private static InstrumentCatalog CatalogWith(params InstrumentDefinition[] extra)
         {
             InstrumentCatalog baseCat = TestData.Catalog();
-            return new InstrumentCatalog(baseCat.UnitsPerShare, baseCat.Instruments.Concat(extra), baseCat.GuildWorkshopTypes);
+            return new InstrumentCatalog(baseCat.UnitsPerShare, baseCat.Instruments.Concat(extra), baseCat.GuildTypes);
         }
     }
 }

@@ -21,5 +21,8 @@ namespace CalradicExchange.Core.Trading
 
         /// <summary>Realized profit of a sell; 0 for a buy.</summary>
         public decimal RealizedPnl { get; set; }
+
+        /// <summary>Not a player order: guild closure or a sale to cover a guild loss (ADR-027). Schema 9.</summary>
+        public bool Forced { get; set; }
     }
 }

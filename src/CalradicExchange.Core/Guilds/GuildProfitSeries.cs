@@ -18,6 +18,9 @@ namespace CalradicExchange.Core.Guilds
         /// <summary>Last exchange day this pair was seen with at least one workshop.</summary>
         public int LastDay { get; set; }
 
+        /// <summary>Exchange day of the newest <see cref="DailyProfit"/> entry; -1 before the first. Added in schema 9.</summary>
+        public int LastProfitDay { get; set; } = -1;
+
         /// <summary>Daily profit in denars, oldest first, at most the configured window.</summary>
         public List<double> DailyProfit { get; set; } = new List<double>();
 

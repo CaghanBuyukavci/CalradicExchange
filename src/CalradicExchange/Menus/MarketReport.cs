@@ -35,7 +35,8 @@ namespace CalradicExchange.Menus
             t.SetTextVariable("LIMIT", Fmt.Denars(b.Orders.TotalLimit(trader)));
             t.SetTextVariable("FEE", Fmt.Pct(b.Orders.CommissionRate(trader.TradeSkill)).TrimStart('+'));
             t.SetTextVariable("TAX", Fmt.Pct(b.Market.Settings.Trading.ProfitTaxRate).TrimStart('+'));
-            return t.ToString();
+            decimal debt = b.Portfolio.TotalGuildDebt;
+            return debt > 0 ? t + "\n" + Strings.MenuGuildDebt.SetTextVariable("DEBT", Fmt.Denars(debt)) : t.ToString();
         }
 
         public static void ShowPortfolio()
@@ -52,7 +53,7 @@ namespace CalradicExchange.Menus
             {
                 decimal price = PriceOf(b, pos.InstrumentId);
                 TextObject line = Strings.PortfolioLine;
-                line.SetTextVariable("NAME", Names.Instrument(b.Catalog.Find(pos.InstrumentId)));
+                line.SetTextVariable("NAME", Names.Instrument(b.Market.Find(pos.InstrumentId)));
                 line.SetTextVariable("QTY", pos.Quantity);
                 line.SetTextVariable("AVG", Fmt.Price(pos.AverageCost));
                 line.SetTextVariable("PRICE", Fmt.Price(price));
@@ -80,6 +81,14 @@ namespace CalradicExchange.Menus
             totals.SetTextVariable("FEES", Fmt.Denars(pf.TotalCommissionPaid));
             totals.SetTextVariable("TAXES", Fmt.Denars(pf.TotalProfitTaxPaid));
             string footer = pf.Positions.Count == 0 ? Strings.PortfolioEmpty + "\n" + totals : totals.ToString();
+            if (pf.GuildIncomeTotal != 0 || pf.GuildAccruals.Count > 0 || pf.GuildDebts.Count > 0)
+            {
+                TextObject guilds = Strings.PortfolioGuildTotals;
+                guilds.SetTextVariable("INCOME", Fmt.SignedDenars(pf.GuildIncomeTotal));
+                guilds.SetTextVariable("PENDING", Fmt.SignedDenars(pf.GuildAccruals.Values.Sum()));
+                guilds.SetTextVariable("DEBT", Fmt.Denars(pf.TotalGuildDebt));
+                footer += "\n" + guilds;
+            }
 
             var vm = new ExchangeTableVM(Strings.PortfolioTitle.ToString(),
                 new[]
@@ -90,6 +99,7 @@ namespace CalradicExchange.Menus
                 footer, Strings.Close.ToString(), close);
 
             string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString();
+            string here = b.CurrentTrader().TownId;
             Action back = ShowPortfolio;
             bool alternate = false;
             foreach (Position pos in pf.Positions)
@@ -100,9 +110,11 @@ namespace CalradicExchange.Menus
                 PriceState ps = b.Market.Get(pos.InstrumentId);
                 bool open = ps != null && ps.HasPrice && !ps.Closed;
                 string id = pos.InstrumentId;
-                vm.PortfolioRows.Add(new PortfolioRowVM(Names.Instrument(b.Catalog.Find(id)), pos.Quantity.ToString(),
+                InstrumentDefinition def = b.Market.Find(id);
+                bool canBuy = open && (def?.Class != InstrumentClass.Guild || def.TownId == here);
+                vm.PortfolioRows.Add(new PortfolioRowVM(Names.Instrument(b.Market.Find(id)), pos.Quantity.ToString(),
                     Fmt.Price(pos.AverageCost), Fmt.Price(price), Fmt.SignedDenars(pnl), Fmt.Pct(pct), TableColors.ForAmount(pnl), alternate,
-                    open, open, buyText, sellText,
+                    canBuy, open, buyText, sellText,
                     () => TradeFlow.StartTrade(id, OrderSide.Buy, back),
                     () => TradeFlow.StartTrade(id, OrderSide.Sell, back)));
                 alternate = !alternate;

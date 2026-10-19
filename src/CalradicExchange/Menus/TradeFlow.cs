@@ -80,6 +80,92 @@ namespace CalradicExchange.Menus
             return vm;
         }
 
+        /// <summary>
+        /// Guild market (ADR-026): partnership shares of this town's guilds (Buy and Sell), then the player's shares in
+        /// other towns (Sell only).
+        /// </summary>
+        public static void ShowGuildMarket()
+        {
+            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
+            if (b == null || !b.IsReady) return;
+            ButtonSkins.EnsureApplied();
+            if (TablePopup.Show("CxTradeTable", close => GuildTable(b, close))) return;
+            ExchangeLog.Warn("Guild market table could not be shown.");
+        }
+
+        private static ExchangeTableVM GuildTable(ExchangeCampaignBehavior b, Action close)
+        {
+            TraderProfile trader = b.CurrentTrader();
+            decimal heldValue = b.Portfolio.MarketValue(id => MarketReport.PriceOf(b, id));
+            TextObject limits = Strings.TradeDescription;
+            limits.SetTextVariable("GOLD", trader.Gold);
+            limits.SetTextVariable("LEFT", Fmt.Denars(Math.Max(0, b.Orders.TotalLimit(trader) - heldValue)));
+
+            var vm = new ExchangeTableVM(Strings.GuildMarketTitle.ToString(),
+                new[]
+                {
+                    Strings.ColGuild.ToString(), Strings.ColPrice.ToString(), Strings.ColWeek.ToString(),
+                    Strings.ColWeekProfitPerShare.ToString(), Strings.ColHeld.ToString(),
+                },
+                null, Strings.Close.ToString(), close, Strings.GuildMarketDescription + "\n" + limits);
+
+            Action back = ShowGuildMarket;
+            vm.TradeRows.Add(new TradeRowVM(Strings.GuildSectionLocal.SetTextVariable("TOWN", Names.Settlement(trader.TownId)).ToString()));
+            List<InstrumentDefinition> local = b.Market.Guilds.Where(g => g.TownId == trader.TownId && !(b.Market.Get(g.Id)?.Closed ?? true)).ToList();
+            if (local.Count == 0) vm.TradeRows.Add(new TradeRowVM(Strings.GuildNoneHere.ToString()));
+            bool alternate = false;
+            foreach (InstrumentDefinition def in local)
+            {
+                vm.TradeRows.Add(GuildRow(b, def, true, alternate, back));
+                alternate = !alternate;
+            }
+
+            List<InstrumentDefinition> elsewhere = b.Portfolio.Positions
+                .Select(p => b.Market.Find(p.InstrumentId))
+                .Where(d => d != null && d.Class == InstrumentClass.Guild && d.TownId != trader.TownId)
+                .ToList();
+            if (elsewhere.Count > 0)
+            {
+                vm.TradeRows.Add(new TradeRowVM(Strings.GuildSectionOther.ToString()));
+                alternate = false;
+                foreach (InstrumentDefinition def in elsewhere)
+                {
+                    vm.TradeRows.Add(GuildRow(b, def, false, alternate, back));
+                    alternate = !alternate;
+                }
+            }
+            return vm;
+        }
+
+        private static TradeRowVM GuildRow(ExchangeCampaignBehavior b, InstrumentDefinition def, bool local, bool alternate, Action back)
+        {
+            PriceState ps = b.Market.Get(def.Id);
+            bool priced = ps != null && ps.HasPrice;
+            bool open = priced && !ps.Closed;
+            int qty = b.Portfolio.QuantityOf(def.Id);
+            double week = priced ? ps.ChangeOver(7) : 0;
+            double weekProfit = WeekProfitPerShare(b, def.Id);
+            string none = Strings.NoPrice.ToString();
+            string id = def.Id;
+            return new TradeRowVM(Names.Instrument(def),
+                priced ? Fmt.Price(ps.Price) : none,
+                priced ? Fmt.Pct(week) : none, TableColors.ForChange(week),
+                Fmt.SignedDenars((decimal)weekProfit), TableColors.ForAmount((decimal)weekProfit),
+                qty > 0 ? qty.ToString() : none,
+                open && local, open && qty > 0, alternate, Strings.BtnBuy.ToString(), Strings.BtnSell.ToString(),
+                () => Guard("buy pick", () => AskQuantity(id, OrderSide.Buy, back)),
+                () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell, back)));
+        }
+
+        /// <summary>Profit of the guild's last 7 recorded days for one partnership share.</summary>
+        private static double WeekProfitPerShare(ExchangeCampaignBehavior b, string id)
+        {
+            var series = b.Market.GuildSeries(id);
+            if (series == null || series.DailyProfit.Count == 0) return 0;
+            double week = series.DailyProfit.Skip(Math.Max(0, series.DailyProfit.Count - 7)).Sum();
+            return week / Math.Max(1, b.Market.Settings.Guilds?.SharesPerGuild ?? 100);
+        }
+
         private static string MarketTitle(InstrumentClass cls)
         {
             return (cls == InstrumentClass.Commodity ? Strings.CommodityMarketTitle : Strings.BasketMarketTitle).ToString();
@@ -113,7 +199,7 @@ namespace CalradicExchange.Menus
                 AskQuantity(id, OrderSide.Buy, back);
                 return;
             }
-            InformationManager.ShowInquiry(new InquiryData(Names.Instrument(b.Catalog.Find(id)), "", true, true,
+            InformationManager.ShowInquiry(new InquiryData(Names.Instrument(b.Market.Find(id)), "", true, true,
                 Strings.BtnBuy.ToString(), Strings.BtnSell.ToString(),
                 () => Guard("fallback buy", () => AskQuantity(id, OrderSide.Buy, back)),
                 () => Guard("fallback sell", () => AskQuantity(id, OrderSide.Sell, back))));
@@ -132,9 +218,10 @@ namespace CalradicExchange.Menus
         private static void AskQuantity(string id, OrderSide side, Action back)
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
-            InstrumentDefinition def = b.Catalog.Find(id);
+            InstrumentDefinition def = b.Market.Find(id);
             TraderProfile trader = b.CurrentTrader();
             string name = Names.Instrument(def);
+            bool guild = def?.Class == InstrumentClass.Guild;
 
             int max;
             TextObject prompt;
@@ -147,19 +234,19 @@ namespace CalradicExchange.Menus
                     ShowError(b.Orders.Quote(id, OrderSide.Buy, 1, trader, b.Portfolio).Error);
                     return;
                 }
-                prompt = Strings.QuantityBuy;
+                prompt = guild ? Strings.QuantityBuyGuild : Strings.QuantityBuy;
                 prompt.SetTextVariable("PRICE", Fmt.Price(MarketReport.PriceOf(b, id)));
             }
             else
             {
                 max = b.Portfolio.QuantityOf(id);
                 if (max <= 0) return;
-                prompt = Strings.QuantitySell;
+                prompt = guild ? Strings.QuantitySellGuild : Strings.QuantitySell;
                 prompt.SetTextVariable("QTY", max);
             }
             prompt.SetTextVariable("NAME", name);
             prompt.SetTextVariable("MAX", max);
-            string title = side == OrderSide.Buy ? Strings.BuyTitle.ToString() : Strings.SellTitle.ToString();
+            string title = (side == OrderSide.Buy ? guild ? Strings.BuyGuildTitle : Strings.BuyTitle : guild ? Strings.SellGuildTitle : Strings.SellTitle).ToString();
             int initial = side == OrderSide.Sell ? max : 1;
 
             bool shown = TablePopup.Show("CxQuantityPopup", close => new QuantityVM(title, prompt.ToString(), max, initial,
@@ -210,7 +297,7 @@ namespace CalradicExchange.Menus
 
             TextObject text = side == OrderSide.Buy ? Strings.ConfirmBuy : Strings.ConfirmSell;
             text.SetTextVariable("QTY", q.Quantity);
-            text.SetTextVariable("NAME", Names.Instrument(b.Catalog.Find(id)));
+            text.SetTextVariable("NAME", Names.Instrument(b.Market.Find(id)));
             text.SetTextVariable("PRICE", Fmt.Price(q.MarketPrice));
             text.SetTextVariable("EXEC", Fmt.Price(q.ExecutionPrice));
             text.SetTextVariable("GROSS", q.Gross);
@@ -246,7 +333,7 @@ namespace CalradicExchange.Menus
 
             TextObject msg = side == OrderSide.Buy ? Strings.Bought : Strings.Sold;
             msg.SetTextVariable("QTY", quantity);
-            msg.SetTextVariable("NAME", Names.Instrument(b.Catalog.Find(id)));
+            msg.SetTextVariable("NAME", Names.Instrument(b.Market.Find(id)));
             msg.SetTextVariable("TOTAL", q.Total);
             msg.SetTextVariable("PNL", Fmt.SignedDenars(r.RealizedPnl));
             InformationManager.DisplayMessage(new InformationMessage(msg.ToString(), Colors.Yellow));
