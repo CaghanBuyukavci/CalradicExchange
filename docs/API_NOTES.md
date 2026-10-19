@@ -136,6 +136,10 @@ Sources: `Modules\SandBoxCore\ModuleData\items\horses_and_others.xml`, `TaleWorl
 | `MBTextManager.SetTextVariable(string, string)` | | VERIFIED | Menu text `{=!}{CX_EXCHANGE_TEXT}` |
 | `Campaign.Current.CurrentMenuContext.GameMenu.StringId` | | VERIFIED | Used to refresh the exchange menu after a trade |
 | `Colors.Green/Red/Yellow` | `static readonly Color` | VERIFIED | |
+| `MenuContext.SetBackgroundMeshName(string)` | name is a Gauntlet **sprite** name (`GameMenuWidget Sprite="@Background"`, `GameMenuVM.Background`) | VERIFIED | Exchange menu background `cx_exchange_bg` |
+| `UIResourceManager.SpriteData.Sprites` | `Dictionary<string, Sprite>`, looked up by `SpriteData.GetSprite(name)` | VERIFIED | We add our runtime sprite here |
+| `abstract Sprite(string, int, int, SpriteNinePatchParameters)` + `Texture`, `GetMinUvs`, `GetMaxUvs` | subclassable | VERIFIED | `UI/TextureSprite` |
+| `TaleWorlds.Engine.Texture.LoadTextureFromPath(fileName, folder)`, `CreateFromMemory(byte[])` | native; no vanilla caller | VERIFIED (signature) | PNG loading confirmed only by in-game test; fallback order path → memory |
 
 ## 9. After every game update
 

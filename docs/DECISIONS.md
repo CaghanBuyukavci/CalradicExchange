@@ -165,3 +165,9 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Hurma yağma haberi yine zarar etti. Sebep: yaz şokunun sona ermesiyle fiyat hedefin üstünde kalmıştı; yağma sadece +%5 getirdi, bu da alıp satma maliyetinin (~%5,6) altında kaldı. Bu bir hata değil, şans payı sayıldı.
   - **İzlenecek:** Hisseler 43 günde ortalama +%15 yükseldi. Yaklaşık yarısı geçici şoklardan (kış başlangıcı, savaşlar), kalanı tabanın kampanya başındaki fiyat yükselişini izlemesinden geliyor. Gerçek fiyatlar çoğu malda tabanın altında, bu yüzden taban geri inmeli. Uzun oyunda al-tut stratejisi hâlâ bu kadar kazandırıyorsa `anchorHalfLifeDays` veya mevsim dürtüleri ayarlanacak.
   - Kayıttan borsa durumu okunabiliyor: `.sav` dosyası 4 baytlık başlık uzunluğu + JSON başlık + ham deflate gövdeden oluşuyor. Durum JSON'u `"schemaVersion"` aranarak bulunur.
+
+## ADR-023 — Borsa menüsü arka planı çalışma anında yüklenen doku ile
+
+- **Bağlam:** Kullanıcı "Borsaya gir"den sonra açılan menünün arka planı olarak kendi görselini (`cx_townBG.png`, 932×1688, vanilla 445×805 arka planlarla aynı oran) istedi.
+- **Karar:** Görsel `GUI/Textures/cx_exchange_bg.png` olarak dağıtılır. Menü ilk açıldığında `Texture.LoadTextureFromPath` (olmazsa `CreateFromMemory`) ile motor dokusu yüklenir, tüm dokuyu gösteren bir `Sprite` alt sınıfı (`TextureSprite`) `UIResourceManager.SpriteData.Sprites`'a `cx_exchange_bg` adıyla eklenir ve menü init'i `SetBackgroundMeshName("cx_exchange_bg")` çağırır.
+- **Neden:** Sprite sheet/TPAC üretmek Modding Kit gerektirir. Harmony gerekmez. Yükleme başarısız olursa vanilla arka plan kalır ve log'a yazılır.

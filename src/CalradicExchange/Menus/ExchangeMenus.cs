@@ -2,6 +2,7 @@ using System;
 using CalradicExchange.Behaviors;
 using CalradicExchange.Diagnostics;
 using CalradicExchange.Localization;
+using CalradicExchange.UI;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Settlements;
@@ -78,6 +79,7 @@ namespace CalradicExchange.Menus
         {
             try
             {
+                if (MenuBackground.EnsureRegistered()) args.MenuContext.SetBackgroundMeshName(MenuBackground.SpriteName);
                 MBTextManager.SetTextVariable(MenuTextVariable, MarketReport.MenuText());
             }
             catch (Exception ex)
