@@ -11,6 +11,7 @@ namespace CalradicExchange.UI
     /// Registers GUI\Textures\cx_exchange_bg.png as the Gauntlet sprite used as the exchange menu background.
     /// The game menu binds its background by sprite name (GameMenuWidget.Sprite="@Background"), so a sprite added to
     /// UIResourceManager.SpriteData under our name is picked up by MenuContext.SetBackgroundMeshName.
+    /// The engine loads PNGs with red and blue swapped; deploy.ps1 writes a pre-swapped copy from Assets\Textures.
     /// </summary>
     public static class MenuBackground
     {
