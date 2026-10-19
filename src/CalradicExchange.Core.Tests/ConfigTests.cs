@@ -31,7 +31,9 @@ namespace CalradicExchange.Core.Tests
             Assert.Equal(0.20, s.For(InstrumentClass.Commodity).Kappa);
             Assert.Equal(3, s.RulesFor(MarketEventType.VillageLooted).Count);
             Assert.Equal(0.21, s.SeasonImpulses[Season.Winter]);
-            Assert.Equal(5, s.Trading.MinCommission);
+            Assert.Equal(2, s.Trading.MinCommission);
+            Assert.Equal(0.025, s.Trading.CommissionRateMax);
+            Assert.Equal(0.6, s.EconomyWeight);
             Assert.Equal(0.10, s.Trading.ProfitTaxRate);
         }
 

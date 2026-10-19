@@ -146,7 +146,7 @@ namespace CalradicExchange.Sim
             checks.Add(RangeCheck("Commodity annual volatility 25% - 60%", commodities, vol, 0.25, 0.60));
             checks.Add(RangeCheck("Sector annual volatility 15% - 35%", sectors, vol, 0.15, 0.35));
             List<string> lowCorr = corr.Keys.Where(id => corr[id].Average() <= 0.65).ToList();
-            checks.Add(("Correlation with fundamental (30d avg) > 0.65", lowCorr.Count == 0,
+            checks.Add(("Correlation with target F x e^S (30d avg) > 0.65", lowCorr.Count == 0,
                 $"lowest {corr.Min(c => c.Value.Average()):0.00}" + Fails(lowCorr)));
             checks.Add(("Buy-and-hold 4y return -10% .. +15%", bh.Average() >= -0.10 && bh.Average() <= 0.15, Pct(bh.Average())));
             checks.Add(("Random trading average negative", rnd.Average() < 0, Pct(rnd.Average())));

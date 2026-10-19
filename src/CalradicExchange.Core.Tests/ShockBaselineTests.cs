@@ -28,7 +28,7 @@ namespace CalradicExchange.Core.Tests
             Raid(e, 1);
             e.Tick(TestData.World(2));
 
-            Assert.Equal(0.075, e.Get("cx_grain").Shock, 9);
+            Assert.Equal(0.15, e.Get("cx_grain").Shock, 9);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace CalradicExchange.Core.Tests
             Raid(e, 600);
             e.Tick(TestData.World(601));
 
-            Assert.InRange(e.Get("cx_grain").Shock, 0.06, 0.075);
+            Assert.InRange(e.Get("cx_grain").Shock, 0.12, 0.15);
         }
     }
 }

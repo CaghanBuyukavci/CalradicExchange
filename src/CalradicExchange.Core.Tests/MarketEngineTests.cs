@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CalradicExchange.Core.Config;
 using CalradicExchange.Core.Model;
@@ -74,11 +74,11 @@ namespace CalradicExchange.Core.Tests
             Assert.Equal(new[] { "cx_grain" }, affected);
             e.Tick(TestData.World(2));
             PriceState grain = e.Get("cx_grain");
-            Assert.Equal(0.075, grain.Shock, 9);
-            Assert.Equal(100 * System.Math.Exp(0.20 * 0.075), (double)grain.Price, 3);
+            Assert.Equal(0.15, grain.Shock, 9);
+            Assert.Equal(100 * System.Math.Exp(0.20 * 0.15), (double)grain.Price, 2);
 
             for (int d = 3; d <= 12; d++) e.Tick(TestData.World(d));
-            Assert.Equal(0.0375, grain.Shock, 6);
+            Assert.Equal(0.075, grain.Shock, 6);
             Assert.Equal(400m, e.Get("cx_salt").Price); // untouched: 10 x 40
         }
 
@@ -93,12 +93,46 @@ namespace CalradicExchange.Core.Tests
         [Fact]
         public void Shock_IsClampedToMaxAbsShock()
         {
-            MarketEngine e = NewEngine();
+            MarketSettings s = TestData.NoNoiseSettings();
+            s.RulesFor(MarketEventType.VillageLooted)[0].MaxStack = 0;
+            var e = new MarketEngine(TestData.Catalog(), s, new MarketState(), new XorShift128Plus(1));
             e.Tick(TestData.World(1));
             for (int i = 0; i < 40; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "grain" });
             e.Tick(TestData.World(2));
 
             Assert.Equal(1.0, e.Get("cx_grain").Shock, 9);
+        }
+
+        [Fact]
+        public void RepeatedRaids_StackOnlyUpToMaxStack()
+        {
+            MarketEngine e = NewEngine();
+            e.Tick(TestData.World(1));
+            for (int i = 0; i < 40; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "grain" });
+            e.Tick(TestData.World(2));
+
+            Assert.Equal(0.15 * 4, e.Get("cx_grain").Shock, 9);
+        }
+
+        [Fact]
+        public void StackRoom_RefillsAsOldRaidsDecay_AndOtherItemsAreSeparate()
+        {
+            MarketEngine e = NewEngine();
+            e.Tick(TestData.World(1));
+            for (int i = 0; i < 4; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "salt" });
+            for (int d = 2; d <= 11; d++) e.Tick(TestData.World(d)); // day 2 applies, days 3..11 decay 9 times
+
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 11, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 11, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 11, ItemId = "grain" });
+            e.Tick(TestData.World(12));
+
+            // The new raids only fill the room left under 4 x 0.15 (not 3 x 0.15); then the old ones decay once more.
+            double left = 0.6 * System.Math.Pow(0.5, 0.9);
+            double expected = left * System.Math.Pow(0.5, 0.1) + (0.6 - left);
+            Assert.Equal(expected, e.Get("cx_grain").Shock, 6);
+            Assert.Equal(0.15 * 0.5, e.Get("cx_salt").Shock, 6);
         }
 
         [Fact]
@@ -111,11 +145,11 @@ namespace CalradicExchange.Core.Tests
 
             e.ApplyEvent(new MarketEvent { Type = MarketEventType.SiegeStarted, Day = 1, TownId = "town_A" });
             for (int d = 2; d <= 8; d++) e.Tick(TestData.World(d));
-            Assert.Equal(-0.225, e.Get("g_A").Shock, 9);
+            Assert.Equal(-0.45, e.Get("g_A").Shock, 9);
 
             e.ApplyEvent(new MarketEvent { Type = MarketEventType.SiegeEnded, Day = 8, TownId = "town_A" });
             for (int d = 9; d <= 15; d++) e.Tick(TestData.World(d));
-            Assert.Equal(-0.1125, e.Get("g_A").Shock, 6);
+            Assert.Equal(-0.225, e.Get("g_A").Shock, 6);
         }
 
         [Fact]
@@ -134,8 +168,8 @@ namespace CalradicExchange.Core.Tests
             for (int d = 2; d <= 8; d++) e.Tick(TestData.World(d));
 
             // Released before its first tick: tick 2 applies it in full, ticks 3-8 decay it 6 times.
-            Assert.Equal(-0.225 * System.Math.Pow(0.5, 6.0 / 7), e.Get("g_A").Shock, 9);
-            Assert.Equal(-0.225, e.Get("g_B").Shock, 9);
+            Assert.Equal(-0.45 * System.Math.Pow(0.5, 6.0 / 7), e.Get("g_A").Shock, 9);
+            Assert.Equal(-0.45, e.Get("g_B").Shock, 9);
         }
 
         [Fact]
@@ -202,7 +236,7 @@ namespace CalradicExchange.Core.Tests
             MarketEvent ev = e.Tick(w).GeneratedEvents.Single();
 
             Assert.Equal(0.5, ev.TownShare.Value, 9);
-            Assert.Equal(0.12 * 0.5 * 2.0, e.Get("cx_grain").Shock, 9);
+            Assert.Equal(0.24 * 0.5 * 2.0, e.Get("cx_grain").Shock, 9);
         }
 
         [Fact]

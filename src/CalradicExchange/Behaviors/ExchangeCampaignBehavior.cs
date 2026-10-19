@@ -171,6 +171,12 @@ namespace CalradicExchange.Behaviors
                 StartMarket();
                 ExchangeMenus.AddTo(starter);
                 ExchangeLog.Info($"Session launched. Exchange day {NextDay}, ready {IsReady}.");
+                // In a new campaign the character is created after this point; fees use the skill at trade time.
+                if (IsReady && Hero.MainHero != null)
+                {
+                    TraderProfile t = CurrentTrader();
+                    ExchangeLog.Info($"Trader now: trade skill {t.TradeSkill} -> commission {Orders.CommissionRate(t.TradeSkill):P2}, clan tier {t.ClanTier}, limit {Orders.TotalLimit(t)}.");
+                }
             }
             catch (Exception ex)
             {

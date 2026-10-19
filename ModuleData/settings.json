@@ -1,6 +1,6 @@
 ﻿{
   "schemaVersion": 1,
-  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013 to ADR-021).",
+  "_comment": "Default market parameters. Source: docs/ECONOMY_MODEL.md, tuned with the simulator (PLAN 1.14, ADR-013 to ADR-022).",
   "volatilityMultiplier": 1.0,
   "maxDailyLogReturn": 0.25,
   "maxAbsShock": 1.0,
@@ -8,9 +8,12 @@
   "newsKeep": 30,
   "famineCooldownDays": 21,
   "shockBaselineHalfLifeDays": 42,
-  "fundamentalHalfLifeDays": 0,
-  "fundamentalStartHalfLifeDays": 45,
-  "fundamentalRampDays": 90,
+  "_economyHelp": "ADR-022: F = anchor x exp(E). E = decaying sum of the item's daily town-price move minus the median move of its class, times economyWeight, clamped to economyMaxAbs. The anchor drifts to the town price with anchorHalfLifeDays.",
+  "economyWeight": 0.6,
+  "economyHalfLifeDays": 14,
+  "economyMaxAbs": 0.3,
+  "economyMaxDailyMove": 0.15,
+  "anchorHalfLifeDays": 120,
   "classes": {
     "Commodity": {
       "kappa": 0.2,
@@ -50,9 +53,9 @@
   },
   "trading": {
     "_comment": "Commission rate falls linearly with Trade skill from commissionRateMax (skill 0) to commissionRateMin (tradeSkillCap). profitTaxRate is taken from realized profit on sells (ADR-014).",
-    "commissionRateMax": 0.05,
+    "commissionRateMax": 0.025,
     "commissionRateMin": 0.005,
-    "minCommission": 5,
+    "minCommission": 2,
     "tradeSkillCap": 300,
     "profitTaxRate": 0.1,
     "permanentImpactFactor": 0.5
@@ -63,6 +66,7 @@
     "perTradeSkill": 50,
     "perInstrumentDepthMultiple": 1.5
   },
+  "_shocksHelp": "Event impulses were doubled on 2026-10-19 so following the news beats the commission (ADR-022). Season impulses were not: they are known in advance.",
   "_targetsHelp": "instrument:<id> | tag:<tag> | eventItem | guilds:eventTown | townBond:eventTown | kingdomIndex:eventKingdom | kingdomIndex:otherKingdom | kingdomIndex:both",
   "seasonImpulses": {
     "Spring": 0.0735,
@@ -74,36 +78,37 @@
     "VillageLooted": [
       {
         "target": "eventItem",
-        "impulse": 0.075,
-        "halfLifeDays": 10
+        "impulse": 0.15,
+        "halfLifeDays": 10,
+        "maxStack": 4
       },
       {
         "target": "kingdomIndex:eventKingdom",
-        "impulse": -0.03,
+        "impulse": -0.06,
         "halfLifeDays": 10
       },
       {
         "target": "townBond:eventTown",
-        "impulse": -0.015,
+        "impulse": -0.03,
         "halfLifeDays": 7
       }
     ],
     "SiegeStarted": [
       {
         "target": "guilds:eventTown",
-        "impulse": -0.225,
+        "impulse": -0.45,
         "halfLifeDays": 7,
         "holdUntilEnd": true
       },
       {
         "target": "townBond:eventTown",
-        "impulse": -0.15,
+        "impulse": -0.3,
         "halfLifeDays": 7,
         "holdUntilEnd": true
       },
       {
         "target": "instrument:cx_sector_military",
-        "impulse": 0.045,
+        "impulse": 0.09,
         "halfLifeDays": 14
       }
     ],
@@ -111,17 +116,17 @@
     "SettlementCaptured": [
       {
         "target": "kingdomIndex:eventKingdom",
-        "impulse": -0.12,
+        "impulse": -0.24,
         "halfLifeDays": 21
       },
       {
         "target": "kingdomIndex:otherKingdom",
-        "impulse": 0.075,
+        "impulse": 0.15,
         "halfLifeDays": 21
       },
       {
         "target": "guilds:eventTown",
-        "impulse": -0.075,
+        "impulse": -0.15,
         "halfLifeDays": 14,
         "volMultiplier": 2.0,
         "volDays": 14
@@ -130,17 +135,17 @@
     "WarDeclared": [
       {
         "target": "instrument:cx_sector_military",
-        "impulse": 0.075,
+        "impulse": 0.15,
         "halfLifeDays": 21
       },
       {
         "target": "instrument:cx_sector_luxury",
-        "impulse": -0.045,
+        "impulse": -0.09,
         "halfLifeDays": 21
       },
       {
         "target": "kingdomIndex:both",
-        "impulse": -0.03,
+        "impulse": -0.06,
         "halfLifeDays": 14,
         "volMultiplier": 1.5,
         "volDays": 14
@@ -149,17 +154,17 @@
     "PeaceMade": [
       {
         "target": "instrument:cx_sector_luxury",
-        "impulse": 0.045,
+        "impulse": 0.09,
         "halfLifeDays": 21
       },
       {
         "target": "instrument:cx_sector_textile",
-        "impulse": 0.045,
+        "impulse": 0.09,
         "halfLifeDays": 21
       },
       {
         "target": "instrument:cx_sector_military",
-        "impulse": -0.06,
+        "impulse": -0.12,
         "halfLifeDays": 21
       }
     ],
@@ -173,14 +178,14 @@
     "FamineStarted": [
       {
         "target": "tag:agriculture",
-        "impulse": 0.12,
+        "impulse": 0.24,
         "halfLifeDays": 14,
         "scaleByTownShare": true,
         "townShareMultiplier": 2.0
       },
       {
         "target": "guilds:eventTown",
-        "impulse": -0.09,
+        "impulse": -0.18,
         "halfLifeDays": 14
       }
     ],

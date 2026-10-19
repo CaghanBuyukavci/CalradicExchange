@@ -19,16 +19,22 @@ namespace CalradicExchange.Core.Config
         [JsonProperty("shockBaselineHalfLifeDays")] public double ShockBaselineHalfLifeDays { get; set; }
 
         /// <summary>
-        /// Half-life of the log-EMA that smooths observed fundamentals after the start ramp (ADR-021).
-        /// 0 means no smoothing in settled play: F follows the world snapshot each day.
+        /// Weight of the real economy's relative daily moves in the economy signal E (ADR-022). 0 switches the
+        /// model off: F is the observed world value each day (direct mode, used by tests).
         /// </summary>
-        [JsonProperty("fundamentalHalfLifeDays")] public double FundamentalHalfLifeDays { get; set; }
+        [JsonProperty("economyWeight")] public double EconomyWeight { get; set; }
 
-        /// <summary>Smoothing half-life on the market's first day; moves linearly to the normal one over the ramp.</summary>
-        [JsonProperty("fundamentalStartHalfLifeDays")] public double FundamentalStartHalfLifeDays { get; set; }
+        /// <summary>Half-life of E: a relative price move in the towns fades out of the share price over this time.</summary>
+        [JsonProperty("economyHalfLifeDays")] public double EconomyHalfLifeDays { get; set; }
 
-        /// <summary>Days after the market starts over which the start half-life eases to the normal one.</summary>
-        [JsonProperty("fundamentalRampDays")] public int FundamentalRampDays { get; set; }
+        /// <summary>|E| never exceeds this (log units, 0.3 = about +35% / -26%).</summary>
+        [JsonProperty("economyMaxAbs")] public double EconomyMaxAbs { get; set; }
+
+        /// <summary>A single day's observed move is clamped to this before it enters E (data glitches, empty markets).</summary>
+        [JsonProperty("economyMaxDailyMove")] public double EconomyMaxDailyMove { get; set; }
+
+        /// <summary>Half-life of the anchor's drift towards the observed world value (the slow real link). 0 = fixed anchor.</summary>
+        [JsonProperty("anchorHalfLifeDays")] public double AnchorHalfLifeDays { get; set; }
 
         /// <summary>A town that ran out of food cannot start another famine for this many days.</summary>
         [JsonProperty("famineCooldownDays")] public int FamineCooldownDays { get; set; }

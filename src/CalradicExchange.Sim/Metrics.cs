@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using CalradicExchange.Core.Pricing;
@@ -31,7 +31,7 @@ namespace CalradicExchange.Sim
 
         public static double MaxRatio(IReadOnlyList<PricePoint> s) => (double)(s.Max(p => p.P) / s[0].P);
 
-        /// <summary>Pearson correlation of the 30-day moving averages of P and F.</summary>
+        /// <summary>Pearson correlation of the 30-day moving averages of P and its target F x e^S (ADR-022: news, not F alone, sets the direction).</summary>
         public static double FundamentalCorrelation(IReadOnlyList<PricePoint> s, int window = 30)
         {
             var p = new List<double>();
@@ -42,7 +42,7 @@ namespace CalradicExchange.Sim
                 for (int j = i - window + 1; j <= i; j++)
                 {
                     sp += (double)s[j].P;
-                    sf += (double)s[j].F;
+                    sf += (double)s[j].F * Math.Exp(s[j].S);
                 }
                 p.Add(sp / window);
                 f.Add(sf / window);

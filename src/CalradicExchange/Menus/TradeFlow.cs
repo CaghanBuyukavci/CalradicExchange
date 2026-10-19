@@ -178,7 +178,8 @@ namespace CalradicExchange.Menus
         private static void Execute(string id, OrderSide side, int quantity)
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
-            TradeResult r = b.Orders.Execute(id, side, quantity, b.CurrentTrader(), b.Portfolio);
+            TraderProfile trader = b.CurrentTrader();
+            TradeResult r = b.Orders.Execute(id, side, quantity, trader, b.Portfolio);
             if (!r.Success)
             {
                 ExchangeLog.Info($"Trade rejected: {side} {quantity} {id}: {r.Quote.Error}");
@@ -191,7 +192,7 @@ namespace CalradicExchange.Menus
             else if (r.GoldDelta > 0) GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, r.GoldDelta, true);
 
             TradeQuote q = r.Quote;
-            ExchangeLog.Info($"Trade: {side} {quantity} {id} @ {q.ExecutionPrice} (market {q.MarketPrice}), gross {q.Gross}, fee {q.Commission}, tax {q.ProfitTax}, gold {r.GoldDelta:+0;-0}, realized {r.RealizedPnl:0.##}. Gold now {Hero.MainHero.Gold}.");
+            ExchangeLog.Info($"Trade: {side} {quantity} {id} @ {q.ExecutionPrice} (market {q.MarketPrice}), gross {q.Gross}, fee {q.Commission}, tax {q.ProfitTax}, gold {r.GoldDelta:+0;-0}, realized {r.RealizedPnl:0.##}. Gold now {Hero.MainHero.Gold}. Trade skill {trader.TradeSkill} -> commission {b.Orders.CommissionRate(trader.TradeSkill):P2}, clan tier {trader.ClanTier}.");
 
             TextObject msg = side == OrderSide.Buy ? Strings.Bought : Strings.Sold;
             msg.SetTextVariable("QTY", quantity);

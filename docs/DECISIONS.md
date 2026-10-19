@@ -128,7 +128,7 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Karar:** Kendi Gauntlet prefablarımız (`GUI/Prefabs/CxMarketTable.xml`, `CxPortfolioTable.xml`) ve `ExchangeTableVM`. Sütunlar sabit genişlikli, sayılar sağa hizalı, renk `Brush.FontColor="@..."` bağlamasıyla. Vanilla fırçaları ve sprite'ları kullanılır; kendi fırçamız yok. Katman açılamazsa eski metin penceresine düşülür (ADR-006).
 - **Ek (2026-10-19, kullanıcı isteği):** Al/Sat adet penceresi de aynı yolla yapıldı: `CxQuantityPopup.xml` + `QuantityVM`. Slider (`SliderWidget`) ve sayı kutusu (`IntegerInputTextWidget`) aynı `Quantity` özelliğine bağlı; ikisi de v1.4.8 vanilla prefablarında (pazarlık ekranı) kullanılıyor. Sprite'lar `ui_group1` kategorisinde (vanilla metin penceresiyle aynı), haritada yüklü.
 
-## ADR-021 — Kampanya başında temel değer yumuşatılır
+## ADR-021 — Kampanya başında temel değer yumuşatılır (ADR-022 ile kaldırıldı)
 
 - **Bağlam:** Yeni kampanyada şehir depoları boş başlıyor, işlenmiş mallar normalin 5–6 katına satılıyor. Gerçek oyun verisi (`market_raw.csv`, borsa günü 6–40): depolar doldukça temel değer düşüyor; kadife −%63, keten kumaş −%62, şarap −%61, alet −%57, tahıl −%48; 12 emtianın ortalaması −%25. Borsa bunu doğru yansıtıyordu ama oyuncu ilk 40 günde neredeyse her gün kırmızı gördü ve para kaybetti (−599 dinar, ~220'si komisyon).
 - **Karar (kullanıcı, 2026-10-19, "temel değeri yumuşat"; borsa ilk günden açık kalacak):** Fiyatın çekildiği F, gözlenen temel değerin log-üstel ortalamasıdır. Yarı ömür piyasa açıldığında 45 gün, 90 günde doğrusal olarak 0'a iner (yumuşatma kapanır). Gözlenen değer `PriceState.RawFundamental` alanında tutulur. `settings.json`: `fundamentalStartHalfLifeDays` 45, `fundamentalRampDays` 90, `fundamentalHalfLifeDays` 0 (rampadan sonraki yarı ömür).
@@ -137,3 +137,23 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Bilinen sınır:** Düşüş kaybolmuyor, rampa boyunca (yaklaşık 2–4. ay) yayılıyor. Kampanya ortasında kurulan modda da rampa çalışır; piyasa zaten oturmuşsa etkisi küçüktür.
 - **Açığa satışla etkileşim (Faz 3.8):** Yumuşatılmış F gerçek fiyatın gerisinden gelir. Açığa satış varken kampanya başında "aç, bekle, kapat" neredeyse risksiz kazanç olur. Açığa satış eklenirken ödünç ücreti, ayrı limit ve rampa süresince kapalı tutma değerlendirilecek.
 - **Kayıt:** Şema 4: `market.startDay`, `prices[].rawFundamental`. Göç: başlangıç günü en eski geçmiş noktasından alınır, ham değer son F'den kopyalanır. Yeniden kurulum gerekmez.
+
+## ADR-022 — Taban + göreli ekonomi sinyali; haberler 2 kat, komisyon en fazla %2,5
+
+- **Bağlam (2026-10-19 testi, yeni kampanya, 35 gün):** Yeni kampanyada şehirlerin başlangıç stoğu ilk 10 günde tükeniyor. İşlenmiş mallar 2–3 katına çıkıp sonra düşüyor (kadife 3.256 → 8.215 → 6.620, alet 1.693 → 4.105 → 1.756). Borsa bunu birebir izledi: günlerin %96'sı yeşil (gün 1–11), sonra %38 ve %25. Kullanıcı şunu istedi: hem oyun içi olaylardan etkilenen hem dengeli yeşil/kırmızı gösteren, bilen oyuncunun az da olsa kazandığı, şans payı olan bir borsa. "Gerekirse gerçek ekonominin ağırlığını azaltalım, ama haberleri takip etmek anlamlı olmalı." Hurma yağma haberinden sonra alınan hisse zarar etti. Yağma şokunun etkisi %7,5, erken oyunda bir alıp satmanın komisyonu ise ~%9'du. ADR-021 yumuşatması bu testte oyuna ulaşmamıştı (deploy hatası: eski `bin\x64` çıktısı kopyalanıyordu; düzeltildi, deploy artık DLL özetini doğruluyor).
+- **Karar (kullanıcı, 2026-10-19: "yeni model + yavaş gerçek bağ", "ikisi birden"):**
+  - **Fiyat modeli:** F = taban × e^E. `PriceState.Anchor` ve `EconomySignal` alanları eklendi.
+  - **Ekonomi sinyali E:** Her gün malın şehir fiyatı değişimi, kendi sınıfının (emtia veya sektör) medyan değişimi çıkarılarak alınır, 0,6 ile çarpılır ve E'ye eklenir. E 14 günlük yarı ömürle söner ve ±0,3 ile sınırlıdır. Tek günlük gözlem ±0,15 ile kırpılır. Bütün ekonominin birlikte inip çıkması (başlangıç dalgası gibi) E'ye girmez.
+  - **Yavaş gerçek bağ:** Taban, şehir fiyatına 120 günlük yarı ömürle kayar.
+  - **ADR-021 yumuşatması kaldırıldı.** `settings.json`: `economyWeight` (0 = eski doğrudan mod, testler kullanır), `economyHalfLifeDays`, `economyMaxAbs`, `economyMaxDailyMove`, `anchorHalfLifeDays`.
+  - **Haber şokları ×2** (yağma 0,075 → 0,15, savaş → askeri +0,15, kıtlık 0,24 …). Mevsim dürtüleri değişmedi, çünkü önceden bilinebiliyorlar.
+  - **Komisyon:** En yüksek oran %5 → %2,5. Taban oran %0,5 (Tüccar 300) ve asgari 5 → 2 dinar. Oran her işlemde karakterin o anki Tüccar becerisinden hesaplanır; yüksek Tüccar ile başlayan karakter ilk işlemden itibaren düşük öder (örneğin Tüccar 60: %2,1). Log her işlemde beceriyi ve oranı yazar.
+  - **Yağma birikme sınırı:** Aynı kuraldan bir araca gelen canlı şoklar dürtü × `maxStack` değerini geçemez. Yağmada `maxStack` 4. `ShockComponent.Source` alanı eklendi. Sınır olmadan kendi köylerini yağmalayan manipülatör erken oyunda günde 123 dinar kazanıyordu.
+  - **Simülatör hedefi değişti:** "Temel değerle korelasyon" yerine "hedef F × e^S ile korelasyon" (> 0,65). Yeni modelde yönü haberler belirlediği için F tek başına fiyatın izlemesi gereken değer değil.
+- **Sonuç (20 seed, 4 yıl):** 8/8 hedef geçiyor.
+  - Haber takipçisi yıllık erken +%0,5, orta +%0,5, geç +%1,1 (eskiden erken −%4,5, orta −%2,3). Olay başına geç oyunda: savaş +146, mevsim +138 dinar.
+  - Manipülatör döngü başına: erken +123, orta +175, geç +404 dinar.
+  - Erken oyun en iyi bot günde 40,8 dinar (sınır 50). Al-tut +%0,5, rastgele −%12,9.
+  - Gerçek veri (35 gün, gürültü ve şoklar hariç): yeşil gün oranı dönemlere göre %53 / %62 / %62. 35 günlük değişim ortalama +%9, aralık −%14 … +%46 (eskiden +%40, −%29 … +%175).
+- **Bedeli:** Hisse fiyatı artık "10 birim malın şehirdeki fiyatı" değil; ona sadece yavaşça yaklaşan bir endeks.
+- **Kayıt:** Şema 5: `prices[].anchor`, `prices[].economySignal`, `shocks[].source`. Göç: taban mevcut F'den başlar, sinyal 0.

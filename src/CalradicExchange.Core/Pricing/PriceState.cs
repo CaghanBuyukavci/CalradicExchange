@@ -15,11 +15,17 @@ namespace CalradicExchange.Core.Pricing
         public bool Closed { get; set; }
 
         public decimal Price { get; set; }
-        /// <summary>Smoothed fundamental the price is pulled towards (ADR-021).</summary>
+        /// <summary>Value the price is pulled towards: Anchor x e^EconomySignal (ADR-022).</summary>
         public decimal Fundamental { get; set; }
 
-        /// <summary>Fundamental as observed in the last world snapshot, before smoothing. Added in schema 4.</summary>
+        /// <summary>Value as observed in the last world snapshot (town prices). Added in schema 4.</summary>
         public decimal RawFundamental { get; set; }
+
+        /// <summary>Slow base level: listing price drifting towards the observed value (ADR-022). Added in schema 5.</summary>
+        public decimal Anchor { get; set; }
+
+        /// <summary>E: decaying, bounded relative move of this instrument in the real economy (ADR-022). Added in schema 5.</summary>
+        public double EconomySignal { get; set; }
 
         public decimal InitialPrice { get; set; }
 

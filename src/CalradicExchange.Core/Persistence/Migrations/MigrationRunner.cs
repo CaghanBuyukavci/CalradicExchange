@@ -27,10 +27,29 @@ namespace CalradicExchange.Core.Persistence.Migrations
                     case 3:
                         root = Migrate3To4(root);
                         break;
+                    case 4:
+                        root = Migrate4To5(root);
+                        break;
                 }
             }
 
             root["schemaVersion"] = toVersion;
+            return root;
+        }
+
+        /// <summary>
+        /// Schema 5 adds prices[].anchor and prices[].economySignal (ADR-022). The anchor starts at the current
+        /// fundamental so prices do not jump; the signal starts at 0.
+        /// </summary>
+        private static JObject Migrate4To5(JObject root)
+        {
+            if (!(root["market"] is JObject market) || !(market["prices"] is JArray prices)) return root;
+            foreach (JToken price in prices)
+            {
+                if (!(price is JObject ps)) continue;
+                if (ps["anchor"] == null && ps["fundamental"] != null) ps["anchor"] = ps["fundamental"];
+                if (ps["economySignal"] == null) ps["economySignal"] = 0.0;
+            }
             return root;
         }
 

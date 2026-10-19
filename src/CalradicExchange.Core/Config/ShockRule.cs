@@ -28,5 +28,11 @@ namespace CalradicExchange.Core.Config
         [JsonProperty("scaleByTownShare")] public bool ScaleByTownShare { get; set; }
 
         [JsonProperty("townShareMultiplier")] public double TownShareMultiplier { get; set; } = 1.0;
+
+        /// <summary>
+        /// When above 0, live components of this rule on one instrument never add up to more than
+        /// impulse x maxStack: repeated news of the same kind is worth less (ADR-022, self-raid manipulation cap).
+        /// </summary>
+        [JsonProperty("maxStack")] public double MaxStack { get; set; }
     }
 }

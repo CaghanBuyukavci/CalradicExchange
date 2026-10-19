@@ -14,7 +14,6 @@ namespace CalradicExchange.Core.Pricing
     public sealed class MarketEngine
     {
         private const double NegligibleShock = 1e-5;
-        private const double MinSmoothingHalfLife = 0.5;
 
         /// <summary>Version of the fundamental calculation. Changing it rebuilds existing markets on load (ADR-017).</summary>
         public const string FundamentalMethodId = "volume_v1";
@@ -74,11 +73,14 @@ namespace CalradicExchange.Core.Pricing
                     PriceState ps = Get(def.Id);
                     if (ps == null || ps.Closed) continue;
 
-                    if (impulse != 0)
+                    string source = ev.Type + ":" + rule.Target;
+                    double added = StackLimited(ps, source, impulse, rule.MaxStack);
+                    if (added != 0)
                     {
                         ps.Shocks.Add(new ShockComponent
                         {
-                            Value = impulse,
+                            Value = added,
+                            Source = source,
                             HalfLifeDays = rule.HalfLifeDays,
                             HoldKey = rule.HoldUntilEnd ? holdKey : null,
                             Pending = true,
@@ -129,6 +131,9 @@ namespace CalradicExchange.Core.Pricing
 
             DetectGeneratedEvents(world, summary);
 
+            Dictionary<string, decimal> observed = ObserveFundamentals(world);
+            Dictionary<InstrumentClass, double> common = CommonMoves(observed);
+
             summary.MinMove = double.MaxValue;
             summary.MaxMove = double.MinValue;
             foreach (InstrumentDefinition def in _catalog.Instruments)
@@ -138,17 +143,13 @@ namespace CalradicExchange.Core.Pricing
                 double eps = _rng.NextGaussian();
                 if (ps.Closed) continue;
 
-                decimal? f = ComputeFundamental(def, world);
+                bool seen = observed.TryGetValue(def.Id, out decimal f);
                 if (!ps.HasPrice)
                 {
-                    if (f != null && f > 0) StartPrice(ps, f.Value, world.Day);
+                    if (seen) StartPrice(ps, f, world.Day);
                     continue;
                 }
-                if (f != null && f > 0)
-                {
-                    ps.RawFundamental = f.Value;
-                    ps.Fundamental = SmoothFundamental(ps.Fundamental, f.Value, world.Day);
-                }
+                if (seen) UpdateFundamental(ps, def.Class, f, common);
 
                 ps.Shock = ClampShock(EffectiveShock(ps, DecayAndSumShocks(ps)));
                 double volMult = ActiveVolMultiplier(ps, world.Day);
@@ -192,6 +193,8 @@ namespace CalradicExchange.Core.Pricing
                 ps.HasPrice = true;
                 ps.InitialPrice = price;
                 ps.Fundamental = price;
+                ps.RawFundamental = price;
+                ps.Anchor = price;
             }
             ps.Price = PriceMath.Round((double)price);
             return true;
@@ -217,39 +220,91 @@ namespace CalradicExchange.Core.Pricing
             ps.Price = p;
             ps.Fundamental = p;
             ps.RawFundamental = p;
+            ps.Anchor = p;
+            ps.EconomySignal = 0;
             ps.InitialPrice = p;
             AddHistory(ps, day);
         }
 
-        /// <summary>
-        /// Log-EMA step towards the observed fundamental (ADR-021). The half-life starts long, because a new
-        /// campaign opens with empty town stores and inflated prices that fall for months, and eases to the
-        /// normal half-life (default 0, no smoothing) over the ramp. Smoothing in settled play would delay
-        /// the supply effect of raids and remove the manipulation channel (simulator, ADR-021).
-        /// </summary>
-        private decimal SmoothFundamental(decimal previous, decimal observed, int day)
+        /// <summary>World values of every open instrument that has data today.</summary>
+        private Dictionary<string, decimal> ObserveFundamentals(WorldSnapshot world)
         {
-            double halfLife = SmoothingHalfLife(day);
-            if (halfLife <= 0 || previous <= 0) return observed;
-            double alpha = 1 - PriceMath.DecayFactor(halfLife);
-            double log = Math.Log((double)previous) + alpha * (Math.Log((double)observed) - Math.Log((double)previous));
-            return PriceMath.Round(Math.Exp(log));
+            var observed = new Dictionary<string, decimal>();
+            foreach (InstrumentDefinition def in _catalog.Instruments)
+            {
+                PriceState ps = _byId[def.Id];
+                if (ps.Closed) continue;
+                decimal? f = ComputeFundamental(def, world);
+                if (f != null && f > 0) observed[def.Id] = f.Value;
+            }
+            return observed;
         }
 
-        /// <summary>Fundamental smoothing half-life on an exchange day; 0 when smoothing is off.</summary>
-        public double SmoothingHalfLife(int day)
+        /// <summary>
+        /// Median daily move per instrument class: the part of a move that is the whole economy getting dearer or
+        /// cheaper (e.g. a new campaign's stock boom and bust). It is taken out of E (ADR-022).
+        /// </summary>
+        private Dictionary<InstrumentClass, double> CommonMoves(Dictionary<string, decimal> observed)
         {
-            double normal = Math.Max(0, _settings.FundamentalHalfLifeDays);
-            double start = _settings.FundamentalStartHalfLifeDays;
-            int ramp = _settings.FundamentalRampDays;
-            double halfLife = normal;
-            if (ramp > 0 && start > 0 && State.StartDay >= 0)
+            var moves = new Dictionary<InstrumentClass, List<double>>();
+            foreach (InstrumentDefinition def in _catalog.Instruments)
             {
-                double t = Math.Min(1.0, Math.Max(0.0, (day - State.StartDay) / (double)ramp));
-                halfLife = start + (normal - start) * t;
+                PriceState ps = _byId[def.Id];
+                if (!ps.HasPrice || ps.RawFundamental <= 0 || !observed.TryGetValue(def.Id, out decimal f)) continue;
+                if (!moves.TryGetValue(def.Class, out List<double> list)) moves[def.Class] = list = new List<double>();
+                list.Add(DailyMove(ps.RawFundamental, f));
             }
-            // Below half a day the EMA is within noise of the raw value; treat it as off.
-            return halfLife < MinSmoothingHalfLife ? 0 : halfLife;
+            var common = new Dictionary<InstrumentClass, double>();
+            foreach (KeyValuePair<InstrumentClass, List<double>> kv in moves) common[kv.Key] = Median(kv.Value);
+            return common;
+        }
+
+        /// <summary>
+        /// F = anchor x e^E (ADR-022). E carries the instrument's own move relative to its class, decays with
+        /// economyHalfLifeDays and stays within economyMaxAbs; the anchor drifts slowly towards the town price.
+        /// With economyWeight 0 the model is off and F is the observed value.
+        /// </summary>
+        private void UpdateFundamental(PriceState ps, InstrumentClass cls, decimal observed, Dictionary<InstrumentClass, double> common)
+        {
+            double weight = _settings.EconomyWeight;
+            if (weight <= 0)
+            {
+                ps.RawFundamental = observed;
+                ps.Fundamental = observed;
+                return;
+            }
+
+            if (ps.Anchor <= 0) ps.Anchor = ps.Fundamental > 0 ? ps.Fundamental : observed;
+            if (ps.RawFundamental > 0)
+            {
+                double relative = DailyMove(ps.RawFundamental, observed) - (common.TryGetValue(cls, out double c) ? c : 0);
+                double decay = _settings.EconomyHalfLifeDays > 0 ? PriceMath.DecayFactor(_settings.EconomyHalfLifeDays) : 0;
+                double max = _settings.EconomyMaxAbs;
+                ps.EconomySignal = Math.Max(-max, Math.Min(max, decay * ps.EconomySignal + weight * relative));
+            }
+            if (_settings.AnchorHalfLifeDays > 0)
+            {
+                double step = 1 - PriceMath.DecayFactor(_settings.AnchorHalfLifeDays);
+                double log = Math.Log((double)ps.Anchor);
+                ps.Anchor = PriceMath.Round(Math.Exp(log + step * (Math.Log((double)observed) - log)));
+            }
+            ps.RawFundamental = observed;
+            ps.Fundamental = PriceMath.Round((double)ps.Anchor * Math.Exp(ps.EconomySignal));
+        }
+
+        private double DailyMove(decimal previous, decimal now)
+        {
+            double move = Math.Log((double)now / (double)previous);
+            double max = _settings.EconomyMaxDailyMove;
+            return max > 0 ? Math.Max(-max, Math.Min(max, move)) : move;
+        }
+
+        private static double Median(List<double> values)
+        {
+            if (values.Count == 0) return 0;
+            values.Sort();
+            int n = values.Count;
+            return n % 2 == 1 ? values[n / 2] : (values[n / 2 - 1] + values[n / 2]) / 2;
         }
 
         private void UpdateBaselines(WorldSnapshot world)
@@ -308,6 +363,21 @@ namespace CalradicExchange.Core.Pricing
                     State.FamineTowns.Remove(town.Id);
                 }
             }
+        }
+
+        /// <summary>The part of an impulse that still fits under the rule's maxStack on this instrument.</summary>
+        private static double StackLimited(PriceState ps, string source, double impulse, double maxStack)
+        {
+            if (maxStack <= 0 || impulse == 0) return impulse;
+            double live = 0;
+            foreach (ShockComponent c in ps.Shocks)
+            {
+                if (c.Source == source && Math.Sign(c.Value) == Math.Sign(impulse)) live += c.Value;
+            }
+            double room = impulse * maxStack - live;
+            if (Math.Sign(room) != Math.Sign(impulse)) return 0;
+            double added = Math.Abs(room) < Math.Abs(impulse) ? room : impulse;
+            return Math.Abs(added) < NegligibleShock ? 0 : added;
         }
 
         private static double DecayAndSumShocks(PriceState ps)

@@ -26,7 +26,15 @@ w_town = arz_town(c) + stok_town(c)     (pazar hacmi, ADR-017; hiçbir şehirde 
 
 - `price_town(c)`: Şehir pazarında malın satış fiyatı. Hangi API'nin bunu verdiği Faz 0'da doğrulanacak (API_NOTES).
 - Kuşatma altındaki şehirler hesaba katılmaz.
-- Kampanya başı yumuşatma (ADR-021): fiyatın çekildiği F, bu değerin log-üstel ortalamasıdır; yarı ömür piyasa açılınca 45 gün, 90 günde 0'a iner. Sektör endeksleri için de geçerlidir.
+- Bu değer (ve §2.2'deki sektör değeri) borsanın **gözlemi**dir; fiyatın çekildiği F doğrudan bu değil (ADR-022):
+
+```
+F = taban × e^E
+E(t) = sön(E(t−1)) + 0,6 × ( Δln gözlem − sınıfın medyan Δln gözlemi )      |E| ≤ 0,3, sönme yarı ömrü 14 gün
+taban(t): ln taban, ln gözleme doğru 120 gün yarı ömürle kayar
+```
+
+- Bütün ekonominin birlikte hareketi (yeni kampanyadaki stok patlaması ve çöküşü) E'ye girmez; sadece malın diğerlerinden farklı hareketi girer ve zamanla söner.
 - Hacmi sıfır olan şehirler (stoğu ve arzı yok) katılmaz: oyun orada sadece teorik, tavana yakın bir fiyat gösterir (gerçek veri: kadifede şehirlerin %87'si).
 
 ### 2.2 Sektör endeksi
@@ -179,7 +187,7 @@ Bir araca birden çok olaydan gelen dürtüler toplanır. |S| en fazla 1,0 (yani
 
 Olay ID'leri ve değerleri `ModuleData/settings.json` içinde `eventShocks` altında tutulur.
 
-**Ayar notu (ADR-013, ADR-015):** Köy yağmasının emtia dürtüsü +0,075 (ADR-015). Tablodaki diğer tüm dürtüler ve mevsim dürtüleri simülatör ayarında ×1,5 yapıldı (örneğin savaş → askeri tedarik +0,075, kış → tarım +0,21). Güncel değerler `settings.json`'dadır.
+**Ayar notu (ADR-013, ADR-015, ADR-022):** ADR-022 ile bütün olay dürtüleri ×2 yapıldı (yağma +0,15, savaş → askeri tedarik +0,15, kıtlık +0,24); mevsim dürtüleri değişmedi. Yağma şoku bir araçta en fazla 4 yağma kadar birikir (`maxStack`). Eski not: Köy yağmasının emtia dürtüsü +0,075 (ADR-015). Tablodaki diğer tüm dürtüler ve mevsim dürtüleri simülatör ayarında ×1,5 yapıldı (örneğin savaş → askeri tedarik +0,075, kış → tarım +0,21). Güncel değerler `settings.json`'dadır.
 
 ### 4.2 Haber gecikmesi (Faz 4)
 
@@ -200,8 +208,8 @@ haber_hızı = 40 harita birimi / gün       (harita ölçeğine göre Faz 4'te 
 işlem_fiyatı_alış = P × (1 + fark/2) × (1 + etki)
 işlem_fiyatı_satış = P × (1 − fark/2) × (1 − etki)
 etki = λ × (emir_değeri / derinlik)
-komisyon = max(5, oran(trade) × emir_değeri)
-oran(trade) = %5 − (%5 − %0,5) × min(trade, 300) / 300      (Trade 0: %5, Trade 150: %2,75, Trade 300+: %0,5)
+komisyon = max(2, oran(trade) × emir_değeri)
+oran(trade) = %2,5 − (%2,5 − %0,5) × min(trade, 300) / 300      (Trade 0: %2,5, Trade 60: %2,1, Trade 150: %1,5, Trade 300+: %0,5; ADR-022)
 kâr_vergisi = %10 × max(0, satış_geliri − komisyon − satılan_payların_maliyeti)   (sadece satışta, zararda yok)
 ```
 
@@ -249,7 +257,7 @@ Kabul hedefleri:
 | Hiçbir fiyat başlangıcının | 0,2× altına inmez, 5× üstüne çıkmaz (krallık yok olması hariç) |
 | Emtia yıllıklandırılmış oynaklık | %25–60 |
 | Endeks yıllıklandırılmış oynaklık | %15–35 |
-| Temel değerle korelasyon (30 günlük ortalamalar) | > 0,65 (ADR-015; önce 0,7) |
+| Hedefle (F × e^S) korelasyon (30 günlük ortalamalar) | > 0,65 (ADR-022; önce temel değerle, ADR-015) |
 | "Al ve tut" stratejisi 4 yıllık getirisi (maliyetler sonrası) | −%10 ile +%15 arası |
 | Rastgele işlem stratejisi | ortalama negatif (maliyetler yüzünden) |
 | "Olayı gören" strateji (olay sonrası ilk gün işlem), geç oyun profili (klan 5, Trade 250) | pozitif ama yıllık %40'ı geçmemeli |
