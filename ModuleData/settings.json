@@ -61,6 +61,10 @@
     "permanentImpactFactor": 0.5,
     "tradeHistoryLimit": 500
   },
+  "guilds": {
+    "_comment": "Guild shares (PLAN 2.1-2.3). profitWindowDays: days of workshop profit averaged into a guild's daily profit.",
+    "profitWindowDays": 28
+  },
   "limits": {
     "baseTotal": 5000,
     "perClanTier": 15000,

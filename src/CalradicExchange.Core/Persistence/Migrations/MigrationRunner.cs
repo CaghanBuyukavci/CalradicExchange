@@ -34,6 +34,9 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // Schema 6 adds portfolio.history (trade history). A missing list deserializes as empty;
                         // trades made before schema 6 were never recorded.
                         break;
+                    case 6:
+                        // Schema 7 adds market.guilds (workshop profit series, PLAN 2.1). Starts empty and fills daily.
+                        break;
                 }
             }
 

@@ -121,6 +121,7 @@ namespace CalradicExchange.Behaviors
             _state.LastTickDay = _state.Market.LastTickDay;
             ExchangeLog.Info($"Daily tick {summary} (towns {world.Towns.Count}, kingdoms {world.KingdomCount}, wars {world.ActiveWarPairs}, season {world.Season})");
             foreach (MarketEvent ev in summary.GeneratedEvents) ExchangeLog.Info($"Generated event {ev}");
+            if (summary.Processed) ExchangeLog.Info("Guilds: " + GuildReport.Summary(_state.Market.Guilds));
             if (summary.Processed && !summary.Initialized) NotifyBigMoves();
             if (summary.Processed && _state.Market.LastTickDay <= MarketDump.AutoDumpDays) MarketDump.Append(this);
             return summary;

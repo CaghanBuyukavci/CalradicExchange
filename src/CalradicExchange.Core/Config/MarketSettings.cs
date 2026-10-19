@@ -42,6 +42,7 @@ namespace CalradicExchange.Core.Config
         [JsonProperty("classes")] public Dictionary<InstrumentClass, ClassParameters> Classes { get; set; } = new Dictionary<InstrumentClass, ClassParameters>();
         [JsonProperty("trading")] public TradingSettings Trading { get; set; }
         [JsonProperty("limits")] public LimitSettings Limits { get; set; }
+        [JsonProperty("guilds")] public GuildSettings Guilds { get; set; } = new GuildSettings();
         [JsonProperty("seasonImpulses")] public Dictionary<Season, double> SeasonImpulses { get; set; } = new Dictionary<Season, double>();
         [JsonProperty("eventShocks")] public Dictionary<MarketEventType, List<ShockRule>> EventShocks { get; set; } = new Dictionary<MarketEventType, List<ShockRule>>();
 

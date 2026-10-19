@@ -25,5 +25,8 @@ namespace CalradicExchange.Core.Model
 
         /// <summary>Market volume per item category StringId.</summary>
         public Dictionary<string, double> CategoryVolumes { get; set; } = new Dictionary<string, double>();
+
+        /// <summary>Workshops grouped by workshop type StringId (PLAN 2.1). Hidden types are left out by the reader.</summary>
+        public Dictionary<string, WorkshopGroupSnapshot> Workshops { get; set; } = new Dictionary<string, WorkshopGroupSnapshot>();
     }
 }

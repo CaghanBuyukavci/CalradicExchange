@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CalradicExchange.Core.Config;
+using CalradicExchange.Core.Guilds;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Random;
 
@@ -109,6 +110,7 @@ namespace CalradicExchange.Core.Pricing
             if (NeedsRebase) Rebuild();
             SyncPriceStates();
             UpdateBaselines(world);
+            GuildProfitTracker.Record(State.Guilds, world, _settings.Guilds?.ProfitWindowDays ?? 28);
 
             if (!State.Initialized)
             {

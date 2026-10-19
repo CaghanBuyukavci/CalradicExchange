@@ -64,6 +64,7 @@ namespace CalradicExchange.Core.Config
                 Range(e, w + ".lambda", p.Lambda, 0, 10);
             }
 
+            if (s.Guilds != null) Range(e, "guilds.profitWindowDays", s.Guilds.ProfitWindowDays, 1, 336);
             if (s.Trading == null) e.Add("trading is missing.");
             else
             {

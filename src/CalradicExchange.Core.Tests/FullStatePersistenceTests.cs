@@ -1,4 +1,5 @@
 using System.Linq;
+using CalradicExchange.Core.Guilds;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Persistence;
 using CalradicExchange.Core.Pricing;
@@ -52,12 +53,30 @@ namespace CalradicExchange.Core.Tests
             Assert.Contains(loaded.Market.Prices.Single(p => p.InstrumentId == "cx_grain").Shocks, s => s.Value > 0);
             Assert.Equal(10, loaded.Portfolio.QuantityOf("cx_grain"));
             Assert.Equal(1, loaded.Portfolio.TradeCount);
+            GuildProfitSeries guild = Assert.Single(loaded.Market.Guilds);
+            Assert.Equal("town_A", guild.TownId);
+            Assert.Equal("smithy", guild.WorkshopTypeId);
+            Assert.Equal(2, guild.WorkshopCount);
+            Assert.Equal(28, guild.DailyProfit.Count); // 30 days recorded, trimmed to the window
+            Assert.Equal(40, guild.AverageDailyProfit, 9);
             TradeRecord t = Assert.Single(loaded.Portfolio.History);
             Assert.Equal(29, t.Day);
             Assert.Equal("cx_grain", t.InstrumentId);
             Assert.Equal(OrderSide.Buy, t.Side);
             Assert.Equal(10, t.Quantity);
             Assert.True(t.Total > 0);
+        }
+
+        [Fact]
+        public void Schema6Save_GetsEmptyGuildSeries()
+        {
+            const string schema6 = "{\"schemaVersion\":6,\"createdOnDay\":91077,\"market\":{\"initialized\":true}}";
+
+            ExchangeState s = StateSerializer.Deserialize(schema6);
+
+            Assert.Equal(ExchangeState.CurrentSchemaVersion, s.SchemaVersion);
+            Assert.NotNull(s.Market.Guilds);
+            Assert.Empty(s.Market.Guilds);
         }
 
         [Fact]

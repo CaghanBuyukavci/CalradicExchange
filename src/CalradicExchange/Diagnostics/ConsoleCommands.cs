@@ -159,6 +159,22 @@ namespace CalradicExchange.Diagnostics
             });
         }
 
+        /// <summary>
+        /// Lists the most profitable guilds (town, workshop type) by average daily profit and writes all of them to
+        /// Logs/guilds_day{N}.csv. Usage: exchange.dump_guilds [count, default 25].
+        /// </summary>
+        [CommandLineFunctionality.CommandLineArgumentFunction("dump_guilds", Group)]
+        public static string DumpGuilds(List<string> args)
+        {
+            return RunReady("dump_guilds", args, b =>
+            {
+                int count = args != null && args.Count > 0 && int.TryParse(args[0], out int n) ? n : 25;
+                string path = Path.Combine(ModulePaths.LogsFolder, $"guilds_day{b.State.Market.LastTickDay}.csv");
+                File.WriteAllText(path, GuildReport.Csv(b.State.Market.Guilds));
+                return GuildReport.Top(b.State.Market.Guilds, count) + "\nWrote " + path;
+            });
+        }
+
         /// <summary>Appends raw per-town market data to Logs/market_raw.csv (see <see cref="MarketDump"/>).</summary>
         [CommandLineFunctionality.CommandLineArgumentFunction("dump_market", Group)]
         public static string DumpMarket(List<string> args)

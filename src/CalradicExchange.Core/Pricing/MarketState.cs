@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CalradicExchange.Core.Guilds;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Random;
 using Newtonsoft.Json;
@@ -41,5 +42,8 @@ namespace CalradicExchange.Core.Pricing
         public List<PriceState> Prices { get; set; } = new List<PriceState>();
         public List<NewsItem> News { get; set; } = new List<NewsItem>();
         public RandomState Rng { get; set; }
+
+        /// <summary>Daily workshop profit per (town, workshop type), the base of guild shares. Added in schema 7.</summary>
+        public List<GuildProfitSeries> Guilds { get; set; } = new List<GuildProfitSeries>();
     }
 }

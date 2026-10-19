@@ -55,6 +55,7 @@ namespace CalradicExchange.Core.Tests
                     town.ItemPrices[p.Key] = p.Value * (decimal)m;
                 }
                 foreach (string cat in Catalog().RequiredCategoryIds) town.CategoryFactors[cat] = categoryFactor;
+                if (id == "town_A") town.Workshops["smithy"] = new WorkshopGroupSnapshot { Count = 2, DailyProfit = 40 };
                 world.Towns.Add(town);
             }
             return world;

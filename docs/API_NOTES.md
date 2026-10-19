@@ -50,7 +50,7 @@ General notes for v1.4.8:
 | `Village.VillageState` | State | `VillageStates { Normal, BeingRaided, ForcedForVolunteers, ForcedForSupplies, Looted }` | VERIFIED | |
 | `Village.Bound` / `TradeBound` | Parent town | `Settlement Bound`, `Settlement TradeBound` | VERIFIED | |
 | `Town.Workshops` | Guild shares | `Workshop[] Workshops` | VERIFIED | |
-| `Workshop.WorkshopType` | Guild type | `WorkshopType WorkshopType` (`.StringId`) | VERIFIED | Hidden type `artisans` must be skipped |
+| `Workshop.WorkshopType` | Guild type | `WorkshopType WorkshopType` (`.StringId`, `.IsHidden`); null for an empty slot | VERIFIED | Hidden type `artisans` skipped via `IsHidden` |
 | Workshop profit | Guild dividends | `int Workshop.ProfitMade` (= max(Capital−InitialCapital,0)), `int Capital`, `int Expense`; `Campaign.Current.Models.ClanFinanceModel.CalculateOwnerIncomeFromWorkshop(Workshop)` | VERIFIED | ADR-010: daily owner income from the finance model |
 | `Kingdom.All`, `IsEliminated` | Kingdom indices | `static MBReadOnlyList<Kingdom> All`, `bool IsEliminated`, `MBReadOnlyList<Town> Fiefs`, `MBReadOnlyList<Settlement> Settlements` | VERIFIED | |
 | `FactionManager.IsAtWarAgainstFaction` | War state | `static bool IsAtWarAgainstFaction(IFaction, IFaction)` | VERIFIED | `IFaction.IsAtWarWith` also used by vanilla |

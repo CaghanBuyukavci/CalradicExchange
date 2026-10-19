@@ -5,7 +5,9 @@ using CalradicExchange.Core.Config;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Diagnostics;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
 
@@ -77,6 +79,7 @@ namespace CalradicExchange.Adapters
                         snap.CategoryVolumes[cat.StringId] = Volume(market, cat);
                     }
                 }
+                ReadWorkshops(town, snap);
                 world.Towns.Add(snap);
             }
 
@@ -90,6 +93,30 @@ namespace CalradicExchange.Adapters
                 }
             }
             return world;
+        }
+
+        /// <summary>
+        /// Groups the town's workshops by type (PLAN 2.1). Profit = the owner's daily income from the finance model
+        /// (ADR-010): owners withdraw a fifth of the accumulated profit each day, so this tracks the daily profit.
+        /// Empty slots and hidden types (artisans) are skipped.
+        /// </summary>
+        private static void ReadWorkshops(Town town, TownSnapshot snap)
+        {
+            Workshop[] workshops = town.Workshops;
+            if (workshops == null) return;
+            ClanFinanceModel finance = Campaign.Current?.Models?.ClanFinanceModel;
+            foreach (Workshop w in workshops)
+            {
+                WorkshopType type = w?.WorkshopType;
+                if (type == null || type.IsHidden || string.IsNullOrEmpty(type.StringId)) continue;
+                if (!snap.Workshops.TryGetValue(type.StringId, out WorkshopGroupSnapshot group))
+                {
+                    group = new WorkshopGroupSnapshot();
+                    snap.Workshops[type.StringId] = group;
+                }
+                group.Count++;
+                group.DailyProfit += finance != null ? Math.Max(0, finance.CalculateOwnerIncomeFromWorkshop(w)) : 0;
+            }
         }
 
         /// <summary>
