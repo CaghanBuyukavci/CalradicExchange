@@ -71,21 +71,39 @@ namespace CalradicExchange.Behaviors
         {
             try
             {
-                string json = null;
+                // The state is saved as several short strings (ADR-028): one longer than 32767 bytes corrupts the save.
                 if (dataStore.IsSaving)
                 {
                     EnsureState();
-                    json = StateSerializer.Serialize(_state);
-                }
-
-                dataStore.SyncData(CoreInfo.SaveKey, ref json);
-
-                if (dataStore.IsSaving)
-                {
-                    ExchangeLog.Info($"State saved ({json.Length} chars, schema {_state.SchemaVersion}, exchange day {_state.Market.LastTickDay}, positions {_state.Portfolio.Positions.Count}).");
+                    string json = StateSerializer.Serialize(_state);
+                    List<string> chunks = SaveChunks.Pack(json);
+                    for (int i = 0; i < chunks.Count; i++)
+                    {
+                        string chunk = chunks[i];
+                        dataStore.SyncData(ChunkKey(i), ref chunk);
+                    }
+                    ExchangeLog.Info($"State saved ({json.Length} chars in {chunks.Count} chunk(s) of {chunks.Max(c => c.Length)} chars max, schema {_state.SchemaVersion}, exchange day {_state.Market.LastTickDay}, positions {_state.Portfolio.Positions.Count}).");
                 }
                 else if (dataStore.IsLoading)
                 {
+                    string first = null;
+                    dataStore.SyncData(ChunkKey(0), ref first);
+                    var chunks = new List<string> { first };
+                    for (int i = 1; i < SaveChunks.PartCount(first); i++)
+                    {
+                        string chunk = null;
+                        dataStore.SyncData(ChunkKey(i), ref chunk);
+                        chunks.Add(chunk);
+                    }
+                    string json = null;
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(first)) json = SaveChunks.Unpack(chunks);
+                    }
+                    catch (StateFormatException ex)
+                    {
+                        ExchangeLog.Error("Saved exchange state chunks could not be joined; starting fresh.", ex);
+                    }
                     LoadState(json);
                 }
             }
@@ -94,6 +112,9 @@ namespace CalradicExchange.Behaviors
                 ExchangeLog.Error("SyncData failed", ex);
             }
         }
+
+        /// <summary>Chunk 0 keeps the original key, so saves from before ADR-028 (one plain JSON string) still load.</summary>
+        private static string ChunkKey(int index) => index == 0 ? CoreInfo.SaveKey : CoreInfo.SaveKey + "_" + index;
 
         public TraderProfile CurrentTrader()
         {

@@ -232,3 +232,12 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Her lonca 100 pay.
   - Örnek: ortanca 174 dinar/gün kârda pay fiyatı ≈ 174 × 84 / 0,25 / 100 ≈ 585 dinar. Haftalık dağıtım pay başına ≈ 12 dinar (%2/hafta).
 
+## ADR-028 — Kayıttaki durum sıkıştırılıp 32 KB altı parçalara bölünür
+
+- **Bağlam (2026-10-19):** Kullanıcının kaydı "Kayıtlı oyunu yüklerken bir sorun oluştu" hatasıyla açılmadı. Oyun log'unda: "Load Strings" adımından sonra "Dizi boyutları desteklenen aralığı aştı" ve "Could not load the game!". Sebep: Bannerlord kayıttaki her metnin boyutunu 16 bitlik bir sayıya yazıyor (`SaveContext.SaveStringTo`: `WriteShort((short)(4 + utf8Bytes))`). Modun durum JSON'u lonca serileriyle 121.000 karaktere çıkmıştı; boyut taştı ve metin bölümü bozuldu. Dünkü `save008` da aynı sebeple bozuktu: 51.837 karakter, uzun fiyat geçmişi.
+- **Karar:**
+  - `Core/Persistence/SaveChunks`: JSON deflate ile sıkıştırılır, base64'e çevrilir ve en fazla 24.000 karakterlik parçalara bölünür. Parça biçimi `CXZ1|sıra|toplam|veri`. Parçalar `cx_state_v1`, `cx_state_v1_1`, ... anahtarlarıyla kaydedilir.
+  - `{` ile başlayan ilk parça eski düz JSON kabul edilir, bu yüzden eski kayıtlar yine okunur.
+  - Eksik ya da bozuk parçada kampanya bozulmaz; borsa sıfırdan başlar ve log'a hata yazılır.
+- **Kurtarma:** `tools/repair_save.py` bozuk kaydı açıyor; durumu (lonca serileri çıkarılarak) tek sıkıştırılmış parça hâlinde yazıyor, boyut alanlarını düzeltip `*_onarildi.sav` olarak kaydediyor. Orijinaller `Game Saves/cx_backup/` klasöründe. `save009`, `saveauto2` ve `save008` onarıldı; durumlarının mod kodu (net472) ile okunduğu doğrulandı.
+

@@ -59,7 +59,8 @@ GUI/                            Gauntlet prefabs (Phase 2+)
 
 ## Save-game rules (important)
 
-- Persist all mod state as **one JSON string** via `SyncData` in a single `CampaignBehaviorBase` (key `"cx_state_v1"`). Do not register custom types with `SaveableTypeDefiner`. Reason: removing the mod or changing a class must not corrupt the user's save (ADR-002).
+- Persist all mod state as **one JSON document** via `SyncData` in a single `CampaignBehaviorBase` (key `"cx_state_v1"`). Do not register custom types with `SaveableTypeDefiner`. Reason: removing the mod or changing a class must not corrupt the user's save (ADR-002).
+- **Never write a single save string longer than 32767 bytes.** Bannerlord stores each string's size as a 16-bit number (`SaveContext.SaveStringTo`); a longer string corrupts the whole save ("Could not load the game!", ADR-028). The JSON is deflated, base64-encoded and split by `Core/Persistence/SaveChunks` into chunks under keys `cx_state_v1`, `cx_state_v1_1`, ... Any new `SyncData` string must go through it too. `tools/repair_save.py` can repair a save broken this way.
 - The JSON root has a `schemaVersion` field. Any change to persisted shape bumps it and adds a migration in `Core/Persistence/Migrations`.
 - Test every persistence change with a round-trip unit test (serialize → deserialize → equal).
 

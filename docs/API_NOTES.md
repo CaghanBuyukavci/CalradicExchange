@@ -141,6 +141,8 @@ Sources: `Modules\SandBoxCore\ModuleData\items\horses_and_others.xml`, `TaleWorl
 | `UIResourceManager.BrushFactory.GetBrush(name)`, `BrushLayer.Sprite/Color`, `Style.GetLayer(name)` → `StyleLayer.Sprite/Color/ColorFactor` | settable at runtime; `StyleLayer` falls back to its brush layer unless set | VERIFIED (signature) | `UI/ButtonSkins` |
 | `ChangeRelationAction.ApplyPlayerRelation(Hero, int, bool affectRelatives = true, bool showQuickNotification = true)` | | VERIFIED (signature) | Guild debt penalty (ADR-027) |
 | `MBInformationManager.AddQuickInformation(TextObject, int extraTimeInMs = 0, BasicCharacterObject announcer = null, Equipment = null, string sound = "")` | top-of-screen panel with portrait | VERIFIED (signature) | Debt penalty warning |
+| Save strings (`SaveContext.SaveStringTo`) | entry size written as `short` (4 + UTF-8 bytes) | VERIFIED | **A string > 32767 bytes corrupts the save.** State goes through `SaveChunks` (ADR-028) |
+| `IDataStore.SyncData<T>(key, ref data)` on load | missing key returns false, leaves `data` | VERIFIED | Chunk keys `cx_state_v1_N` |
 | `abstract Sprite(string, int, int, SpriteNinePatchParameters)` + `Texture`, `GetMinUvs`, `GetMaxUvs` | subclassable | VERIFIED | `UI/TextureSprite` |
 | `TaleWorlds.Engine.Texture.LoadTextureFromPath(fileName, folder)`, `CreateFromMemory(byte[])` | native; no vanilla caller | VERIFIED (signature) | PNG loads from path. **24-bit RGB PNGs show red/blue swapped; 32-bit RGBA PNGs are correct** (in-game test). Deploy writes 32-bit RGBA |
 
