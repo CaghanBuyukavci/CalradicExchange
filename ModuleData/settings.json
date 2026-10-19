@@ -58,7 +58,8 @@
     "minCommission": 2,
     "tradeSkillCap": 300,
     "profitTaxRate": 0.1,
-    "permanentImpactFactor": 0.5
+    "permanentImpactFactor": 0.5,
+    "tradeHistoryLimit": 500
   },
   "limits": {
     "baseTotal": 5000,

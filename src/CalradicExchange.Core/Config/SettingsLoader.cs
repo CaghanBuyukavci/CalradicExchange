@@ -73,6 +73,7 @@ namespace CalradicExchange.Core.Config
                 RangeOpenLow(e, "trading.tradeSkillCap", s.Trading.TradeSkillCap, 0, 10000);
                 Range(e, "trading.profitTaxRate", s.Trading.ProfitTaxRate, 0, 1);
                 Range(e, "trading.permanentImpactFactor", s.Trading.PermanentImpactFactor, 0, 1);
+                Range(e, "trading.tradeHistoryLimit", s.Trading.TradeHistoryLimit, 0, 10000);
             }
 
             if (s.Limits == null) e.Add("limits is missing.");

@@ -21,5 +21,8 @@ namespace CalradicExchange.Core.Config
 
         /// <summary>Share of the slippage that stays in the market price after a trade.</summary>
         [JsonProperty("permanentImpactFactor")] public double PermanentImpactFactor { get; set; }
+
+        /// <summary>Number of trades kept in the player's trade history; older ones are dropped.</summary>
+        [JsonProperty("tradeHistoryLimit")] public int TradeHistoryLimit { get; set; } = 500;
     }
 }

@@ -8,7 +8,7 @@
     <string id="cx_btn_close" text="Kapat" />
     <string id="cx_btn_confirm" text="Onayla" />
     <string id="cx_btn_continue" text="Devam" />
-    <string id="cx_buy_desc" text="Ne almak istediğini seç. Altın: {GOLD} dinar. Kalan limit: {LEFT} dinar." />
+    <string id="cx_buy_desc" text="Almak istediğin hisseye tıkla. Altın: {GOLD} dinar. Kalan limit: {LEFT} dinar." />
     <string id="cx_buy_element" text="{NAME} - {PRICE}" />
     <string id="cx_buy_title" text="Hisse al" />
     <string id="cx_closed_data" text="defterler okunamadı, exchange.log dosyasına bak" />
@@ -97,7 +97,7 @@
     <string id="cx_sector_metal" text="Maden ve metal sepeti" />
     <string id="cx_sector_military" text="Askeri tedarik sepeti" />
     <string id="cx_sector_textile" text="Tekstil sepeti" />
-    <string id="cx_sell_desc" text="Ne satmak istediğini seç." />
+    <string id="cx_sell_desc" text="Satmak istediğin hisseye tıkla." />
     <string id="cx_sell_element" text="{NAME} - {QTY} adet, fiyat {PRICE}" />
     <string id="cx_sell_title" text="Hisse sat" />
     <string id="cx_tip_nothing_to_sell" text="Elinde hiç hisse yok." />
@@ -114,5 +114,16 @@
     <string id="cx_no_price_short" text="-" />
     <string id="cx_qty_estimate_buy" text="Ödenecek: {TOTAL} dinar (komisyon {FEE})" />
     <string id="cx_qty_estimate_sell" text="Eline geçecek: {TOTAL} dinar (komisyon {FEE}, vergi {TAX})" />
+    <string id="cx_opt_history" text="Takas Geçmişim" />
+    <string id="cx_history_title" text="Takas Geçmişim" />
+    <string id="cx_history_empty" text="Henüz hiç işlem yapmadın." />
+    <string id="cx_history_totals" text="{COUNT} işlem. Gerçekleşmiş kâr/zarar {REALIZED}. Ödenen komisyon {FEES}, vergi {TAXES} dinar." />
+    <string id="cx_history_missing" text="Daha eski {COUNT} işlem bu listede yok." />
+    <string id="cx_side_buy" text="Alış" />
+    <string id="cx_side_sell" text="Satış" />
+    <string id="cx_col_date" text="Tarih" />
+    <string id="cx_col_side" text="İşlem" />
+    <string id="cx_col_total" text="Tutar" />
+    <string id="cx_col_costs" text="Masraf" />
   </strings>
 </base>

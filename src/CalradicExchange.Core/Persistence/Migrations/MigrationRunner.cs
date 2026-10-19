@@ -30,6 +30,10 @@ namespace CalradicExchange.Core.Persistence.Migrations
                     case 4:
                         root = Migrate4To5(root);
                         break;
+                    case 5:
+                        // Schema 6 adds portfolio.history (trade history). A missing list deserializes as empty;
+                        // trades made before schema 6 were never recorded.
+                        break;
                 }
             }
 

@@ -52,6 +52,25 @@ namespace CalradicExchange.Core.Tests
             Assert.Contains(loaded.Market.Prices.Single(p => p.InstrumentId == "cx_grain").Shocks, s => s.Value > 0);
             Assert.Equal(10, loaded.Portfolio.QuantityOf("cx_grain"));
             Assert.Equal(1, loaded.Portfolio.TradeCount);
+            TradeRecord t = Assert.Single(loaded.Portfolio.History);
+            Assert.Equal(29, t.Day);
+            Assert.Equal("cx_grain", t.InstrumentId);
+            Assert.Equal(OrderSide.Buy, t.Side);
+            Assert.Equal(10, t.Quantity);
+            Assert.True(t.Total > 0);
+        }
+
+        [Fact]
+        public void Schema5Save_GetsEmptyTradeHistory()
+        {
+            const string schema5 = "{\"schemaVersion\":5,\"createdOnDay\":91077,\"portfolio\":{\"positions\":[{\"instrumentId\":\"cx_grain\",\"quantity\":3,\"costBasis\":309}],\"tradeCount\":1}}";
+
+            ExchangeState s = StateSerializer.Deserialize(schema5);
+
+            Assert.Equal(ExchangeState.CurrentSchemaVersion, s.SchemaVersion);
+            Assert.Equal(3, s.Portfolio.QuantityOf("cx_grain"));
+            Assert.NotNull(s.Portfolio.History);
+            Assert.Empty(s.Portfolio.History);
         }
 
         [Fact]
@@ -87,7 +106,7 @@ namespace CalradicExchange.Core.Tests
             {
                 if (d == 5) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.SiegeStarted, Day = d, TownId = "town_B", KingdomId = "k1" });
                 if (d == 28) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = d, ItemId = "grain", TownId = "town_A", SettlementId = "village_A1" });
-                if (d == 29) orders.Execute("cx_grain", OrderSide.Buy, 10, new TraderProfile(100000, 3, 50), state.Portfolio);
+                if (d == 29) orders.Execute("cx_grain", OrderSide.Buy, 10, new TraderProfile(100000, 3, 50), state.Portfolio, d);
 
                 WorldSnapshot w = TestData.World(d, d < 20 ? Season.Spring : Season.Summer);
                 if (d >= 25) w.Towns[0].FoodStocks = 0;

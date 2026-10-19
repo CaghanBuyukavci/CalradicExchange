@@ -22,6 +22,7 @@ namespace CalradicExchange.Localization
         public const string OptSell = "{=cx_opt_sell}Sell shares";
         public const string OptPortfolio = "{=cx_opt_portfolio}Your portfolio";
         public const string OptNews = "{=cx_opt_news}News";
+        public const string OptHistory = "{=cx_opt_history}Your trade history";
         public const string OptLeave = "{=cx_opt_leave}Leave";
         public static TextObject NothingToSell => new TextObject("{=cx_tip_nothing_to_sell}You hold no shares.");
         public static TextObject ClosedReasonData => new TextObject("{=cx_closed_data}its ledgers could not be read, see exchange.log");
@@ -48,15 +49,19 @@ namespace CalradicExchange.Localization
         public static TextObject ColNow => new TextObject("{=cx_col_now}Now");
         public static TextObject ColProfit => new TextObject("{=cx_col_profit}Profit");
         public static TextObject ColProfitPct => new TextObject("{=cx_col_profit_pct}Profit %");
+        public static TextObject ColDate => new TextObject("{=cx_col_date}Date");
+        public static TextObject ColSide => new TextObject("{=cx_col_side}Trade");
+        public static TextObject ColTotal => new TextObject("{=cx_col_total}Total");
+        public static TextObject ColCosts => new TextObject("{=cx_col_costs}Fees");
         public static TextObject NoPrice => new TextObject("{=cx_no_price_short}-");
 
         public static TextObject NoPriceYet => new TextObject("{=cx_no_price}{NAME}: no price yet");
 
         // Buy / sell flow
         public static TextObject BuyTitle => new TextObject("{=cx_buy_title}Buy shares");
-        public static TextObject BuyDescription => new TextObject("{=cx_buy_desc}Choose what to buy. Gold: {GOLD} denars. Limit left: {LEFT} denars.");
+        public static TextObject BuyDescription => new TextObject("{=cx_buy_desc}Click a share to buy it. Gold: {GOLD} denars. Limit left: {LEFT} denars.");
         public static TextObject SellTitle => new TextObject("{=cx_sell_title}Sell shares");
-        public static TextObject SellDescription => new TextObject("{=cx_sell_desc}Choose what to sell.");
+        public static TextObject SellDescription => new TextObject("{=cx_sell_desc}Click a share to sell it.");
         public static TextObject BuyElement => new TextObject("{=cx_buy_element}{NAME} - {PRICE}");
         public static TextObject SellElement => new TextObject("{=cx_sell_element}{NAME} - {QTY} shares at {PRICE}");
         public static TextObject QuantityBuy => new TextObject("{=cx_qty_buy}{NAME} costs {PRICE} per share before fees.\nHow many shares? (at most {MAX})");
@@ -76,6 +81,14 @@ namespace CalradicExchange.Localization
         public static TextObject PortfolioEmpty => new TextObject("{=cx_portfolio_empty}You hold no shares.");
         public static TextObject PortfolioLine => new TextObject("{=cx_portfolio_line}{NAME}: {QTY} shares, bought at {AVG}, now {PRICE}, {PNL}");
         public static TextObject PortfolioTotals => new TextObject("{=cx_portfolio_totals}Value {VALUE} denars, open profit {OPEN}.\nRealized profit {REALIZED}. Fees paid {FEES}, taxes paid {TAXES} denars.");
+
+        // Trade history
+        public static TextObject HistoryTitle => new TextObject("{=cx_history_title}Your trade history");
+        public static TextObject HistoryEmpty => new TextObject("{=cx_history_empty}You have not traded yet.");
+        public static TextObject HistoryTotals => new TextObject("{=cx_history_totals}{COUNT} trades. Realized profit {REALIZED}. Fees paid {FEES}, taxes paid {TAXES} denars.");
+        public static TextObject HistoryMissing => new TextObject("{=cx_history_missing}{COUNT} older trades are not in this list.");
+        public static TextObject SideBuy => new TextObject("{=cx_side_buy}Buy");
+        public static TextObject SideSell => new TextObject("{=cx_side_sell}Sell");
 
         // News
         public static TextObject NewsTitle => new TextObject("{=cx_news_title}News at the exchange");

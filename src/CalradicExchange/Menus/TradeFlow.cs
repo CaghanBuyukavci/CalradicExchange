@@ -46,6 +46,7 @@ namespace CalradicExchange.Menus
             desc.SetTextVariable("GOLD", trader.Gold);
             desc.SetTextVariable("LEFT", Fmt.Denars(Math.Max(0, b.Orders.TotalLimit(trader) - held)));
 
+            if (TablePopup.Show("CxPickTable", close => BuyPicker(b, desc.ToString(), close))) return;
             MBInformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
                 Strings.BuyTitle.ToString(), desc.ToString(), elements, true, 1, 1,
                 Strings.Continue.ToString(), Strings.Cancel.ToString(),
@@ -73,11 +74,55 @@ namespace CalradicExchange.Menus
             }
             if (elements.Count == 0) return;
 
+            if (TablePopup.Show("CxPickTable", close => SellPicker(b, close))) return;
             MBInformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
                 Strings.SellTitle.ToString(), Strings.SellDescription.ToString(), elements, true, 1, 1,
                 Strings.Continue.ToString(), Strings.Cancel.ToString(),
                 chosen => Guard("sell pick", () => AskQuantity((string)chosen.First().Identifier, OrderSide.Sell)),
                 null));
+        }
+
+        /// <summary>Clickable buy list: a click opens the quantity step directly, no Continue button.</summary>
+        private static ExchangeTableVM BuyPicker(ExchangeCampaignBehavior b, string description, Action close)
+        {
+            var vm = new ExchangeTableVM(Strings.BuyTitle.ToString(),
+                new[] { Strings.ColInstrument.ToString(), Strings.ColPrice.ToString(), Strings.ColToday.ToString(), Strings.ColWeek.ToString() },
+                null, Strings.Cancel.ToString(), close, description);
+            bool alternate = false;
+            foreach (InstrumentDefinition def in b.Catalog.Instruments)
+            {
+                PriceState ps = b.Market.Get(def.Id);
+                if (ps == null || !ps.HasPrice || ps.Closed) continue;
+                string id = def.Id;
+                double day = ps.ChangeOver(1), week = ps.ChangeOver(7);
+                vm.Rows.Add(new GridRowVM(new[] { Names.Instrument(def), Fmt.Price(ps.Price), Fmt.Pct(day), Fmt.Pct(week) }, alternate,
+                        () => Guard("buy pick", () => AskQuantity(id, OrderSide.Buy)))
+                    .WithColor(3, TableColors.ForChange(day))
+                    .WithColor(4, TableColors.ForChange(week)));
+                alternate = !alternate;
+            }
+            return vm;
+        }
+
+        private static ExchangeTableVM SellPicker(ExchangeCampaignBehavior b, Action close)
+        {
+            var vm = new ExchangeTableVM(Strings.SellTitle.ToString(),
+                new[] { Strings.ColInstrument.ToString(), Strings.ColQuantity.ToString(), Strings.ColNow.ToString(), Strings.ColProfit.ToString() },
+                null, Strings.Cancel.ToString(), close, Strings.SellDescription.ToString());
+            bool alternate = false;
+            foreach (Position pos in b.Portfolio.Positions)
+            {
+                InstrumentDefinition def = b.Catalog.Find(pos.InstrumentId);
+                PriceState ps = b.Market.Get(pos.InstrumentId);
+                if (def == null || ps == null) continue;
+                string id = def.Id;
+                decimal pnl = pos.Quantity * ps.Price - pos.CostBasis;
+                vm.Rows.Add(new GridRowVM(new[] { Names.Instrument(def), pos.Quantity.ToString(), Fmt.Price(ps.Price), Fmt.SignedDenars(pnl) }, alternate,
+                        () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell)), !ps.Closed)
+                    .WithColor(4, TableColors.ForAmount(pnl)));
+                alternate = !alternate;
+            }
+            return vm;
         }
 
         private static void AskQuantity(string id, OrderSide side)
@@ -179,7 +224,7 @@ namespace CalradicExchange.Menus
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             TraderProfile trader = b.CurrentTrader();
-            TradeResult r = b.Orders.Execute(id, side, quantity, trader, b.Portfolio);
+            TradeResult r = b.Orders.Execute(id, side, quantity, trader, b.Portfolio, (int)CampaignTime.Now.ToDays);
             if (!r.Success)
             {
                 ExchangeLog.Info($"Trade rejected: {side} {quantity} {id}: {r.Quote.Error}");

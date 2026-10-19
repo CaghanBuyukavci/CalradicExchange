@@ -40,6 +40,8 @@ namespace CalradicExchange.Menus
                 args => Option(args, GameMenuOption.LeaveType.Manage), args => Guard("portfolio", MarketReport.ShowPortfolio));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_news", Strings.OptNews,
                 args => Option(args, GameMenuOption.LeaveType.Submenu), args => Guard("news", MarketReport.ShowNews));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_history", Strings.OptHistory,
+                args => Option(args, GameMenuOption.LeaveType.Manage), args => Guard("history", TradeHistoryReport.Show));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_leave", Strings.OptLeave,
                 args => { args.optionLeaveType = GameMenuOption.LeaveType.Leave; return true; },
                 args => Guard("leave", () => GameMenu.SwitchToMenu(TownMenuId)), isLeave: true);

@@ -126,6 +126,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 ### 2B. Gauntlet ekranı
 - [ ] 2.6 Teknik deneme (spike): Gauntlet'te basit bir liste ekranı ve ViewModel. Örnek olarak vanilla ekranlardan birinin prefab'ını incele
   - Kısmen öne çekildi (ADR-020): piyasa ve portföy tablo pencereleri. Oyun içi test bekleniyor.
+  - 2026-10-19: borsa menüsü arka plan görseli (ADR-023); tıklanınca doğrudan miktar adımına geçen alım/satım seçim tablosu ve "Takas Geçmişim" tablosu (ADR-024).
 - [ ] 2.7 Grafik çözümü denemesi: ince widget'larla çubuk grafik veya dinamik doku. Sonuç `DECISIONS.md`'ye
 - [ ] 2.8 Piyasa sekmesi: liste, filtre, sıralama, mini grafik
 - [ ] 2.9 Araç detayı: büyük grafik, temel değer bileşenleri

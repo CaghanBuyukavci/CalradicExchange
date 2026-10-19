@@ -68,6 +68,43 @@ namespace CalradicExchange.Core.Tests
         }
 
         [Fact]
+        public void Trades_AreRecordedInHistory_WithTheirCosts()
+        {
+            TradeResult buy = _orders.Execute("cx_grain", OrderSide.Buy, 10, _rich, _portfolio, 7);
+            TradeResult sell = _orders.Execute("cx_grain", OrderSide.Sell, 4, _rich, _portfolio, 9);
+
+            Assert.Equal(2, _portfolio.History.Count);
+            TradeRecord b = _portfolio.History[0], s = _portfolio.History[1];
+            Assert.Equal(7, b.Day);
+            Assert.Equal(OrderSide.Buy, b.Side);
+            Assert.Equal(10, b.Quantity);
+            Assert.Equal(buy.Quote.ExecutionPrice, b.ExecutionPrice);
+            Assert.Equal(1034, b.Total);
+            Assert.Equal(26, b.Commission);
+            Assert.Equal(0m, b.RealizedPnl);
+            Assert.Equal(9, s.Day);
+            Assert.Equal(OrderSide.Sell, s.Side);
+            Assert.Equal(sell.GoldDelta, s.Total);
+            Assert.Equal(sell.RealizedPnl, s.RealizedPnl);
+        }
+
+        [Fact]
+        public void RejectedTrade_IsNotRecorded()
+        {
+            _orders.Execute("cx_grain", OrderSide.Sell, 1, _rich, _portfolio, 3);
+            Assert.Empty(_portfolio.History);
+        }
+
+        [Fact]
+        public void History_KeepsOnlyTheNewestTrades()
+        {
+            var p = new Portfolio();
+            for (int i = 1; i <= 5; i++) p.Record(new TradeRecord { Day = i }, 3);
+
+            Assert.Equal(new[] { 3, 4, 5 }, p.History.ConvertAll(t => t.Day));
+        }
+
+        [Fact]
         public void ImmediateRoundTrip_LosesMoney_AndIsNotTaxed()
         {
             _orders.Execute("cx_grain", OrderSide.Buy, 10, _rich, _portfolio);

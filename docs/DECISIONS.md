@@ -172,3 +172,14 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Karar:** Görsel `GUI/Textures/cx_exchange_bg.png` olarak dağıtılır. Menü ilk açıldığında `Texture.LoadTextureFromPath` (olmazsa `CreateFromMemory`) ile motor dokusu yüklenir, tüm dokuyu gösteren bir `Sprite` alt sınıfı (`TextureSprite`) `UIResourceManager.SpriteData.Sprites`'a `cx_exchange_bg` adıyla eklenir ve menü init'i `SetBackgroundMeshName("cx_exchange_bg")` çağırır.
 - **Neden:** Sprite sheet/TPAC üretmek Modding Kit gerektirir. Harmony gerekmez. Yükleme başarısız olursa vanilla arka plan kalır ve log'a yazılır.
 - **Test (2026-10-19):** Doku yüklendi (log: `932x1688, loaded from path`), ama görsel her saatte mavi göründü. `LoadTextureFromPath` PNG'nin kırmızı ve mavi kanallarını takas ediyor (sıcak turuncu → mavi). Orijinal görsel `Assets/Textures/` altında duruyor; `deploy.ps1` bunu kırmızı/mavi önceden takas edilmiş olarak oyunun `GUI/Textures/` klasörüne yazıyor.
+
+## ADR-024 — İşlem geçmişi kayda yazılır; seçim tablosunda "Devam" yok
+
+- **Bağlam:** Kullanıcı borsa menüsünün sonuna bütün işlemlerini listeleyen bir "Takas Geçmişim" penceresi istedi. Ayrıca alım/satımda hisse seçince "Devam"a basmadan miktar adımına geçilmesini istedi. O zamana kadar tek tek işlemler sadece `exchange.log`'daydı; kayıtta sadece toplamlar (gerçekleşen kâr, komisyon, vergi, işlem sayısı) vardı.
+- **Karar:**
+  - `Portfolio.History` (`TradeRecord` listesi) şema 6 ile kayda eklendi. Her kayıtta şunlar tutulur: oyun günü, hisse, yön, adet, gerçekleşen fiyat, tutar, komisyon, vergi, gerçekleşen kâr. Liste `trading.tradeHistoryLimit` (varsayılan 500) ile sınırlı; en eskiler düşer.
+  - Şema 5 kayıtları boş geçmişle açılır. Tablonun altında "Daha eski N işlem bu listede yok" yazar (N = `TradeCount` − listedeki işlem sayısı).
+  - Vanilla çoklu seçim penceresinin seçim anında çağrılan bir geri çağrısı yok. Bu yüzden alım/satım seçimi kendi Gauntlet tablomuzla (`CxPickTable`) yapılıyor; satıra tıklamak doğrudan miktar penceresini açar. Pencere açılamazsa eski seçim penceresine düşülür (ADR-006).
+  - Takas Geçmişim: `CxHistoryTable`, en yeni işlem üstte. Sütunlar: Tarih, İşlem, Hisse, Adet, Fiyat, Tutar (altın akışı, işaretli), Masraf (komisyon + vergi), Kâr/zarar (sadece satışlarda).
+- **Bedel:** Seçim tablosunda vanilla penceredeki eşya ikonları yok. Karşılığında bugün/7 gün değişimi (alımda) ve kâr/zarar (satımda) sütunları var.
+

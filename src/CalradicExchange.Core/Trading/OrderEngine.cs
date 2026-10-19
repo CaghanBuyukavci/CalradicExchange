@@ -117,8 +117,11 @@ namespace CalradicExchange.Core.Trading
             return q;
         }
 
-        /// <summary>Quotes and, if valid, executes: updates the portfolio and the market price. Gold is applied by the caller.</summary>
-        public TradeResult Execute(string instrumentId, OrderSide side, int quantity, TraderProfile trader, Portfolio portfolio)
+        /// <summary>
+        /// Quotes and, if valid, executes: updates the portfolio, records the trade under <paramref name="day"/> and
+        /// moves the market price. Gold is applied by the caller.
+        /// </summary>
+        public TradeResult Execute(string instrumentId, OrderSide side, int quantity, TraderProfile trader, Portfolio portfolio, int day = 0)
         {
             TradeQuote q = Quote(instrumentId, side, quantity, trader, portfolio);
             var result = new TradeResult { Quote = q };
@@ -134,6 +137,18 @@ namespace CalradicExchange.Core.Trading
                 result.RealizedPnl = portfolio.ApplySell(instrumentId, quantity, q.Total, q.Commission, q.ProfitTax);
                 result.GoldDelta = q.Total;
             }
+            portfolio.Record(new TradeRecord
+            {
+                Day = day,
+                InstrumentId = instrumentId,
+                Side = side,
+                Quantity = quantity,
+                ExecutionPrice = q.ExecutionPrice,
+                Total = q.Total,
+                Commission = q.Commission,
+                ProfitTax = q.ProfitTax,
+                RealizedPnl = result.RealizedPnl,
+            }, _market.Settings.Trading.TradeHistoryLimit);
             _market.ApplyTradeImpact(instrumentId, side == OrderSide.Buy, q.Impact);
             return result;
         }

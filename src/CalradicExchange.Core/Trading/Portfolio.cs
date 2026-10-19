@@ -13,6 +13,17 @@ namespace CalradicExchange.Core.Trading
         public long TotalProfitTaxPaid { get; set; }
         public int TradeCount { get; set; }
 
+        /// <summary>Executed trades, oldest first, trimmed to the configured limit. Added in schema 6.</summary>
+        public List<TradeRecord> History { get; set; } = new List<TradeRecord>();
+
+        /// <summary>Appends a trade and drops the oldest ones beyond <paramref name="limit"/> (0 keeps none).</summary>
+        public void Record(TradeRecord record, int limit)
+        {
+            History.Add(record);
+            int excess = History.Count - System.Math.Max(0, limit);
+            if (excess > 0) History.RemoveRange(0, excess);
+        }
+
         public Position Find(string instrumentId)
         {
             return Positions.FirstOrDefault(p => p.InstrumentId == instrumentId);
