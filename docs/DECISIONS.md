@@ -275,3 +275,40 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Yıkılış:** `KingdomDestroyed` olayı ya da günlük okumada krallığın yaşayanlar arasında olmaması endeksi kapatır (fiyat 0, bir daha açılmaz). Oyun katmanı elde tutulan payları sıfır fiyattan "Zorunlu satış" olarak kapatır; kayıp gerçekleşmiş zarara ve Takas Geçmişim'e yazılır.
 - **Okuyucu hatası koruması:** Hiç krallık içermeyen anlık görüntü (okuma hatası, simülatör) hiçbir şeyi kapatmaz. Simülatör çıktısı bu yüzden değişmedi; 8 hedefin hepsi geçiyor.
 - **Arayüz:** Menüde "Krallık Piyasası" (Emtia/Sepet tablosuyla aynı düzen), portföyde "Krallıklar" sekmesi. Günlük log'a her krallık için fiyat, temel değer, fief, refah, düşman ve kuşatma sayısı yazılır (ayar turu için).
+
+## ADR-031 — Arayüz turu: arama, Portföy kısayolu, onay listesi, tutsak haberleri, performans grafiği (2026-10-20)
+
+- **Kullanıcı istekleri (2026-10-20, save10 testinden sonra):**
+  - Emtia Piyasası'nda sağ üstte arama kutusu; satırlarda "hissesi" eki yok.
+  - Altın ve kalan limit bütün pencerelerde sol altta.
+  - Sepet Piyasası'nın ilk sütunu "Sepet".
+  - Portföy dışındaki pencerelerde Kapat'ın sağında Portföy butonu. Portföy kapanınca önceki pencere geri gelir.
+  - "Elde" sütunu ortalı.
+  - Haberlere tutsak alınma olayları kendi renginde eklenir. Yer adlarının yanında parantez içinde krallık yazılır. En fazla 20 haber tutulur.
+  - Alım/satım onayı Gauntlet liste penceresi olur; satışta kâr/zarar görünür.
+  - Portföy'de Performans butonu; 7/14/30 gün seçilebilen çizgi grafik.
+- **Kullanıcı kararları:**
+  - Grafikte **toplam kâr/zarar** çizilir: açık K/Z + gerçekleşen K/Z + lonca ödemeleri + henüz ödenmemiş lonca hak edişi. Alım ve satım çizgiyi oynatmaz; sadece kazanç ve kayıp oynatır.
+  - Geçmiş günler **yeniden hesaplanmaz**. Her gün bir nokta kaydedilir (`portfolio.performance`, son 60 gün, şema 11). Grafik ikinci kayıtlı günden itibaren görünür.
+- **Tutsak haberi:** `HeroPrisonerTaken`. Sadece krallık lordları (`IsLord` ve krallık fraksiyonu) haber olur; yoldaşlar, gezginler ve küçük klanlar dışarıda kalır.
+  - Yeni olay türü `HeroCaptured`, `MarketEvent.HeroId` / `OtherHeroId` alanlarıyla. Şok kuralı yok (`"HeroCaptured": []`).
+  - Lord tahvilleri (Faz 3) bu olayı kullanacak.
+  - Esir alan partinin lideri yoksa (garnizon) metin sadece fraksiyonu yazar.
+- **Yer adlarında krallık:** Haberin gösterildiği andaki sahibi yazılır (`Settlement.MapFaction`). Fetih haberinde yazılmaz, çünkü metin iki krallığı zaten söylüyor.
+- **20 haber:** `settings.json` `newsKeep` 30'dan 20'ye indi. Kayıttaki eski haberler bir sonraki olayda kırpılır.
+- **Portföy kısayolu:** `ExchangeTableVM.WithSecondary` ile Kapat'ın sağına ikinci buton eklenir. `ShowPortfolio(back)`: Portföy kapanınca `back` çalışır. Portföyden yapılan bir işlem portföye döner ve `back`'i korur. Emtia aramasındaki metin de işlemden sonra geri gelir.
+- **Onay penceresi:** `CxConfirmPopup.xml`, etiket | değer satırları. Satış şunları gösterir:
+  - Ortalama maliyet
+  - Kâr vergisi
+  - Eline geçecek tutar
+  - Kâr/zarar: `TradeQuote.RealizedPnl = Total − CostBasis`, işlem sonrası `TradeResult.RealizedPnl` ile aynı.
+  - Gauntlet açılamazsa eski metin onayı yedek olarak kalır.
+- **Grafik tekniği (PLAN 2.7):** Gauntlet'te widget döndürme ve çizgi çizme yok. Çözüm: Core'daki `Charts/LineChart` grafiği 4 piksellik dilimlere böler.
+  - Her dilim için çizgi parçasının üst kenarı ve yüksekliği hesaplanır, ayrıca sıfır çizgisine kadar dolgu (kârda yeşil, zararda kırmızı).
+  - Dilim içinde kalan tepe noktaları da hesaba katılır, böylece sivri tepeler kaybolmaz.
+  - Dikey eksen her zaman sıfırı içerir. Konumlar `float` VM özellikleriyle `MarginTop` / `SuggestedHeight`'a bağlanır (bkz. API_NOTES).
+  - 820 piksellik grafik 205 dilim. Dinamik doku gerekmedi.
+- **Krallık endeksi ayarı (save10 log'undan):**
+  - Vlandia 28 günde 15 yağma yedi. Her biri −0,06 ve yığılma sınırı yoktu, bu yüzden fiyat temel değerin %25 altına indi (P 67,8, F 90,5).
+  - Kural −0,03'e indi, `maxStack` 3 (canlı en fazla −0,09).
+  - Diğer krallıklarda fiyat/temel değer farkı %3–5.

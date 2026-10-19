@@ -31,6 +31,31 @@ namespace CalradicExchange.Core.Trading
         /// <summary>Executed trades, oldest first, trimmed to the configured limit. Added in schema 6.</summary>
         public List<TradeRecord> History { get; set; } = new List<TradeRecord>();
 
+        /// <summary>Daily total profit for the performance chart, oldest first, one point per day. Added in schema 11.</summary>
+        public List<PerformancePoint> Performance { get; set; } = new List<PerformancePoint>();
+
+        /// <summary>Total profit at the given prices: open + realized + guild payouts + guild profit accrued but not paid.</summary>
+        public decimal TotalPnl(Func<string, decimal> priceOf)
+        {
+            return UnrealizedPnl(priceOf) + RealizedPnl + GuildIncomeTotal + GuildAccruals.Values.Sum();
+        }
+
+        /// <summary>The performance point for <paramref name="day"/> at the given prices (not stored).</summary>
+        public PerformancePoint PerformanceAt(int day, Func<string, decimal> priceOf)
+        {
+            return new PerformancePoint { Day = day, Pnl = Math.Round(TotalPnl(priceOf), 2), Value = Math.Round(MarketValue(priceOf), 2) };
+        }
+
+        /// <summary>Stores today's point (replacing an earlier one of the same day) and keeps the newest <paramref name="keep"/> days.</summary>
+        public void RecordPerformance(int day, Func<string, decimal> priceOf, int keep)
+        {
+            PerformancePoint point = PerformanceAt(day, priceOf);
+            Performance.RemoveAll(p => p.Day >= day);
+            Performance.Add(point);
+            int excess = Performance.Count - Math.Max(1, keep);
+            if (excess > 0) Performance.RemoveRange(0, excess);
+        }
+
         /// <summary>Appends a trade and drops the oldest ones beyond <paramref name="limit"/> (0 keeps none).</summary>
         public void Record(TradeRecord record, int limit)
         {

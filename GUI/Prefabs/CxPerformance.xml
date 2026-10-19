@@ -1,0 +1,82 @@
+<Prefab>
+  <!-- Calradic Exchange: portfolio performance. Period tabs (TabVM), headline + totals, line chart of total profit drawn as 4 px slices (ChartColumnVM: line piece + fill to the zero line). Chart is 820 x 360 (PerformanceReport.ChartWidth/Height). Data source: PerformanceVM. -->
+  <Window>
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000ff" AlphaFactor="0.7">
+      <Children>
+
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="1040" SuggestedHeight="720" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Children>
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="StdAssets\Popup\canvas" />
+
+            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalTopToBottom">
+              <Children>
+
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="56" MarginTop="8" Brush="Popup.Title.Text" Text="@Title" />
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="23" Sprite="StdAssets\Popup\divider" />
+
+                <ListPanel DataSource="{Tabs}" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="42" HorizontalAlignment="Center" MarginBottom="10" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <ItemTemplate>
+                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="160" SuggestedHeight="42" MarginLeft="6" MarginRight="6" Command.Click="ExecuteSelect">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.18" IsVisible="@IsSelected" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#FFFFFFFF" AlphaFactor="0.05" IsVisible="@IsNotSelected" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="3" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" IsVisible="@IsSelected" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="@TextColor" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@Text" />
+                      </Children>
+                    </ButtonWidget>
+                  </ItemTemplate>
+                </ListPanel>
+
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="36" Brush="Popup.Description.Text" Brush.FontSize="26" Brush.FontColor="@HeadlineColor" Brush.TextHorizontalAlignment="Center" Text="@Headline" IsVisible="@HasHeadline" />
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Text="@Totals" />
+
+                <!-- Chart: y labels (left, 110 px), plot (820 x 360), x labels below -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="960" SuggestedHeight="396" HorizontalAlignment="Center" MarginTop="14">
+                  <Children>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="24" HorizontalAlignment="Left" VerticalAlignment="Top" Brush="Popup.Description.Text" Brush.FontSize="16" Brush.FontColor="#B8AE9EFF" Brush.TextHorizontalAlignment="Right" Text="@MaxLabel" IsVisible="@HasChart" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="24" HorizontalAlignment="Left" VerticalAlignment="Top" MarginTop="@ZeroLabelTop" Brush="Popup.Description.Text" Brush.FontSize="16" Brush.FontColor="#B8AE9EFF" Brush.TextHorizontalAlignment="Right" Text="@ZeroLabel" IsVisible="@HasChart" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="24" HorizontalAlignment="Left" VerticalAlignment="Top" MarginTop="@MinLabelTop" Brush="Popup.Description.Text" Brush.FontSize="16" Brush.FontColor="#B8AE9EFF" Brush.TextHorizontalAlignment="Right" Text="@MinLabel" IsVisible="@HasChart" />
+
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="820" SuggestedHeight="360" HorizontalAlignment="Left" VerticalAlignment="Top" MarginLeft="124" IsVisible="@HasChart">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#FFFFFFFF" AlphaFactor="0.04" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.2" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.2" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" VerticalAlignment="Top" MarginTop="@ZeroTop" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.45" />
+
+                        <ListPanel DataSource="{Columns}" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                          <ItemTemplate>
+                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4" DoNotAcceptEvents="true">
+                              <Children>
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" VerticalAlignment="Top" MarginTop="@FillTop" SuggestedHeight="@FillHeight" Sprite="BlankWhiteSquare_9" Color="@FillColor" AlphaFactor="0.28" />
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" VerticalAlignment="Top" MarginTop="@LineTop" SuggestedHeight="@LineHeight" Sprite="BlankWhiteSquare_9" Color="#F2D9A6FF" />
+                              </Children>
+                            </Widget>
+                          </ItemTemplate>
+                        </ListPanel>
+                      </Children>
+                    </Widget>
+
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="28" HorizontalAlignment="Left" VerticalAlignment="Top" MarginLeft="124" MarginTop="366" Brush="Popup.Description.Text" Brush.FontSize="16" Brush.FontColor="#B8AE9EFF" Brush.TextHorizontalAlignment="Left" Text="@StartLabel" IsVisible="@HasChart" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="28" HorizontalAlignment="Left" VerticalAlignment="Top" MarginLeft="644" MarginTop="366" Brush="Popup.Description.Text" Brush.FontSize="16" Brush.FontColor="#B8AE9EFF" Brush.TextHorizontalAlignment="Right" Text="@EndLabel" IsVisible="@HasChart" />
+
+                    <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="700" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="Popup.Description.Text" Brush.FontSize="20" Text="@EmptyText" IsVisible="@IsEmpty" />
+                  </Children>
+                </Widget>
+
+              </Children>
+            </ListPanel>
+
+            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="12" Brush="Popup.Done.Button.NineGrid" Command.Click="ExecuteClose">
+              <Children>
+                <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginLeft="50" MarginRight="50" VerticalAlignment="Center" Brush="Popup.Button.Text" Text="@CloseText" />
+              </Children>
+            </ButtonWidget>
+
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="frame_9" ExtendLeft="18" ExtendTop="18" ExtendRight="18" ExtendBottom="18" IsEnabled="false" />
+          </Children>
+        </Widget>
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

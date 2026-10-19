@@ -76,7 +76,7 @@ All are `static IMbEvent<...>` properties on `CampaignEvents`.
 | `KingdomDestroyedEvent` | Close kingdom index | `IMbEvent<Kingdom>` | VERIFIED | |
 | `MobilePartyDestroyed` | Caravan loss | `IMbEvent<MobileParty, PartyBase>` | VERIFIED | Phase 3 |
 | `HeroKilledEvent` | Lord bond default | `IMbEvent<Hero, Hero, KillCharacterAction.KillCharacterActionDetail, bool>` | VERIFIED | Phase 3 |
-| `HeroPrisonerTaken` | Lord bond freeze | `IMbEvent<PartyBase, Hero>` | VERIFIED | Phase 3 |
+| `HeroPrisonerTaken` | Lord bond freeze; "captive" news (ADR-031) | `IMbEvent<PartyBase, Hero>` (capturer, prisoner) | VERIFIED | News filter: `Hero.IsLord` (`Occupation == Lord`) and `MapFaction.IsKingdomFaction`. Captor = `PartyBase.LeaderHero` (null for garrisons), `PartyBase.MapFaction`. `Hero.Find(stringId)` looks up via `CampaignObjectManager` |
 | `PlayerInventoryExchangeEvent` | Player market impact | `IMbEvent<List<(ItemRosterElement, int)>, List<(ItemRosterElement, int)>, bool>` | VERIFIED | Phase 4: total vs unit price still to check in `InventoryLogic` |
 | Season change | Seasonal shock | — | MISSING | No event; detect `GetSeasonOfYear` change in daily tick (as planned) |
 | Famine | Food stocks hit zero | — | MISSING | No event; detect from `FoodStocks <= 0` in daily tick (as planned) |
@@ -96,6 +96,9 @@ All are `static IMbEvent<...>` properties on `CampaignEvents`.
 | `InformationManager.DisplayMessage` | Notifications | `static void DisplayMessage(InformationMessage message)`; `InformationMessage(string)`, `(string, Color)` | VERIFIED | |
 | `TextObject` | Localization | `TextObject(string value, Dictionary<string, object> attributes = null)`, `SetTextVariable(string, string/int/float)` | VERIFIED | |
 | Gauntlet | Phase 2 screen | `TaleWorlds.GauntletUI*.dll`, `TaleWorlds.Engine.GauntletUI.dll`, `TaleWorlds.ScreenSystem.dll` present | DEFERRED | Verify in Phase 2.6 spike |
+| Gauntlet data binding of layout values | Chart slices (ADR-031) | `WidgetExtensions.SetWidgetAttribute` → `ConvertObject` only converts **strings** (to Sprite, Brush, int, Color); other values are set as-is by reflection | VERIFIED | So a VM property bound to `MarginTop` / `SuggestedHeight` / `PositionYOffset` must be `float` exactly. Vanilla binds `PositionYOffset="@CursorPositionY"` |
+| `DimensionSyncWidget` | Popup that sizes to its content | `DimensionToSync="Vertical" WidgetToCopyHeightFrom="<child id>"` | VERIFIED | Used by vanilla `SingleQueryPopup.xml`; our `CxConfirmPopup.xml` |
+| Search box | Commodity market search | `BrushWidget Brush="SaveLoad.Search.Button"` + `EditableTextWidget Brush="SaveLoad.Search.InputText" DefaultSearchText="@..." Text="@SearchText"` | VERIFIED | Same markup as vanilla `MultiSelectionQueryPopup.xml`; brushes are in SandBox (loaded in campaign) |
 
 ## 6. Money and skills
 

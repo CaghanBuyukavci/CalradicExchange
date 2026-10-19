@@ -132,12 +132,14 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - Kısmen öne çekildi (ADR-020): piyasa ve portföy tablo pencereleri. Oyun içi test bekleniyor.
   - 2026-10-19: borsa menüsü arka plan görseli (ADR-023); tıklanınca doğrudan miktar adımına geçen alım/satım seçim tablosu ve "Takas Geçmişim" tablosu (ADR-024).
   - 2026-10-19: "Hisse al/sat" yerine Emtia Piyasası ve Sepet Piyasası tabloları; her satırda AL/SAT, işlemden sonra tabloya dönüş (ADR-025).
-- [ ] 2.7 Grafik çözümü denemesi: ince widget'larla çubuk grafik veya dinamik doku. Sonuç `DECISIONS.md`'ye
+- [x] 2.7 Grafik çözümü denemesi: ince widget'larla çubuk grafik veya dinamik doku. Sonuç `DECISIONS.md`'ye
+  - 2026-10-20: 4 piksellik ince widget dilimleriyle çizgi grafik (dönme ve doku yok), ilk kullanım Portföy Performansı penceresi (ADR-031). 2.9'daki fiyat grafiği aynı `LineChart` yerleşimini kullanacak.
 - [ ] 2.8 ~~Piyasa sekmesi~~ Tam ekran ekran yapılmıyor (ADR-026); piyasa tabloları (Emtia, Sepet, Lonca, Krallık) bu işi görüyor
 - [ ] 2.9 Araç detay penceresi: tablolarda hisse adına tıklanınca fiyat grafiği ve temel değer bileşenleri
 - [x] 2.10 Emir paneli: adet girişi, maliyet önizlemesi, onay
   - Slider'lı miktar penceresi + onay penceresi; satırdaki AL/SAT butonlarından açılıyor (ADR-025).
 - [x] 2.11 Portföy ve Haberler pencereleri: portföy tablo (Hisseler / Sepetler / Loncalar sekmeleri), Haberler renkli tablo (olay türüne göre renk)
+  - 2026-10-20 (ADR-031): Emtia araması, alt solda altın/limit, Portföy butonu ve geri dönüş, Gauntlet alım/satım onayı (satışta K/Z), haberlerde tutsak alınan lordlar ve yer adlarının yanında krallık, en fazla 20 haber, Portföy Performansı grafiği.
 - [x] 2.12 Menü tabanlı arayüzü yedek olarak tut (Gauntlet hata verirse ona düş)
   - Her tablo penceresi açılamazsa vanilla inquiry'ye düşüyor.
 

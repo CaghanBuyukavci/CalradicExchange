@@ -200,5 +200,12 @@
     <string id="cx_cf_receive" text="Eline geçecek" />
     <string id="cx_cf_profit" text="Kâr / zarar" />
     <string id="cx_denars_amount" text="{AMOUNT} dinar" />
+    <string id="cx_btn_performance" text="Performans" />
+    <string id="cx_perf_title" text="Portföy Performansı" />
+    <string id="cx_perf_period" text="{DAYS} gün" />
+    <string id="cx_perf_change" text="Son {DAYS} gün: {CHANGE} dinar" />
+    <string id="cx_perf_change_partial" text="Son {DAYS} gün: {CHANGE} dinar ({COVERED} günlük kayıt var)" />
+    <string id="cx_perf_totals" text="Toplam kâr/zarar: {PNL} dinar. Portföy değeri: {VALUE} dinar." />
+    <string id="cx_perf_not_enough" text="Her gün bir nokta kaydedilir. Grafik ilk kayıtlı günden sonra görünür." />
   </strings>
 </base>

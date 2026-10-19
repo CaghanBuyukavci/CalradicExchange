@@ -167,6 +167,7 @@ namespace CalradicExchange.Behaviors
                 }
             }
             if (summary.Processed) WriteOffFallenKingdoms(summary.Day);
+            if (summary.Processed) RecordPerformance(summary.Day);
             if (summary.Processed && !summary.Initialized) NotifyBigMoves();
             if (summary.Processed && _state.Market.LastTickDay <= MarketDump.AutoDumpDays) MarketDump.Append(this);
             return summary;
@@ -312,6 +313,25 @@ namespace CalradicExchange.Behaviors
         }
 
         /// <summary>One line per listed kingdom index for the daily log: price, fundamental, fiefs, prosperity, wars, sieges.</summary>
+        /// <summary>Daily point of the portfolio performance chart (ADR-031), after payouts and write-offs.</summary>
+        private void RecordPerformance(int day)
+        {
+            try
+            {
+                Portfolio pf = _state.Portfolio;
+                pf.RecordPerformance(day, id => _market.Get(id) is PriceState ps && ps.HasPrice ? ps.Price : 0, PerformanceDaysKept);
+                PerformancePoint p = pf.Performance[pf.Performance.Count - 1];
+                ExchangeLog.Info($"Performance day {day}: total profit {p.Pnl:0}, value {p.Value:0}, points {pf.Performance.Count}.");
+            }
+            catch (Exception ex)
+            {
+                ExchangeLog.Error("Recording performance failed", ex);
+            }
+        }
+
+        /// <summary>Days of performance kept in the save; the chart shows up to 30.</summary>
+        private const int PerformanceDaysKept = 60;
+
         private string KingdomReport(WorldSnapshot world)
         {
             var parts = new List<string>();

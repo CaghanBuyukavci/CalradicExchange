@@ -49,7 +49,8 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // on the next tick are listed at once.
                         break;
                     case 10:
-                        // Schema 11 adds news[].event.heroId / otherHeroId (HeroCaptured news). Null when missing.
+                        // Schema 11 adds news[].event.heroId / otherHeroId (HeroCaptured news) and portfolio.performance
+                        // (daily total profit for the chart, ADR-031). Both default when missing; the chart starts empty.
                         break;
                 }
             }

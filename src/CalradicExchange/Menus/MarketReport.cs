@@ -103,6 +103,7 @@ namespace CalradicExchange.Menus
                     Strings.ColNow.ToString(), Strings.ColProfit.ToString(), Strings.ColProfitPct.ToString(),
                 },
                 footer, Strings.Close.ToString(), close);
+            vm.WithSecondary(Strings.BtnPerformance.ToString(), () => PerformanceReport.Show(() => ShowPortfolio(back)));
 
             foreach (InstrumentClass tab in PortfolioTabs)
             {

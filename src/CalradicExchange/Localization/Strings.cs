@@ -185,6 +185,13 @@ namespace CalradicExchange.Localization
         public static TextObject HeroCapturedByFaction => new TextObject("{=cx_ev_hero_captured_faction}{HERO} ({K1}) was taken prisoner by {K2}.");
 
         public static TextObject NameWithOwner => new TextObject("{=cx_name_with_owner}{NAME} ({OWNER})");
+        public static TextObject BtnPerformance => new TextObject("{=cx_btn_performance}Performance");
+        public static TextObject PerformanceTitle => new TextObject("{=cx_perf_title}Portfolio Performance");
+        public static TextObject PerformancePeriod => new TextObject("{=cx_perf_period}{DAYS} days");
+        public static TextObject PerformanceChange => new TextObject("{=cx_perf_change}Last {DAYS} days: {CHANGE} denars");
+        public static TextObject PerformanceChangePartial => new TextObject("{=cx_perf_change_partial}Last {DAYS} days: {CHANGE} denars (recorded for {COVERED} days)");
+        public static TextObject PerformanceTotals => new TextObject("{=cx_perf_totals}Total profit/loss: {PNL} denars. Portfolio value: {VALUE} denars.");
+        public static TextObject PerformanceNotEnough => new TextObject("{=cx_perf_not_enough}One point is recorded every day. The chart appears after the first recorded day.");
         public static TextObject BtnPortfolio => new TextObject("{=cx_btn_portfolio}Portfolio");
         public static TextObject SearchNoMatch => new TextObject("{=cx_search_no_match}Nothing matches the search.");
         public static TextObject SearchPlaceholder => new TextObject("{=cx_search_placeholder}Search...");
