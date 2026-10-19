@@ -200,3 +200,24 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - **Tablolar + grafik penceresi.** Tam ekran borsa ekranı yapılmaz. Tablolarda hisse adına tıklanınca fiyat grafiği ve temel değer bileşenlerini gösteren bir detay penceresi açılır. 2.8–2.11 bu yöne göre yeniden yazıldı.
 - **Gerekçe:** Kısa liste ve seyahate anlam katması; çalışan ve kullanıcının beğendiği tablo arayüzünü korumak.
 
+## ADR-027 — Lonca "ortaklık payı": kâra ve zarara ortaklık, %25/yıl, göreli fiyat; kâr kasa değişiminden ölçülür
+
+- **Bağlam (2026-10-19, 2.1 verisi, 58 gün):**
+  - Haritada 152 lonca var: 46 şehirde 3'er, 7 şehirde 2'şer. Bunların 145'inde tek atölye var.
+  - Sahibin günlük geliri (ADR-010 ölçüsü) ortanca 174 dinar/gün, %10–%90 aralığı 61–297. Günlük oynaklık yaklaşık %39.
+  - Kampanya başında ortanca 290'dan 175'e düştü.
+  - Bu ölçü zararı gösteremiyor: sahip sadece birikmiş kârdan pay çekiyor, zarar eden atölye 0 görünüyor (58 günde 290 sıfır gün).
+- **Karar (kullanıcı):**
+  - Lonca araçlarına "hisse" değil **"ortaklık payı"** denir.
+  - **Kâra ve zarara ortaklık:** Her 7 günde bir, loncanın o haftaki net kârının ya da zararının tamamı, elde tutulan pay oranında (pay / toplam pay) oyuncuya yansır. Zarar haftasında oyuncu öder.
+  - **Getiri hedefi:** Payın fiyatı, beklenen dağıtımın yılda yaklaşık %25'i olacak şekilde kurulur (yıl = 84 gün).
+  - **Fiyat:** Göreli model (ADR-022 gibi). Taban, lonca açıldığındaki kârdan kurulur. Fiyat, loncanın kârının bütün loncaların ortanca hareketine göre ne yaptığını izler. Kampanya başındaki genel düşüş fiyatları kırmızıya boyamaz, ama dağıtıma gerçek kâr olarak yansır.
+- **Teknik karar:**
+  - Net kâr = günlük kasa değişimi + sahibin o gün çektiği para. Çekilen tutar yerine bir önceki okumadaki `CalculateOwnerIncomeFromWorkshop` kullanılır. Eksi olabilir.
+  - İlk okumada (yüklemeden sonra) ve sahip ya da tür değişince kasa sıfırlandığı için o atölye o gün ölçülmez.
+  - Ölçüm doğrulaması için günlük log'a bütün atölyelerin net kâr toplamı ile sahip geliri toplamı birlikte yazılır. Uzun vadede ikisi yakın olmalı.
+  - Şema 8: eski ölçüyle toplanan seriler silinir, 28 günde yeniden dolar. ADR-010'un "sahip geliri = lonca kârı" kısmının yerine bu geçer.
+- **Varsayılan ölçek (2.2'de simülatörle kontrol edilecek):**
+  - Her lonca 100 pay.
+  - Örnek: ortanca 174 dinar/gün kârda pay fiyatı ≈ 174 × 84 / 0,25 / 100 ≈ 585 dinar. Haftalık dağıtım pay başına ≈ 12 dinar (%2/hafta).
+

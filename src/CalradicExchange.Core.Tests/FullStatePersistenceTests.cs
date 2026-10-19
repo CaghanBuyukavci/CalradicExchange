@@ -68,6 +68,18 @@ namespace CalradicExchange.Core.Tests
         }
 
         [Fact]
+        public void Schema7Save_DropsOldGuildSeries()
+        {
+            const string schema7 = "{\"schemaVersion\":7,\"createdOnDay\":91077,\"market\":{\"initialized\":true,\"guilds\":[{\"townId\":\"town_A\",\"workshopTypeId\":\"smithy\",\"workshopCount\":1,\"lastDay\":5,\"dailyProfit\":[100,120]}]}}";
+
+            ExchangeState s = StateSerializer.Deserialize(schema7);
+
+            Assert.Equal(ExchangeState.CurrentSchemaVersion, s.SchemaVersion);
+            Assert.True(s.Market.Initialized);
+            Assert.Empty(s.Market.Guilds);
+        }
+
+        [Fact]
         public void Schema6Save_GetsEmptyGuildSeries()
         {
             const string schema6 = "{\"schemaVersion\":6,\"createdOnDay\":91077,\"market\":{\"initialized\":true}}";

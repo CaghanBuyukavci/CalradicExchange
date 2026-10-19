@@ -61,15 +61,31 @@ namespace CalradicExchange.Core.Tests
         }
 
         [Fact]
-        public void SameDayTwice_IsRecordedOnce_AndNegativeProfitCountsAsZero()
+        public void SameDayTwice_IsRecordedOnce_AndLossesStayNegative()
         {
             var guilds = new List<GuildProfitSeries>();
             GuildProfitTracker.Record(guilds, World(4, ("t", "smithy", 1, -15)), 28);
             GuildProfitTracker.Record(guilds, World(4, ("t", "smithy", 1, 99)), 28);
 
             GuildProfitSeries g = Assert.Single(guilds);
-            Assert.Equal(new List<double> { 0 }, g.DailyProfit);
+            Assert.Equal(new List<double> { -15 }, g.DailyProfit);
+            Assert.Equal(-15, g.AverageDailyProfit, 9);
             Assert.Equal(1, g.WorkshopCount);
+        }
+
+        [Fact]
+        public void UnmeasuredDay_UpdatesCount_ButAppendsNoProfit()
+        {
+            var guilds = new List<GuildProfitSeries>();
+            WorldSnapshot first = World(1, ("t", "smithy", 2, 0));
+            first.Towns[0].Workshops["smithy"].HasProfit = false; // first reading after a load
+            GuildProfitTracker.Record(guilds, first, 28);
+            GuildProfitTracker.Record(guilds, World(2, ("t", "smithy", 2, 30)), 28);
+
+            GuildProfitSeries g = Assert.Single(guilds);
+            Assert.Equal(new List<double> { 30 }, g.DailyProfit);
+            Assert.Equal(2, g.WorkshopCount);
+            Assert.Equal(2, g.LastDay);
         }
 
         [Fact]

@@ -22,6 +22,15 @@ namespace CalradicExchange.Adapters
         private readonly List<ItemObject> _items = new List<ItemObject>();
         private readonly List<ItemCategory> _categories = new List<ItemCategory>();
 
+        /// <summary>Workshop readings of the previous Read, for the daily net profit (not saved; ADR-027).</summary>
+        private Dictionary<Workshop, WorkshopReading> _previous = new Dictionary<Workshop, WorkshopReading>();
+
+        /// <summary>Totals of the last Read over all workshops, for the daily log (measure check).</summary>
+        public double LastNetTotal { get; private set; }
+        public double LastIncomeTotal { get; private set; }
+        public int LastMeasured { get; private set; }
+        public int LastUnmeasured { get; private set; }
+
         public WorldReader(InstrumentCatalog catalog)
         {
             foreach (string id in catalog.RequiredItemIds)
@@ -48,6 +57,9 @@ namespace CalradicExchange.Adapters
                 Season = (Season)(int)CampaignTime.Now.GetSeasonOfYear,
             };
 
+            LastNetTotal = LastIncomeTotal = 0;
+            LastMeasured = LastUnmeasured = 0;
+            var current = new Dictionary<Workshop, WorkshopReading>();
             foreach (Town town in Town.AllTowns)
             {
                 if (town?.Settlement == null || !town.Settlement.IsTown) continue; // castles are Towns too
@@ -79,9 +91,11 @@ namespace CalradicExchange.Adapters
                         snap.CategoryVolumes[cat.StringId] = Volume(market, cat);
                     }
                 }
-                ReadWorkshops(town, snap);
+                ReadWorkshops(town, snap, current);
                 world.Towns.Add(snap);
             }
+
+            _previous = current;
 
             List<Kingdom> alive = Kingdom.All.Where(k => k != null && !k.IsEliminated).ToList();
             world.KingdomCount = alive.Count;
@@ -96,27 +110,46 @@ namespace CalradicExchange.Adapters
         }
 
         /// <summary>
-        /// Groups the town's workshops by type (PLAN 2.1). Profit = the owner's daily income from the finance model
-        /// (ADR-010): owners withdraw a fifth of the accumulated profit each day, so this tracks the daily profit.
-        /// Empty slots and hidden types (artisans) are skipped.
+        /// Groups the town's workshops by type (PLAN 2.1). Net profit per workshop since the previous reading
+        /// (ADR-027) = capital change + what the owner withdrew. The owner withdraws a fifth of the profit above the
+        /// initial capital each day (ClanFinanceModel.CalculateOwnerIncomeFromWorkshop); the amount computed at the
+        /// previous reading stands in for it. A workshop is not measured on its first reading or after its owner or
+        /// type changed (both reset the capital). Empty slots and hidden types (artisans) are skipped.
         /// </summary>
-        private static void ReadWorkshops(Town town, TownSnapshot snap)
+        private void ReadWorkshops(Town town, TownSnapshot snap, Dictionary<Workshop, WorkshopReading> current)
         {
             Workshop[] workshops = town.Workshops;
             if (workshops == null) return;
             ClanFinanceModel finance = Campaign.Current?.Models?.ClanFinanceModel;
+            var measured = new HashSet<string>();
             foreach (Workshop w in workshops)
             {
                 WorkshopType type = w?.WorkshopType;
                 if (type == null || type.IsHidden || string.IsNullOrEmpty(type.StringId)) continue;
                 if (!snap.Workshops.TryGetValue(type.StringId, out WorkshopGroupSnapshot group))
                 {
-                    group = new WorkshopGroupSnapshot();
+                    group = new WorkshopGroupSnapshot { HasProfit = false };
                     snap.Workshops[type.StringId] = group;
                 }
                 group.Count++;
-                group.DailyProfit += finance != null ? Math.Max(0, finance.CalculateOwnerIncomeFromWorkshop(w)) : 0;
+
+                var now = new WorkshopReading(type.StringId, w.Owner, w.Capital,
+                    finance != null ? Math.Max(0, finance.CalculateOwnerIncomeFromWorkshop(w)) : 0);
+                current[w] = now;
+                LastIncomeTotal += now.OwnerIncome;
+                if (_previous.TryGetValue(w, out WorkshopReading before) && before.TypeId == now.TypeId && before.Owner == now.Owner)
+                {
+                    group.DailyProfit += now.Capital - before.Capital + before.OwnerIncome;
+                    LastNetTotal += now.Capital - before.Capital + before.OwnerIncome;
+                    measured.Add(type.StringId);
+                    LastMeasured++;
+                }
+                else
+                {
+                    LastUnmeasured++;
+                }
             }
+            foreach (string typeId in measured) snap.Workshops[typeId].HasProfit = true;
         }
 
         /// <summary>

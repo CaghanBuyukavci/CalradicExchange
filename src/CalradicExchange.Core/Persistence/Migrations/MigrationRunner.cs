@@ -37,10 +37,23 @@ namespace CalradicExchange.Core.Persistence.Migrations
                     case 6:
                         // Schema 7 adds market.guilds (workshop profit series, PLAN 2.1). Starts empty and fills daily.
                         break;
+                    case 7:
+                        root = Migrate7To8(root);
+                        break;
                 }
             }
 
             root["schemaVersion"] = toVersion;
+            return root;
+        }
+
+        /// <summary>
+        /// Schema 8 measures guild profit as net capital change (can be negative, ADR-027) instead of the owner's
+        /// income. Schema 7 series used the old measure and are dropped; they refill within the profit window.
+        /// </summary>
+        private static JObject Migrate7To8(JObject root)
+        {
+            if (root["market"] is JObject market) market.Remove("guilds");
             return root;
         }
 

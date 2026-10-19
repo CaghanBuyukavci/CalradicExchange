@@ -117,9 +117,9 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 ## Faz 2 — Lonca hisseleri, krallık endeksleri, Gauntlet arayüzü (≈5–7 hafta)
 
 ### 2A. Yeni araçlar
-- [ ] 2.1 Atölye kârı okuyucu (Faz 0.6 kararına göre gerçek veri veya tahmin)
-  - 2026-10-19: kod hazır (ADR-010 yolu). `WorldReader` atölyeleri türe göre gruplar, `MarketState.Guilds` 28 günlük kâr serisini tutar (şema 7), günlük log'a lonca özeti düşer, `exchange.dump_guilds` listeler ve CSV yazar. Gerçek değerler oyun içi testle görülünce işaretlenecek.
-- [ ] 2.2 Lonca hissesi temel değeri ve haftalık temettü (§2.3)
+- [x] 2.1 Atölye kârı okuyucu (Faz 0.6 kararına göre gerçek veri veya tahmin)
+  - 2026-10-19: kod hazır (ADR-010 yolu). `WorldReader` atölyeleri türe göre gruplar, `MarketState.Guilds` 28 günlük kâr serisini tutar (şema 7), günlük log'a lonca özeti düşer, `exchange.dump_guilds` listeler ve CSV yazar. İlk test (58 gün) değerleri verdi. Zararı da göstermek için ölçü kasa değişimine çevrildi (ADR-027, şema 8).
+- [ ] 2.2 Lonca ortaklık payı: temel değer ve haftalık kâr/zarar dağıtımı (§2.3, ADR-027)
 - [ ] 2.3 Lonca listesini dinamik yönet: atölye kaybolursa lonca kapanır, pozisyonlar son fiyattan nakde döner
 - [ ] 2.3a Lonca Piyasası tablosu: bulunulan şehrin loncaları (AL/SAT) + başka şehirlerde elde tutulan loncalar (sadece SAT) (ADR-026)
 - [ ] 2.4 Krallık endeksi (§2.4); krallık yok olunca kapanış; Krallık Piyasası tablosu

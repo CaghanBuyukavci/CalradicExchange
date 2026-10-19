@@ -52,18 +52,19 @@ F_mil = 100 × (kategori fiyat oranı) × (1 + 0,15 × aktif_savaş_sayısı_nor
 aktif_savaş_sayısı_normalize = aktif savaş çifti sayısı / krallık sayısı
 ```
 
-### 2.3 Lonca hissesi (Faz 2)
+### 2.3 Lonca ortaklık payı (Faz 2, ADR-027)
 
-Her lonca 1.000 pay olarak tanımlanır.
+Her lonca (şehir, atölye türü) 100 pay olarak tanımlanır. Oyuncuya görünen adı "ortaklık payı".
 
 ```
-kâr_günlük = son 28 günün atölye kârlarının ortalaması (o şehirdeki o türdeki tüm atölyeler)
-temettü_haftalık = payout_ratio × kâr_günlük × 7 / 1000
-F_guild = (temettü_haftalık × 12) / r_guild          (12 hafta = 1 oyun yılı)
+net_kâr_günlük   = Σ (kasa_bugün − kasa_dün + sahibin_çektiği)   (o şehirdeki o türdeki atölyeler; eksi olabilir)
+kâr_ort          = son 28 günün net_kâr_günlük ortalaması
+dağıtım_haftalık = son 7 günün net_kâr toplamı × (elde_tutulan_pay / 100)     (eksiyse oyuncu öder)
+F_lonca          = taban × e^E      (ADR-022 gibi göreli sinyal; sınıf = tüm loncalar)
+taban_başlangıç  = kâr_ort × 84 / r_guild / 100,   r_guild = 0,25 (yıllık hedef getiri)
 ```
 
-- Varsayılan `payout_ratio = 0,6`, `r_guild = 0,20` (yıllık iskonto).
-- Atölye kâr verisi doğrudan okunamazsa yedek tahmin: (çıktı fiyatı − girdi fiyatı) × üretim oranı × refah çarpanı. Faz 0'da karar verilecek.
+- 2.1 verisi (58 gün): kâr_ort ortanca 174, %10–%90 aralığı 61–297 dinar/gün. Örnek pay fiyatı ≈ 585 dinar, haftalık dağıtım ≈ 12 dinar/pay.
 
 ### 2.4 Krallık endeksi (Faz 2)
 

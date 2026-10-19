@@ -9,8 +9,9 @@ namespace CalradicExchange.Core.Guilds
     public static class GuildProfitTracker
     {
         /// <summary>
-        /// Records <paramref name="world"/>'s workshops. Pairs seen today get today's profit appended (trimmed to
-        /// <paramref name="windowDays"/>); pairs not seen today keep their history but drop to 0 workshops.
+        /// Records <paramref name="world"/>'s workshops. Pairs seen today get today's net profit appended (may be
+        /// negative, trimmed to <paramref name="windowDays"/>); pairs not seen today keep their history but drop to
+        /// 0 workshops. Groups without a measurement today only update their workshop count.
         /// </summary>
         public static void Record(List<GuildProfitSeries> guilds, WorldSnapshot world, int windowDays)
         {
@@ -33,13 +34,14 @@ namespace CalradicExchange.Core.Guilds
                         guilds.Add(series);
                         byKey[key] = series;
                     }
-                    if (series.LastDay == world.Day && series.DailyProfit.Count > 0) continue; // same day twice
+                    seen.Add(key);
+                    if (series.LastDay == world.Day && series.WorkshopCount > 0) continue; // same day twice
                     series.WorkshopCount = pair.Value.Count;
                     series.LastDay = world.Day;
-                    series.DailyProfit.Add(Math.Max(0, pair.Value.DailyProfit));
+                    if (!pair.Value.HasProfit) continue;
+                    series.DailyProfit.Add(pair.Value.DailyProfit);
                     int excess = series.DailyProfit.Count - window;
                     if (excess > 0) series.DailyProfit.RemoveRange(0, excess);
-                    seen.Add(key);
                 }
             }
 
