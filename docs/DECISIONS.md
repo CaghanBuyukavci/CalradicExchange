@@ -192,3 +192,11 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Karar:** Yeni tablo `CxTradeTable` (sütunlar: Hisse, Fiyat, Bugün, 7 gün, Elde, AL, SAT). Butonlar `GUI/Brushes/CxBrushes.xml`'deki `Cx.RowButton.Buy/Sell` brush'larını kullanır (yeşil/kırmızı, hover ve basılı durumları var). İşlem bitince veya miktar/onay adımında vazgeçilince aynı piyasa tablosu yeniden açılır; böylece art arda işlem yapılabilir. Fiyatı olmayan veya kapanmış araçta AL gizlenir. ADR-024'teki seçim tablosu (`CxPickTable`) kaldırıldı. Tablo açılamazsa yedek akış devreye girer: vanilla seçim penceresi, ardından elde varsa Al/Sat sorusu.
 - **Kullanıcıya sorulmadan eklenen:** "Elde" sütunu (eldeki adet). Bu sütun SAT butonunun neden görünüp görünmediğini açıklıyor. "Piyasaya bak" menüde genel bakış olarak kaldı.
 
+## ADR-026 — Faz 2 kapsamı: loncalar yerel alınır, her yerde satılır; tam ekran yerine grafik penceresi
+
+- **Bağlam (2026-10-19):** Faz 2 planlanırken iki soru açıktı. Birincisi: yaklaşık 106 lonca (53 şehir × en kârlı 2 lonca) tek listede çok kalabalık. İkincisi: tablo pencereleri iyi çalışıyor; tam ekran borsa ekranına gerek var mı?
+- **Karar (kullanıcı):**
+  - **Yerel al, her yerde sat.** Lonca Piyasası bulunulan şehrin loncalarını listeler ve sadece onlar alınabilir. Oyuncunun başka şehirlerdeki lonca hisseleri de aynı tabloda ayrı bir bölümde, sadece SAT butonuyla görünür.
+  - **Tablolar + grafik penceresi.** Tam ekran borsa ekranı yapılmaz. Tablolarda hisse adına tıklanınca fiyat grafiği ve temel değer bileşenlerini gösteren bir detay penceresi açılır. 2.8–2.11 bu yöne göre yeniden yazıldı.
+- **Gerekçe:** Kısa liste ve seyahate anlam katması; çalışan ve kullanıcının beğendiği tablo arayüzünü korumak.
+

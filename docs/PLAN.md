@@ -120,8 +120,9 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [ ] 2.1 Atölye kârı okuyucu (Faz 0.6 kararına göre gerçek veri veya tahmin)
 - [ ] 2.2 Lonca hissesi temel değeri ve haftalık temettü (§2.3)
 - [ ] 2.3 Lonca listesini dinamik yönet: atölye kaybolursa lonca kapanır, pozisyonlar son fiyattan nakde döner
-- [ ] 2.4 Krallık endeksi (§2.4); krallık yok olunca kapanış
-- [ ] 2.5 Simülatöre yeni araçları ekle, hedefleri yeniden kontrol et
+- [ ] 2.3a Lonca Piyasası tablosu: bulunulan şehrin loncaları (AL/SAT) + başka şehirlerde elde tutulan loncalar (sadece SAT) (ADR-026)
+- [ ] 2.4 Krallık endeksi (§2.4); krallık yok olunca kapanış; Krallık Piyasası tablosu
+- [ ] 2.5 Simülatöre yeni araçları ekle, hedefleri yeniden kontrol et (özellikle temettülü al-tut getirisi)
 
 ### 2B. Gauntlet ekranı
 - [ ] 2.6 Teknik deneme (spike): Gauntlet'te basit bir liste ekranı ve ViewModel. Örnek olarak vanilla ekranlardan birinin prefab'ını incele
@@ -129,11 +130,13 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - 2026-10-19: borsa menüsü arka plan görseli (ADR-023); tıklanınca doğrudan miktar adımına geçen alım/satım seçim tablosu ve "Takas Geçmişim" tablosu (ADR-024).
   - 2026-10-19: "Hisse al/sat" yerine Emtia Piyasası ve Sepet Piyasası tabloları; her satırda AL/SAT, işlemden sonra tabloya dönüş (ADR-025).
 - [ ] 2.7 Grafik çözümü denemesi: ince widget'larla çubuk grafik veya dinamik doku. Sonuç `DECISIONS.md`'ye
-- [ ] 2.8 Piyasa sekmesi: liste, filtre, sıralama, mini grafik
-- [ ] 2.9 Araç detayı: büyük grafik, temel değer bileşenleri
-- [ ] 2.10 Emir paneli: adet girişi, maliyet önizlemesi, onay
-- [ ] 2.11 Portföy ve Haberler sekmeleri
-- [ ] 2.12 Menü tabanlı arayüzü yedek olarak tut (Gauntlet hata verirse ona düş)
+- [ ] 2.8 ~~Piyasa sekmesi~~ Tam ekran ekran yapılmıyor (ADR-026); piyasa tabloları (Emtia, Sepet, Lonca, Krallık) bu işi görüyor
+- [ ] 2.9 Araç detay penceresi: tablolarda hisse adına tıklanınca fiyat grafiği ve temel değer bileşenleri
+- [x] 2.10 Emir paneli: adet girişi, maliyet önizlemesi, onay
+  - Slider'lı miktar penceresi + onay penceresi; satırdaki AL/SAT butonlarından açılıyor (ADR-025).
+- [ ] 2.11 Portföy ve Haberler pencereleri: portföy tablo oldu; Haberler hâlâ metin penceresi, tabloya çevrilecek
+- [x] 2.12 Menü tabanlı arayüzü yedek olarak tut (Gauntlet hata verirse ona düş)
+  - Her tablo penceresi açılamazsa vanilla inquiry'ye düşüyor.
 
 ### 2C. Ayarlar ve yerelleştirme
 - [ ] 2.13 MCM entegrasyonu (isteğe bağlı bağımlılık); MCM yoksa `settings.json`
