@@ -16,6 +16,9 @@ namespace CalradicExchange.Menus
     /// <summary>The player's trade history table (Portfolio.History, schema 6), newest first.</summary>
     public static class TradeHistoryReport
     {
+        /// <summary>Trades listed in the window, newest first. The save keeps more (trading.tradeHistoryLimit).</summary>
+        private const int MaxRows = 100;
+
         public static void Show()
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
@@ -49,7 +52,7 @@ namespace CalradicExchange.Menus
                 footer, Strings.Close.ToString(), close);
 
             bool alternate = false;
-            foreach (TradeRecord t in Enumerable.Reverse(pf.History))
+            foreach (TradeRecord t in Enumerable.Reverse(pf.History).Take(MaxRows))
             {
                 var row = new GridRowVM(Cells(b, t), alternate)
                     .WithColor(6, t.Side == OrderSide.Buy ? TableColors.Down : TableColors.Up);
@@ -87,8 +90,8 @@ namespace CalradicExchange.Menus
             totals.SetTextVariable("TAXES", Fmt.Denars(pf.TotalProfitTaxPaid));
             string text = totals.ToString();
 
-            // Trades before schema 6, or beyond the history limit, are counted but not listed.
-            int missing = pf.TradeCount - pf.History.Count;
+            // Older trades (beyond the window, the saved history limit, or from before schema 6) are counted but not listed.
+            int missing = pf.TradeCount - Math.Min(pf.History.Count, MaxRows);
             if (missing > 0) text += "\n" + Strings.HistoryMissing.SetTextVariable("COUNT", missing);
             return text;
         }
