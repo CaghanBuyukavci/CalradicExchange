@@ -113,7 +113,7 @@ namespace CalradicExchange.Menus
         }
 
         /// <summary>Portfolio tabs; instruments of other classes (none yet) are listed under the first one.</summary>
-        private static readonly InstrumentClass[] PortfolioTabs = { InstrumentClass.Commodity, InstrumentClass.Sector, InstrumentClass.Guild };
+        private static readonly InstrumentClass[] PortfolioTabs = { InstrumentClass.Commodity, InstrumentClass.Sector, InstrumentClass.Guild, InstrumentClass.Kingdom };
 
         /// <summary>The selected portfolio tab, kept while the game runs so a trade from the portfolio comes back to it.</summary>
         private static InstrumentClass _portfolioTab = InstrumentClass.Commodity;
@@ -130,6 +130,7 @@ namespace CalradicExchange.Menus
             {
                 case InstrumentClass.Sector: return Strings.TabBaskets;
                 case InstrumentClass.Guild: return Strings.TabGuilds;
+                case InstrumentClass.Kingdom: return Strings.TabKingdoms;
                 default: return Strings.TabShares;
             }
         }
@@ -140,6 +141,7 @@ namespace CalradicExchange.Menus
             {
                 case InstrumentClass.Sector: return Strings.ColBasket.ToString();
                 case InstrumentClass.Guild: return Strings.ColGuild.ToString();
+                case InstrumentClass.Kingdom: return Strings.ColKingdom.ToString();
                 default: return Strings.ColInstrument.ToString();
             }
         }

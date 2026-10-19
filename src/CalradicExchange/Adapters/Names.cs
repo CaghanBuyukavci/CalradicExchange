@@ -20,6 +20,10 @@ namespace CalradicExchange.Adapters
                 string guild = string.IsNullOrEmpty(def.NameId) ? def.Name : new TextObject("{=" + def.NameId + "}" + def.Name).ToString();
                 return Strings.GuildName.SetTextVariable("TOWN", Settlement(def.TownId)).SetTextVariable("GUILD", guild).ToString();
             }
+            if (def.Class == InstrumentClass.Kingdom)
+            {
+                return Strings.KingdomIndexName.SetTextVariable("KINGDOM", Kingdom(def.KingdomId)).ToString();
+            }
             return string.IsNullOrEmpty(def.NameId)
                 ? def.Name ?? def.Id
                 : new TextObject("{=" + def.NameId + "}" + (def.Name ?? def.Id)).ToString();

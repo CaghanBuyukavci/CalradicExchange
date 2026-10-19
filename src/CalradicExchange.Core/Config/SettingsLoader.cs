@@ -65,6 +65,7 @@ namespace CalradicExchange.Core.Config
             }
 
             if (s.Guilds != null) Range(e, "guilds.profitWindowDays", s.Guilds.ProfitWindowDays, 1, 336);
+            if (s.Kingdoms != null) Range(e, "kingdoms.minListingDays", s.Kingdoms.MinListingDays, 0, 336);
             if (s.Trading == null) e.Add("trading is missing.");
             else
             {

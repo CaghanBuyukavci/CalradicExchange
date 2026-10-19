@@ -135,6 +135,7 @@ namespace CalradicExchange.Behaviors
             ev.Day = NextDay;
             IReadOnlyList<string> affected = _market.ApplyEvent(ev);
             ExchangeLog.Info($"Event {ev} -> {(affected.Count == 0 ? "no instruments" : string.Join(", ", affected))}");
+            if (ev.Type == MarketEventType.KingdomDestroyed) WriteOffFallenKingdoms(ev.Day);
             return affected;
         }
 
@@ -151,6 +152,7 @@ namespace CalradicExchange.Behaviors
             if (summary.Processed)
             {
                 ExchangeLog.Info("Guilds: " + GuildReport.Summary(_state.Market.Guilds));
+                ExchangeLog.Info("Kingdoms: " + KingdomReport(world));
                 ExchangeLog.Info($"Workshops: {_reader.LastMeasured} measured, {_reader.LastUnmeasured} not measured, net profit {_reader.LastNetTotal:0} vs owner income {_reader.LastIncomeTotal:0} (all workshops).");
             }
             if (summary.Processed && !summary.Initialized)
@@ -164,6 +166,7 @@ namespace CalradicExchange.Behaviors
                     ExchangeLog.Error("Guild payouts failed", ex);
                 }
             }
+            if (summary.Processed) WriteOffFallenKingdoms(summary.Day);
             if (summary.Processed && !summary.Initialized) NotifyBigMoves();
             if (summary.Processed && _state.Market.LastTickDay <= MarketDump.AutoDumpDays) MarketDump.Append(this);
             return summary;
@@ -278,11 +281,55 @@ namespace CalradicExchange.Behaviors
             ApplyEvent(ev);
         }
 
+        /// <summary>
+        /// Shares of a fallen kingdom's index are worth nothing (GDD 6.4, ADR-030): the position is closed at zero and
+        /// recorded as a forced sale so the loss shows in the history and the realized profit.
+        /// </summary>
+        private void WriteOffFallenKingdoms(int day)
+        {
+            try
+            {
+                foreach (Position pos in _state.Portfolio.Positions.ToList())
+                {
+                    InstrumentDefinition def = _market.Find(pos.InstrumentId);
+                    PriceState ps = _market.Get(pos.InstrumentId);
+                    if (def?.Class != InstrumentClass.Kingdom || ps == null || !ps.Closed) continue;
+                    int qty = pos.Quantity;
+                    decimal cost = pos.CostBasis;
+                    _state.Portfolio.ForceSell(def.Id, qty, 0, day, _market.Settings.Trading.TradeHistoryLimit);
+                    TextObject msg = Strings.KingdomFallen;
+                    msg.SetTextVariable("KINGDOM", Names.Kingdom(def.KingdomId));
+                    msg.SetTextVariable("QTY", qty);
+                    msg.SetTextVariable("LOSS", Fmt.Denars(cost));
+                    InformationManager.DisplayMessage(new InformationMessage(msg.ToString(), Colors.Red));
+                    ExchangeLog.Info($"Kingdom fallen: {def.Id}, wrote off {qty} shares (cost {cost:0}).");
+                }
+            }
+            catch (Exception ex)
+            {
+                ExchangeLog.Error("Kingdom write-off failed", ex);
+            }
+        }
+
+        /// <summary>One line per listed kingdom index for the daily log: price, fundamental, fiefs, prosperity, wars, sieges.</summary>
+        private string KingdomReport(WorldSnapshot world)
+        {
+            var parts = new List<string>();
+            foreach (InstrumentDefinition def in _market.Kingdoms)
+            {
+                PriceState ps = _market.Get(def.Id);
+                KingdomSnapshot k = world.Kingdoms.Find(x => x.Id == def.KingdomId);
+                string state = k == null ? "fallen" : $"fiefs {k.FiefCount}, prosperity {k.Prosperity:0}, enemies {k.EnemyCount}, sieges {k.FiefsUnderSiege}";
+                parts.Add($"{def.KingdomId} P {ps?.Price:0.0} F {ps?.Fundamental:0.0} ({state})");
+            }
+            return parts.Count == 0 ? "none listed" : string.Join("; ", parts);
+        }
+
         private void NotifyBigMoves()
         {
             var notices = new List<(PriceState Price, InstrumentDefinition Def)>();
             // Guilds only when held: there are about 150 of them.
-            foreach (InstrumentDefinition def in _catalog.Instruments.Concat(_market.Guilds.Where(g => _state.Portfolio.QuantityOf(g.Id) > 0)))
+            foreach (InstrumentDefinition def in _catalog.Instruments.Concat(_market.Kingdoms).Concat(_market.Guilds.Where(g => _state.Portfolio.QuantityOf(g.Id) > 0)))
             {
                 PriceState ps = _market.Get(def.Id);
                 if (ps == null || !ps.HasPrice || ps.Closed) continue;

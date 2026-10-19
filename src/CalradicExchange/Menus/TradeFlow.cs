@@ -25,7 +25,7 @@ namespace CalradicExchange.Menus
     /// </summary>
     public static class TradeFlow
     {
-        /// <summary>Commodity market (InstrumentClass.Commodity) or basket market (InstrumentClass.Sector).</summary>
+        /// <summary>Commodity, basket (InstrumentClass.Sector) or kingdom market.</summary>
         public static void ShowMarket(InstrumentClass cls)
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
@@ -47,21 +47,26 @@ namespace CalradicExchange.Menus
             {
                 description = Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare) + "\n" + description;
             }
+            else if (cls == InstrumentClass.Kingdom)
+            {
+                description = Strings.KingdomMarketDescription + "\n" + description;
+            }
 
             var vm = new ExchangeTableVM(MarketTitle(cls),
                 new[]
                 {
-                    Strings.ColInstrument.ToString(), Strings.ColPrice.ToString(), Strings.ColToday.ToString(),
-                    Strings.ColWeek.ToString(), Strings.ColHeld.ToString(),
+                    (cls == InstrumentClass.Kingdom ? Strings.ColKingdom : Strings.ColInstrument).ToString(), Strings.ColPrice.ToString(),
+                    Strings.ColToday.ToString(), Strings.ColWeek.ToString(), Strings.ColHeld.ToString(),
                 },
                 null, Strings.Close.ToString(), close, description);
 
             string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString(), none = Strings.NoPrice.ToString();
             Action back = () => ShowMarket(cls);
             bool alternate = false;
-            foreach (InstrumentDefinition def in b.Catalog.Instruments.Where(i => i.Class == cls))
+            foreach (InstrumentDefinition def in b.Market.Instruments.Where(i => i.Class == cls))
             {
                 PriceState ps = b.Market.Get(def.Id);
+                if (cls == InstrumentClass.Kingdom && ps != null && ps.Closed) continue; // fallen kingdoms
                 bool priced = ps != null && ps.HasPrice;
                 bool open = priced && !ps.Closed;
                 int qty = b.Portfolio.QuantityOf(def.Id);
@@ -168,14 +173,19 @@ namespace CalradicExchange.Menus
 
         private static string MarketTitle(InstrumentClass cls)
         {
-            return (cls == InstrumentClass.Commodity ? Strings.CommodityMarketTitle : Strings.BasketMarketTitle).ToString();
+            switch (cls)
+            {
+                case InstrumentClass.Commodity: return Strings.CommodityMarketTitle.ToString();
+                case InstrumentClass.Kingdom: return Strings.KingdomMarketTitle.ToString();
+                default: return Strings.BasketMarketTitle.ToString();
+            }
         }
 
         /// <summary>Vanilla fallback when the Gauntlet table cannot be shown (ADR-006): pick an instrument, then buy or sell.</summary>
         private static void ShowMarketFallback(ExchangeCampaignBehavior b, InstrumentClass cls)
         {
             var elements = new List<InquiryElement>();
-            foreach (InstrumentDefinition def in b.Catalog.Instruments.Where(i => i.Class == cls))
+            foreach (InstrumentDefinition def in b.Market.Instruments.Where(i => i.Class == cls))
             {
                 PriceState ps = b.Market.Get(def.Id);
                 if (ps == null || !ps.HasPrice || ps.Closed) continue;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalradicExchange.Core.Config;
 using CalradicExchange.Core.Guilds;
+using CalradicExchange.Core.Kingdoms;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Random;
 
@@ -29,6 +30,11 @@ namespace CalradicExchange.Core.Pricing
         private readonly Dictionary<string, InstrumentDefinition> _guildById = new Dictionary<string, InstrumentDefinition>();
         private readonly Dictionary<string, GuildProfitSeries> _seriesById = new Dictionary<string, GuildProfitSeries>();
 
+        /// <summary>Kingdom indices built from <see cref="MarketState.Kingdoms"/> (PLAN 2.4), ordered by id.</summary>
+        private readonly List<InstrumentDefinition> _kingdomDefs = new List<InstrumentDefinition>();
+        private readonly Dictionary<string, InstrumentDefinition> _kingdomById = new Dictionary<string, InstrumentDefinition>();
+        private readonly Dictionary<string, KingdomRecord> _recordById = new Dictionary<string, KingdomRecord>();
+
         public MarketEngine(InstrumentCatalog catalog, MarketSettings settings, MarketState state, IRandom rng)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
@@ -36,6 +42,7 @@ namespace CalradicExchange.Core.Pricing
             State = state ?? new MarketState();
             _rng = rng ?? throw new ArgumentNullException(nameof(rng));
             RefreshGuilds();
+            RefreshKingdoms();
             SyncPriceStates();
         }
 
@@ -43,16 +50,30 @@ namespace CalradicExchange.Core.Pricing
         public InstrumentCatalog Catalog => _catalog;
         public MarketSettings Settings => _settings;
 
-        /// <summary>Every listed instrument: the catalog in file order, then guilds ordered by id. Order matters for determinism.</summary>
-        public IEnumerable<InstrumentDefinition> Instruments => _catalog.Instruments.Concat(_guildDefs);
+        /// <summary>
+        /// Every listed instrument: the catalog in file order, then guilds, then kingdom indices, both ordered by id.
+        /// Order matters for determinism.
+        /// </summary>
+        public IEnumerable<InstrumentDefinition> Instruments => _catalog.Instruments.Concat(_guildDefs).Concat(_kingdomDefs);
 
         /// <summary>Listed guild instruments (open and closed).</summary>
         public IReadOnlyList<InstrumentDefinition> Guilds => _guildDefs;
 
+        /// <summary>Listed kingdom indices (open and fallen).</summary>
+        public IReadOnlyList<InstrumentDefinition> Kingdoms => _kingdomDefs;
+
         public InstrumentDefinition Find(string instrumentId)
         {
             if (instrumentId == null) return null;
-            return _catalog.Find(instrumentId) ?? (_guildById.TryGetValue(instrumentId, out InstrumentDefinition def) ? def : null);
+            if (_guildById.TryGetValue(instrumentId, out InstrumentDefinition guild)) return guild;
+            if (_kingdomById.TryGetValue(instrumentId, out InstrumentDefinition kingdom)) return kingdom;
+            return _catalog.Find(instrumentId);
+        }
+
+        /// <summary>Record behind a kingdom index; null for other instruments.</summary>
+        public KingdomRecord KingdomRecord(string instrumentId)
+        {
+            return instrumentId != null && _recordById.TryGetValue(instrumentId, out KingdomRecord r) ? r : null;
         }
 
         /// <summary>Profit series behind a guild instrument; null for other instruments.</summary>
@@ -133,7 +154,9 @@ namespace CalradicExchange.Core.Pricing
 
             if (NeedsRebase) Rebuild();
             GuildProfitTracker.Record(State.Guilds, world, _settings.Guilds?.ProfitWindowDays ?? 28);
+            KingdomInstruments.Track(State.Kingdoms, world, KingdomParams);
             RefreshGuilds();
+            RefreshKingdoms();
             SyncPriceStates();
             UpdateBaselines(world);
 
@@ -169,6 +192,11 @@ namespace CalradicExchange.Core.Pricing
                 // Always draw, so one instrument's data gap does not shift the noise of all the others.
                 double eps = _rng.NextGaussian();
                 if (def.Class == InstrumentClass.Guild) UpdateGuildLifecycle(def, ps, summary);
+                if (def.Class == InstrumentClass.Kingdom && !ps.Closed && KingdomRecord(def.Id)?.Eliminated == true)
+                {
+                    CloseAtZero(ps);
+                    summary.ClosedInstruments.Add(def.Id);
+                }
                 if (ps.Closed) continue;
 
                 bool seen = observed.TryGetValue(def.Id, out decimal f);
@@ -240,8 +268,12 @@ namespace CalradicExchange.Core.Pricing
                     GuildProfitSeries series = GuildSeries(def.Id);
                     if (series == null || series.WorkshopCount <= 0 || series.DailyProfit.Count == 0) return null;
                     return GuildInstruments.ObservedValue(series, _settings.Guilds ?? new GuildSettings(), world.Calendar.DaysInYear);
+                case InstrumentClass.Kingdom:
+                    KingdomRecord record = KingdomRecord(def.Id);
+                    KingdomSnapshot k = record == null || record.Eliminated ? null : world.Kingdoms?.Find(x => x.Id == record.KingdomId);
+                    return k == null ? (decimal?)null : KingdomInstruments.ObservedValue(record, k, KingdomParams);
                 default:
-                    return null; // Kingdom and bond fundamentals arrive later.
+                    return null; // Bond fundamentals arrive in Phase 3.
             }
         }
 
@@ -469,18 +501,46 @@ namespace CalradicExchange.Core.Pricing
             }
         }
 
+        private KingdomSettings KingdomParams => _settings.Kingdoms ?? new KingdomSettings();
+
+        /// <summary>A destroyed kingdom's index goes to zero at once and stays closed (GDD 6.4, ADR-030).</summary>
         private void CloseKingdom(string kingdomId, List<string> affected)
         {
             if (kingdomId == null) return;
+            KingdomRecord record = State.Kingdoms.Find(r => r.KingdomId == kingdomId);
+            if (record != null) record.Eliminated = true;
             foreach (InstrumentDefinition def in Instruments)
             {
                 if (def.Class != InstrumentClass.Kingdom || def.KingdomId != kingdomId) continue;
                 PriceState ps = Get(def.Id);
                 if (ps == null || ps.Closed) continue;
-                ps.Closed = true;
-                ps.Price = 0;
-                ps.Fundamental = 0;
+                CloseAtZero(ps);
                 affected.Add(def.Id);
+            }
+        }
+
+        private static void CloseAtZero(PriceState ps)
+        {
+            ps.Closed = true;
+            ps.Price = 0;
+            ps.Fundamental = 0;
+            ps.Shocks.Clear();
+            ps.VolBoosts.Clear();
+        }
+
+        /// <summary>Rebuilds the kingdom index list from the listed records, ordered by id for determinism.</summary>
+        private void RefreshKingdoms()
+        {
+            _kingdomDefs.Clear();
+            _kingdomById.Clear();
+            _recordById.Clear();
+            foreach (KingdomRecord record in State.Kingdoms.Where(r => r.Listed && !string.IsNullOrEmpty(r.KingdomId))
+                .OrderBy(r => KingdomInstruments.IdFor(r.KingdomId), StringComparer.Ordinal))
+            {
+                InstrumentDefinition def = KingdomInstruments.Define(record);
+                _kingdomDefs.Add(def);
+                _kingdomById[def.Id] = def;
+                _recordById[def.Id] = record;
             }
         }
 

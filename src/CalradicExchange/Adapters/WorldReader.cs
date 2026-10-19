@@ -106,7 +106,26 @@ namespace CalradicExchange.Adapters
                     if (FactionManager.IsAtWarAgainstFaction(alive[i], alive[j])) world.ActiveWarPairs++;
                 }
             }
+            foreach (Kingdom k in alive) world.Kingdoms.Add(ReadKingdom(k, alive));
             return world;
+        }
+
+        /// <summary>Prosperity and fiefs (towns and castles), sieges and enemies of one living kingdom (PLAN 2.4).</summary>
+        private static KingdomSnapshot ReadKingdom(Kingdom k, List<Kingdom> alive)
+        {
+            var snap = new KingdomSnapshot { Id = k.StringId };
+            foreach (Town fief in k.Fiefs)
+            {
+                if (fief == null) continue;
+                snap.FiefCount++;
+                snap.Prosperity += Math.Max(0, fief.Prosperity);
+                if (fief.IsUnderSiege) snap.FiefsUnderSiege++;
+            }
+            foreach (Kingdom other in alive)
+            {
+                if (other != k && FactionManager.IsAtWarAgainstFaction(k, other)) snap.EnemyCount++;
+            }
+            return snap;
         }
 
         /// <summary>

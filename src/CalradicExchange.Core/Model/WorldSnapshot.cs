@@ -17,5 +17,8 @@ namespace CalradicExchange.Core.Model
 
         /// <summary>Number of kingdom pairs currently at war with each other.</summary>
         public int ActiveWarPairs { get; set; }
+
+        /// <summary>Living kingdoms (PLAN 2.4). Empty in the simulator and when the reader fails; nothing closes then.</summary>
+        public List<KingdomSnapshot> Kingdoms { get; set; } = new List<KingdomSnapshot>();
     }
 }

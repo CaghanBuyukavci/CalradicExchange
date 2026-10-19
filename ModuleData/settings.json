@@ -70,6 +70,16 @@
     "minValuedDailyProfit": 10,
     "debtRelationPenalty": 2
   },
+  "kingdoms": {
+    "_comment": "Kingdom indices (PLAN 2.4, ADR-030). F = 100 x prosperity/base x (fiefs/base)^fiefExponent x max(warFloor, 1 - warStep x enemies) x max(siegeFloor, 1 - siegeStep x fiefs under siege). Kingdoms founded later wait minListingDays.",
+    "minListingDays": 7,
+    "fiefExponent": 0.5,
+    "prosperityFloor": 100,
+    "warStep": 0.05,
+    "warFloor": 0.7,
+    "siegeStep": 0.08,
+    "siegeFloor": 0.6
+  },
   "limits": {
     "baseTotal": 5000,
     "perClanTier": 15000,

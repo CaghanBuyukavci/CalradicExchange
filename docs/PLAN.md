@@ -123,7 +123,8 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - ADR-029: pay-gün hak edişi, alt sınırlı fiyat, borç ve ilişki cezası. Core testleri var; oyun içi test bekleniyor.
 - [x] 2.3 Lonca listesini dinamik yönet: atölye kaybolursa lonca kapanır, pozisyonlar son fiyattan nakde döner
 - [x] 2.3a Lonca Piyasası tablosu: bulunulan şehrin loncaları (AL/SAT) + başka şehirlerde elde tutulan loncalar (sadece SAT) (ADR-026)
-- [ ] 2.4 Krallık endeksi (§2.4); krallık yok olunca kapanış; Krallık Piyasası tablosu
+- [x] 2.4 Krallık endeksi (§2.4); krallık yok olunca kapanış; Krallık Piyasası tablosu
+  - ADR-030: her şehirde alınır, açığa satış yok, yıkılınca sıfır, oyuncunun krallığı da listelenir. Şema 10. Oyun içi test bekleniyor.
 - [ ] 2.5 Simülatöre yeni araçları ekle, hedefleri yeniden kontrol et (özellikle temettülü al-tut getirisi)
 
 ### 2B. Gauntlet ekranı

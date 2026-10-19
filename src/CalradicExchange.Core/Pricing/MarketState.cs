@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CalradicExchange.Core.Guilds;
+using CalradicExchange.Core.Kingdoms;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Random;
 using Newtonsoft.Json;
@@ -45,5 +46,8 @@ namespace CalradicExchange.Core.Pricing
 
         /// <summary>Daily workshop profit per (town, workshop type), the base of guild shares. Added in schema 7.</summary>
         public List<GuildProfitSeries> Guilds { get; set; } = new List<GuildProfitSeries>();
+
+        /// <summary>Kingdoms behind the kingdom indices (PLAN 2.4). Added in schema 10.</summary>
+        public List<KingdomRecord> Kingdoms { get; set; } = new List<KingdomRecord>();
     }
 }

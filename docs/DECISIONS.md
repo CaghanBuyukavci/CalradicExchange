@@ -258,3 +258,20 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Elde pay varken lonca büyük hareket ederse ekrana bildirim düşer. Elde olmayan loncalar için bildirim yok, çünkü yaklaşık 150 lonca var.
 - **Şema 9:** `portfolio.guildAccruals`, `guildDebts`, `guildIncomeTotal`, `history[].forced` ve `guilds[].lastProfitDay` eklendi. Hepsinin varsayılanı var, bu yüzden geçiş adımı boş.
 
+
+## ADR-030 — Krallık endeksleri (PLAN 2.4)
+
+- **Kullanıcı kararları (2026-10-19):**
+  - Endeksler her şehirde alınıp satılır.
+  - Açığa satış şimdilik yok. Teminat, ödünç ücreti ve zorla kapatma ile birlikte sonra, bütün sınıflara birden eklenecek.
+  - Yıkılan krallığın endeksi sıfırlanır; elde tutulan paylar değersiz kalır.
+  - Bütün krallıklar listelenir, oyuncunun kurduğu krallık da.
+- **Dinamik araçlar:** Loncalar gibi `instruments.json`'da değil. `MarketState.Kingdoms` kayıtlarından kurulur (şema 10). Kimlik: `cx_kingdom_<krallık>`. Fiyat motoru katalog → loncalar → krallıklar sırasıyla işler.
+- **Listeleme:** Takip başladığında yaşayan krallıklar hemen listelenir. Sonradan kurulanlar (isyan, oyuncu) 7 gün (`minListingDays`) bekler.
+- **Temel değer:** ECONOMY_MODEL 2.4 formülü. Refah ve fief sayısı şehirler ve kaleler (`Kingdom.Fiefs`) üzerinden. Taban: krallığın ilk görüldüğü günün değerleri.
+  - Fiefsiz krallık için alt sınırlar var (refah en az 100, fief en az 0,25), böylece endeks pozitif kalır.
+  - Üstüne ADR-022 göreli modeli uygulanır, sınıf olarak bütün krallıklarla. Bütün Calradia'nın birlikte zenginleşmesi endeksleri yükseltmez; krallıklar birbirine göre hareket eder.
+- **Olaylar:** settings.json'daki kurallar zaten vardı: yağma −0,06, el değiştirme kaybeden −0,24 / kazanan +0,15, savaş ilanı iki taraf −0,06 ve oynaklık ×1,5.
+- **Yıkılış:** `KingdomDestroyed` olayı ya da günlük okumada krallığın yaşayanlar arasında olmaması endeksi kapatır (fiyat 0, bir daha açılmaz). Oyun katmanı elde tutulan payları sıfır fiyattan "Zorunlu satış" olarak kapatır; kayıp gerçekleşmiş zarara ve Takas Geçmişim'e yazılır.
+- **Okuyucu hatası koruması:** Hiç krallık içermeyen anlık görüntü (okuma hatası, simülatör) hiçbir şeyi kapatmaz. Simülatör çıktısı bu yüzden değişmedi; 8 hedefin hepsi geçiyor.
+- **Arayüz:** Menüde "Krallık Piyasası" (Emtia/Sepet tablosuyla aynı düzen), portföyde "Krallıklar" sekmesi. Günlük log'a her krallık için fiyat, temel değer, fief, refah, düşman ve kuşatma sayısı yazılır (ayar turu için).

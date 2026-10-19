@@ -38,6 +38,8 @@ namespace CalradicExchange.Menus
                 args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("basket market", () => TradeFlow.ShowMarket(InstrumentClass.Sector)));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_guild_market", Strings.OptGuildMarket,
                 args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("guild market", TradeFlow.ShowGuildMarket));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_kingdom_market", Strings.OptKingdomMarket,
+                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("kingdom market", () => TradeFlow.ShowMarket(InstrumentClass.Kingdom)));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_portfolio", Strings.OptPortfolio,
                 args => Option(args, GameMenuOption.LeaveType.Manage), args => Guard("portfolio", MarketReport.ShowPortfolio));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_news", Strings.OptNews,

@@ -20,6 +20,7 @@ namespace CalradicExchange.Localization
         public const string OptCommodityMarket = "{=cx_opt_commodity_market}Commodity market";
         public const string OptBasketMarket = "{=cx_opt_basket_market}Basket market";
         public const string OptGuildMarket = "{=cx_opt_guild_market}Guild market";
+        public const string OptKingdomMarket = "{=cx_opt_kingdom_market}Kingdom market";
         public const string OptPortfolio = "{=cx_opt_portfolio}Your portfolio";
         public const string OptNews = "{=cx_opt_news}News";
         public const string OptHistory = "{=cx_opt_history}Your trade history";
@@ -60,6 +61,10 @@ namespace CalradicExchange.Localization
         public static TextObject CommodityMarketTitle => new TextObject("{=cx_commodity_market_title}Commodity market");
         public static TextObject BasketMarketTitle => new TextObject("{=cx_basket_market_title}Basket market");
         public static TextObject GuildMarketTitle => new TextObject("{=cx_guild_market_title}Guild market");
+        public static TextObject KingdomMarketTitle => new TextObject("{=cx_kingdom_market_title}Kingdom market");
+        public static TextObject KingdomMarketDescription => new TextObject("{=cx_kingdom_market_desc}Indices of the kingdoms of Calradia. They rise with the prosperity and the fiefs of the kingdom and fall with its wars and sieges. If a kingdom is destroyed, its index is worth nothing.");
+        public static TextObject KingdomIndexName => new TextObject("{=cx_kingdom_index_name}{KINGDOM} index");
+        public static TextObject KingdomFallen => new TextObject("{=cx_kingdom_fallen}{KINGDOM} has fallen. Your {QTY} shares of its index are worthless: {LOSS} denars lost.");
         public static TextObject GuildMarketDescription => new TextObject("{=cx_guild_market_desc}Partnership shares in the workshops of this town. Every 7 days each share brings its part of the guild's profit, or of its loss. Shares of other towns can be sold anywhere.");
         public static TextObject GuildSectionLocal => new TextObject("{=cx_guild_section_local}Guilds of {TOWN}");
         public static TextObject GuildSectionOther => new TextObject("{=cx_guild_section_other}Your shares in other towns");
@@ -93,6 +98,8 @@ namespace CalradicExchange.Localization
         public static TextObject TabShares => new TextObject("{=cx_tab_shares}Shares ({COUNT})");
         public static TextObject TabBaskets => new TextObject("{=cx_tab_baskets}Baskets ({COUNT})");
         public static TextObject TabGuilds => new TextObject("{=cx_tab_guilds}Guilds ({COUNT})");
+        public static TextObject TabKingdoms => new TextObject("{=cx_tab_kingdoms}Kingdoms ({COUNT})");
+        public static TextObject ColKingdom => new TextObject("{=cx_col_kingdom}Kingdom");
         public static TextObject ColBasket => new TextObject("{=cx_col_basket}Basket");
         public static TextObject PortfolioLine => new TextObject("{=cx_portfolio_line}{NAME}: {QTY} shares, bought at {AVG}, now {PRICE}, {PNL}");
         public static TextObject PortfolioTotals => new TextObject("{=cx_portfolio_totals}Value {VALUE} denars, open profit {OPEN}.\nRealized profit {REALIZED}. Fees paid {FEES}, taxes paid {TAXES} denars.");

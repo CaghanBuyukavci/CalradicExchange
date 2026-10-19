@@ -162,5 +162,12 @@
     <string id="cx_tab_baskets" text="Sepetler ({COUNT})" />
     <string id="cx_tab_guilds" text="Loncalar ({COUNT})" />
     <string id="cx_col_basket" text="Sepet" />
+    <string id="cx_opt_kingdom_market" text="Krallık Piyasası" />
+    <string id="cx_kingdom_market_title" text="Krallık Piyasası" />
+    <string id="cx_kingdom_market_desc" text="Calradia krallıklarının endeksleri. Krallığın refahı ve fiefleri arttıkça yükselir, savaşları ve kuşatmaları arttıkça düşer. Krallık yıkılırsa endeksi sıfırlanır." />
+    <string id="cx_kingdom_index_name" text="{KINGDOM} endeksi" />
+    <string id="cx_kingdom_fallen" text="{KINGDOM} yıkıldı. {QTY} endeks payın değersiz kaldı: {LOSS} dinar zarar." />
+    <string id="cx_tab_kingdoms" text="Krallıklar ({COUNT})" />
+    <string id="cx_col_kingdom" text="Krallık" />
   </strings>
 </base>
