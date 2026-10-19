@@ -48,6 +48,9 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // Schema 10 adds market.kingdoms (kingdom indices, PLAN 2.4). Starts empty; the kingdoms alive
                         // on the next tick are listed at once.
                         break;
+                    case 10:
+                        // Schema 11 adds news[].event.heroId / otherHeroId (HeroCaptured news). Null when missing.
+                        break;
                 }
             }
 

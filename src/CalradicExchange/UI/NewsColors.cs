@@ -14,6 +14,7 @@ namespace CalradicExchange.UI
         private static readonly Color Season = Color.ConvertStringToColor("#7CC4E8FF");
         private static readonly Color Famine = Color.ConvertStringToColor("#E8D060FF");
         private static readonly Color Fall = Color.ConvertStringToColor("#B0B0B0FF");
+        private static readonly Color Captive = Color.ConvertStringToColor("#4FD1C5FF");
 
         public static Color For(MarketEventType type)
         {
@@ -28,6 +29,7 @@ namespace CalradicExchange.UI
                 case MarketEventType.SeasonChanged: return Season;
                 case MarketEventType.FamineStarted: return Famine;
                 case MarketEventType.KingdomDestroyed: return Fall;
+                case MarketEventType.HeroCaptured: return Captive;
                 default: return TableColors.Neutral;
             }
         }

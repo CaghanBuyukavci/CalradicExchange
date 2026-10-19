@@ -25,44 +25,48 @@ namespace CalradicExchange.Menus
     /// </summary>
     public static class TradeFlow
     {
-        /// <summary>Commodity, basket (InstrumentClass.Sector) or kingdom market.</summary>
-        public static void ShowMarket(InstrumentClass cls)
+        /// <summary>Commodity, basket (InstrumentClass.Sector) or kingdom market. <paramref name="search"/> refills the commodity search box.</summary>
+        public static void ShowMarket(InstrumentClass cls, string search = "")
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
             ButtonSkins.EnsureApplied();
-            if (TablePopup.Show("CxTradeTable", close => MarketTable(b, cls, close))) return;
+            if (TablePopup.Show("CxTradeTable", close => MarketTable(b, cls, search, close))) return;
             ShowMarketFallback(b, cls);
         }
 
-        private static ExchangeTableVM MarketTable(ExchangeCampaignBehavior b, InstrumentClass cls, Action close)
+        /// <summary>"Gold: ... / Limit left: ..." for the bottom-left corner of the market tables.</summary>
+        public static string GoldAndLimit(ExchangeCampaignBehavior b)
         {
             TraderProfile trader = b.CurrentTrader();
             decimal held = b.Portfolio.MarketValue(id => MarketReport.PriceOf(b, id));
-            TextObject desc = Strings.TradeDescription;
-            desc.SetTextVariable("GOLD", trader.Gold);
-            desc.SetTextVariable("LEFT", Fmt.Denars(Math.Max(0, b.Orders.TotalLimit(trader) - held)));
-            string description = desc.ToString();
-            if (cls == InstrumentClass.Commodity)
-            {
-                description = Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare) + "\n" + description;
-            }
-            else if (cls == InstrumentClass.Kingdom)
-            {
-                description = Strings.KingdomMarketDescription + "\n" + description;
-            }
+            TextObject t = Strings.TradeDescription;
+            t.SetTextVariable("GOLD", trader.Gold);
+            t.SetTextVariable("LEFT", Fmt.Denars(Math.Max(0, b.Orders.TotalLimit(trader) - held)));
+            return t.ToString();
+        }
 
+        private static ExchangeTableVM MarketTable(ExchangeCampaignBehavior b, InstrumentClass cls, string search, Action close)
+        {
+            string description = null;
+            if (cls == InstrumentClass.Commodity) description = Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare).ToString();
+            else if (cls == InstrumentClass.Kingdom) description = Strings.KingdomMarketDescription.ToString();
+
+            TextObject nameHeader = cls == InstrumentClass.Kingdom ? Strings.ColKingdom : cls == InstrumentClass.Sector ? Strings.ColBasket : Strings.ColInstrument;
             var vm = new ExchangeTableVM(MarketTitle(cls),
                 new[]
                 {
-                    (cls == InstrumentClass.Kingdom ? Strings.ColKingdom : Strings.ColInstrument).ToString(), Strings.ColPrice.ToString(),
+                    nameHeader.ToString(), Strings.ColPrice.ToString(),
                     Strings.ColToday.ToString(), Strings.ColWeek.ToString(), Strings.ColHeld.ToString(),
                 },
                 null, Strings.Close.ToString(), close, description);
+            vm.StatusText = GoldAndLimit(b);
 
             string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString(), none = Strings.NoPrice.ToString();
-            Action back = () => ShowMarket(cls);
-            bool alternate = false;
+            Action back = () => ShowMarket(cls, vm.SearchText);
+            vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(back));
+
+            var rows = new List<KeyValuePair<string, TradeRowVM>>();
             foreach (InstrumentDefinition def in b.Market.Instruments.Where(i => i.Class == cls))
             {
                 PriceState ps = b.Market.Get(def.Id);
@@ -72,17 +76,37 @@ namespace CalradicExchange.Menus
                 int qty = b.Portfolio.QuantityOf(def.Id);
                 double day = priced ? ps.ChangeOver(1) : 0, week = priced ? ps.ChangeOver(7) : 0;
                 string id = def.Id;
-                vm.TradeRows.Add(new TradeRowVM(Names.Instrument(def),
+                string name = Names.ShortInstrument(def);
+                rows.Add(new KeyValuePair<string, TradeRowVM>(name, new TradeRowVM(name,
                     priced ? Fmt.Price(ps.Price) : none,
                     priced ? Fmt.Pct(day) : none, TableColors.ForChange(day),
                     priced ? Fmt.Pct(week) : none, TableColors.ForChange(week),
                     qty > 0 ? qty.ToString() : none,
-                    open, open && qty > 0, alternate, buyText, sellText,
+                    open, open && qty > 0, false, buyText, sellText,
                     () => Guard("buy pick", () => AskQuantity(id, OrderSide.Buy, back)),
-                    () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell, back))));
+                    () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell, back)))));
+            }
+
+            Action<string> fill = text => FillRows(vm, rows, text);
+            if (cls == InstrumentClass.Commodity) vm.WithSearch(Strings.SearchPlaceholder.ToString(), search, fill);
+            else fill("");
+            return vm;
+        }
+
+        /// <summary>Shows the rows whose name contains <paramref name="search"/> (case-insensitive), shading every other one.</summary>
+        private static void FillRows(ExchangeTableVM vm, List<KeyValuePair<string, TradeRowVM>> rows, string search)
+        {
+            string s = (search ?? "").Trim();
+            vm.TradeRows.Clear();
+            bool alternate = false;
+            foreach (KeyValuePair<string, TradeRowVM> row in rows)
+            {
+                if (s.Length > 0 && row.Key.IndexOf(s, StringComparison.CurrentCultureIgnoreCase) < 0) continue;
+                row.Value.IsAlternate = alternate;
+                vm.TradeRows.Add(row.Value);
                 alternate = !alternate;
             }
-            return vm;
+            vm.EmptyText = vm.TradeRows.Count == 0 && s.Length > 0 ? Strings.SearchNoMatch.ToString() : "";
         }
 
         /// <summary>
@@ -101,20 +125,17 @@ namespace CalradicExchange.Menus
         private static ExchangeTableVM GuildTable(ExchangeCampaignBehavior b, Action close)
         {
             TraderProfile trader = b.CurrentTrader();
-            decimal heldValue = b.Portfolio.MarketValue(id => MarketReport.PriceOf(b, id));
-            TextObject limits = Strings.TradeDescription;
-            limits.SetTextVariable("GOLD", trader.Gold);
-            limits.SetTextVariable("LEFT", Fmt.Denars(Math.Max(0, b.Orders.TotalLimit(trader) - heldValue)));
-
             var vm = new ExchangeTableVM(Strings.GuildMarketTitle.ToString(),
                 new[]
                 {
                     Strings.ColGuild.ToString(), Strings.ColPrice.ToString(), Strings.ColWeek.ToString(),
                     Strings.ColWeekProfitPerShare.ToString(), Strings.ColHeld.ToString(),
                 },
-                null, Strings.Close.ToString(), close, Strings.GuildMarketDescription + "\n" + limits);
+                null, Strings.Close.ToString(), close, Strings.GuildMarketDescription.ToString());
+            vm.StatusText = GoldAndLimit(b);
 
             Action back = ShowGuildMarket;
+            vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(back));
             vm.TradeRows.Add(new TradeRowVM(Strings.GuildSectionLocal.SetTextVariable("TOWN", Names.Settlement(trader.TownId)).ToString()));
             List<InstrumentDefinition> local = b.Market.Guilds.Where(g => g.TownId == trader.TownId && !(b.Market.Get(g.Id)?.Closed ?? true)).ToList();
             if (local.Count == 0) vm.TradeRows.Add(new TradeRowVM(Strings.GuildNoneHere.ToString()));

@@ -74,7 +74,7 @@ namespace CalradicExchange.Localization
         public static TextObject SellGuildTitle => new TextObject("{=cx_sell_guild_title}Sell partnership shares");
         public static TextObject QuantityBuyGuild => new TextObject("{=cx_qty_buy_guild}A partnership share of {NAME} costs {PRICE} before fees.\nHow many shares? (at most {MAX})");
         public static TextObject QuantitySellGuild => new TextObject("{=cx_qty_sell_guild}You hold {QTY} partnership shares of {NAME}.\nHow many do you sell?");
-        public static TextObject TradeDescription => new TextObject("{=cx_trade_desc}Gold: {GOLD} denars. Limit left: {LEFT} denars.");
+        public static TextObject TradeDescription => new TextObject("{=cx_trade_desc}Gold: {GOLD} denars\nLimit left: {LEFT} denars");
         public static TextObject BtnBuy => new TextObject("{=cx_btn_buy}BUY");
         public static TextObject BtnSell => new TextObject("{=cx_btn_sell}SELL");
         public static TextObject SellTitle => new TextObject("{=cx_sell_title}Sell shares");
@@ -146,6 +146,7 @@ namespace CalradicExchange.Localization
                 case MarketEventType.SeasonChanged: return new TextObject("{=cx_news_cat_season}Season");
                 case MarketEventType.FamineStarted: return new TextObject("{=cx_news_cat_famine}Famine");
                 case MarketEventType.KingdomDestroyed: return new TextObject("{=cx_news_cat_fall}Fall");
+                case MarketEventType.HeroCaptured: return new TextObject("{=cx_news_cat_captive}Captive");
                 default: return new TextObject(type.ToString());
             }
         }
@@ -163,9 +164,18 @@ namespace CalradicExchange.Localization
                 case MarketEventType.SeasonChanged: return new TextObject("{=cx_ev_season}{SEASON} has come.");
                 case MarketEventType.FamineStarted: return new TextObject("{=cx_ev_famine}Famine in {TOWN}.");
                 case MarketEventType.KingdomDestroyed: return new TextObject("{=cx_ev_kingdom_destroyed}{K1} has fallen.");
+                case MarketEventType.HeroCaptured: return new TextObject("{=cx_ev_hero_captured}{HERO} ({K1}) was taken prisoner by {CAPTOR} ({K2}).");
                 default: return new TextObject(type.ToString());
             }
         }
+
+        /// <summary>HeroCaptured when the capturing party had no leader (e.g. a garrison): the faction only.</summary>
+        public static TextObject HeroCapturedByFaction => new TextObject("{=cx_ev_hero_captured_faction}{HERO} ({K1}) was taken prisoner by {K2}.");
+
+        public static TextObject NameWithOwner => new TextObject("{=cx_name_with_owner}{NAME} ({OWNER})");
+        public static TextObject BtnPortfolio => new TextObject("{=cx_btn_portfolio}Portfolio");
+        public static TextObject SearchNoMatch => new TextObject("{=cx_search_no_match}Nothing matches the search.");
+        public static TextObject SearchPlaceholder => new TextObject("{=cx_search_placeholder}Search...");
 
         public static TextObject SeasonName(Season season)
         {

@@ -77,11 +77,22 @@
               </Children>
             </ListPanel>
 
-            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="12" Brush="Popup.Done.Button.NineGrid" Command.Click="ExecuteClose">
+            <!-- Bottom bar: status line (left), Close + optional second button (center) -->
+            <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="260" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginLeft="40" MarginBottom="22" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@StatusText" IsVisible="@HasStatus" />
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="12" StackLayout.LayoutMethod="HorizontalLeftToRight">
               <Children>
-                <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginLeft="50" MarginRight="50" VerticalAlignment="Center" Brush="Popup.Button.Text" Text="@CloseText" />
+                <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" Brush="Popup.Done.Button.NineGrid" Command.Click="ExecuteClose">
+                  <Children>
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginLeft="50" MarginRight="50" VerticalAlignment="Center" Brush="Popup.Button.Text" Text="@CloseText" />
+                  </Children>
+                </ButtonWidget>
+                <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" MarginLeft="16" Brush="Popup.Done.Button.NineGrid" IsVisible="@HasSecondary" Command.Click="ExecuteSecondary">
+                  <Children>
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginLeft="50" MarginRight="50" VerticalAlignment="Center" Brush="Popup.Button.Text" Text="@SecondaryText" />
+                  </Children>
+                </ButtonWidget>
               </Children>
-            </ButtonWidget>
+            </ListPanel>
 
             <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="frame_9" ExtendLeft="18" ExtendTop="18" ExtendRight="18" ExtendBottom="18" IsEnabled="false" />
           </Children>

@@ -117,7 +117,7 @@
     <string id="cx_opt_basket_market" text="Sepet Piyasası" />
     <string id="cx_commodity_market_title" text="Emtia Piyasası" />
     <string id="cx_basket_market_title" text="Sepet Piyasası" />
-    <string id="cx_trade_desc" text="Altın: {GOLD} dinar. Kalan limit: {LEFT} dinar." />
+    <string id="cx_trade_desc" text="Altın: {GOLD} dinar&#10;Kalan limit: {LEFT} dinar" />
     <string id="cx_btn_buy" text="AL" />
     <string id="cx_btn_sell" text="SAT" />
     <string id="cx_col_held" text="Elde" />
@@ -169,5 +169,24 @@
     <string id="cx_kingdom_fallen" text="{KINGDOM} yıkıldı. {QTY} endeks payın değersiz kaldı: {LOSS} dinar zarar." />
     <string id="cx_tab_kingdoms" text="Krallıklar ({COUNT})" />
     <string id="cx_col_kingdom" text="Krallık" />
+    <string id="cx_news_cat_captive" text="Tutsak" />
+    <string id="cx_ev_hero_captured" text="{HERO} ({K1}), {CAPTOR} ({K2}) tarafından tutsak alındı." />
+    <string id="cx_ev_hero_captured_faction" text="{HERO} ({K1}), {K2} tarafından tutsak alındı." />
+    <string id="cx_name_with_owner" text="{NAME} ({OWNER})" />
+    <string id="cx_btn_portfolio" text="Portföy" />
+    <string id="cx_search_placeholder" text="Ara..." />
+    <string id="cx_search_no_match" text="Aramaya uyan hisse yok." />
+    <string id="cx_inst_date_fruit_short" text="Hurma" />
+    <string id="cx_inst_flax_short" text="Keten" />
+    <string id="cx_inst_grain_short" text="Tahıl" />
+    <string id="cx_inst_iron_short" text="Demir cevheri" />
+    <string id="cx_inst_linen_short" text="Keten kumaş" />
+    <string id="cx_inst_oil_short" text="Zeytinyağı" />
+    <string id="cx_inst_olives_short" text="Zeytin" />
+    <string id="cx_inst_salt_short" text="Tuz" />
+    <string id="cx_inst_tools_short" text="Alet" />
+    <string id="cx_inst_velvet_short" text="Kadife" />
+    <string id="cx_inst_wine_short" text="Şarap" />
+    <string id="cx_inst_wool_short" text="Yün" />
   </strings>
 </base>

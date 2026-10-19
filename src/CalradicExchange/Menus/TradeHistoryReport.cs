@@ -50,6 +50,7 @@ namespace CalradicExchange.Menus
                     Strings.ColPrice.ToString(), Strings.ColTotal.ToString(), Strings.ColCosts.ToString(), Strings.ColProfit.ToString(),
                 },
                 footer, Strings.Close.ToString(), close);
+            vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(Show));
 
             bool alternate = false;
             foreach (TradeRecord t in Enumerable.Reverse(pf.History).Take(MaxRows))

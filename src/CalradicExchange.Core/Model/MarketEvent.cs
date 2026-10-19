@@ -11,6 +11,8 @@ namespace CalradicExchange.Core.Model
     /// SettlementCaptured: TownId, KingdomId = loser, OtherKingdomId = winner.
     /// WarDeclared/PeaceMade: KingdomId and OtherKingdomId.
     /// SeasonChanged: Season = the new season.
+    /// HeroCaptured: HeroId = prisoner, KingdomId = the prisoner's kingdom, OtherHeroId = captor (null when the
+    /// capturing party had no leader), OtherKingdomId = the captor's faction.
     /// </summary>
     public sealed class MarketEvent
     {
@@ -24,6 +26,12 @@ namespace CalradicExchange.Core.Model
         public string KingdomId { get; set; }
         public string OtherKingdomId { get; set; }
 
+        /// <summary>HeroCaptured only. Added in schema 11.</summary>
+        public string HeroId { get; set; }
+
+        /// <summary>HeroCaptured only. Added in schema 11.</summary>
+        public string OtherHeroId { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public Season? Season { get; set; }
 
@@ -32,7 +40,7 @@ namespace CalradicExchange.Core.Model
 
         public override string ToString()
         {
-            return $"{Type} day={Day} settlement={SettlementId} item={ItemId} town={TownId} kingdom={KingdomId} other={OtherKingdomId} season={Season}";
+            return $"{Type} day={Day} settlement={SettlementId} item={ItemId} town={TownId} kingdom={KingdomId} other={OtherKingdomId} season={Season}" + (HeroId != null ? $" hero={HeroId} captor={OtherHeroId}" : "");
         }
     }
 }

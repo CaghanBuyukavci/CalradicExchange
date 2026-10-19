@@ -39,12 +39,18 @@ namespace CalradicExchange.Menus
             return debt > 0 ? t + "\n" + Strings.MenuGuildDebt.SetTextVariable("DEBT", Fmt.Denars(debt)) : t.ToString();
         }
 
-        public static void ShowPortfolio()
+        public static void ShowPortfolio() => ShowPortfolio(null);
+
+        /// <summary>
+        /// Portfolio table. <paramref name="back"/> reopens the window it was opened from (a market, the news) when
+        /// the portfolio is closed; null when it was opened from the menu.
+        /// </summary>
+        public static void ShowPortfolio(Action back)
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
             ButtonSkins.EnsureApplied();
-            if (TablePopup.Show("CxPortfolioTable", close => PortfolioTable(b, close))) return;
+            if (TablePopup.Show("CxPortfolioTable", close => PortfolioTable(b, () => { close(); back?.Invoke(); }, back))) return;
             Portfolio pf = b.Portfolio;
 
             var sb = new StringBuilder();
@@ -71,7 +77,7 @@ namespace CalradicExchange.Menus
             Show(Strings.PortfolioTitle.ToString(), sb.ToString());
         }
 
-        private static ExchangeTableVM PortfolioTable(ExchangeCampaignBehavior b, Action close)
+        private static ExchangeTableVM PortfolioTable(ExchangeCampaignBehavior b, Action close, Action back)
         {
             Portfolio pf = b.Portfolio;
             TextObject totals = Strings.PortfolioTotals;
@@ -105,10 +111,10 @@ namespace CalradicExchange.Menus
                 vm.Tabs.Add(new TabVM(TabLabel(cls).SetTextVariable("COUNT", count).ToString(), cls == _portfolioTab, () =>
                 {
                     _portfolioTab = cls;
-                    FillPortfolio(b, vm);
+                    FillPortfolio(b, vm, back);
                 }));
             }
-            FillPortfolio(b, vm);
+            FillPortfolio(b, vm, back);
             return vm;
         }
 
@@ -146,8 +152,8 @@ namespace CalradicExchange.Menus
             }
         }
 
-        /// <summary>Fills the rows of the selected tab.</summary>
-        private static void FillPortfolio(ExchangeCampaignBehavior b, ExchangeTableVM vm)
+        /// <summary>Fills the rows of the selected tab. A trade from a row comes back to the portfolio, which keeps <paramref name="outerBack"/>.</summary>
+        private static void FillPortfolio(ExchangeCampaignBehavior b, ExchangeTableVM vm, Action outerBack)
         {
             Portfolio pf = b.Portfolio;
             for (int i = 0; i < vm.Tabs.Count; i++) vm.Tabs[i].IsSelected = PortfolioTabs[i] == _portfolioTab;
@@ -156,7 +162,7 @@ namespace CalradicExchange.Menus
 
             string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString();
             string here = b.CurrentTrader().TownId;
-            Action back = ShowPortfolio;
+            Action back = () => ShowPortfolio(outerBack);
             bool alternate = false;
             foreach (Position pos in pf.Positions.Where(p => TabOf(b, p.InstrumentId) == _portfolioTab))
             {
@@ -206,6 +212,7 @@ namespace CalradicExchange.Menus
             var vm = new ExchangeTableVM(Strings.NewsTitle.ToString(),
                 new[] { Strings.ColWhen.ToString(), Strings.ColNewsKind.ToString(), Strings.ColNews.ToString() },
                 null, Strings.Close.ToString(), close);
+            vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => ShowPortfolio(ShowNews));
 
             int today = b.NextDay;
             bool alternate = false;
@@ -224,15 +231,26 @@ namespace CalradicExchange.Menus
             return vm;
         }
 
-        /// <summary>One-line description of an event, used by the news list.</summary>
+        /// <summary>
+        /// One-line description of an event, used by the news list. Places carry their current owner in parentheses,
+        /// except in a capture, whose text already names both kingdoms.
+        /// </summary>
         public static string Describe(MarketEvent ev)
         {
+            if (ev.Type == MarketEventType.HeroCaptured && string.IsNullOrEmpty(ev.OtherHeroId))
+            {
+                return Strings.HeroCapturedByFaction.SetTextVariable("HERO", Names.Hero(ev.HeroId))
+                    .SetTextVariable("K1", Names.Faction(ev.KingdomId)).SetTextVariable("K2", Names.Faction(ev.OtherKingdomId)).ToString();
+            }
+            bool owners = ev.Type != MarketEventType.SettlementCaptured;
             TextObject t = Strings.EventText(ev.Type);
-            t.SetTextVariable("VILLAGE", Names.Settlement(ev.SettlementId));
+            t.SetTextVariable("VILLAGE", owners ? Names.SettlementWithOwner(ev.SettlementId) : Names.Settlement(ev.SettlementId));
             t.SetTextVariable("ITEM", Names.Item(ev.ItemId));
-            t.SetTextVariable("TOWN", Names.Settlement(ev.TownId));
-            t.SetTextVariable("K1", Names.Kingdom(ev.KingdomId));
-            t.SetTextVariable("K2", Names.Kingdom(ev.OtherKingdomId));
+            t.SetTextVariable("TOWN", owners ? Names.SettlementWithOwner(ev.TownId) : Names.Settlement(ev.TownId));
+            t.SetTextVariable("K1", ev.Type == MarketEventType.HeroCaptured ? Names.Faction(ev.KingdomId) : Names.Kingdom(ev.KingdomId));
+            t.SetTextVariable("K2", ev.Type == MarketEventType.HeroCaptured ? Names.Faction(ev.OtherKingdomId) : Names.Kingdom(ev.OtherKingdomId));
+            t.SetTextVariable("HERO", Names.Hero(ev.HeroId));
+            t.SetTextVariable("CAPTOR", Names.Hero(ev.OtherHeroId));
             if (ev.Season != null) t.SetTextVariable("SEASON", Fmt.Season(ev.Season.Value));
             return t.ToString();
         }

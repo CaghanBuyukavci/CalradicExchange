@@ -5,7 +5,7 @@
   "maxDailyLogReturn": 0.25,
   "maxAbsShock": 1.0,
   "historyDays": 112,
-  "newsKeep": 30,
+  "newsKeep": 20,
   "famineCooldownDays": 21,
   "shockBaselineHalfLifeDays": 42,
   "_economyHelp": "ADR-022: F = anchor x exp(E). E = decaying sum of the item's daily town-price move minus the median move of its class, times economyWeight, clamped to economyMaxAbs. The anchor drifts to the town price with anchorHalfLifeDays.",
@@ -104,8 +104,9 @@
       },
       {
         "target": "kingdomIndex:eventKingdom",
-        "impulse": -0.06,
-        "halfLifeDays": 10
+        "impulse": -0.03,
+        "halfLifeDays": 10,
+        "maxStack": 3
       },
       {
         "target": "townBond:eventTown",
@@ -209,6 +210,7 @@
         "halfLifeDays": 14
       }
     ],
-    "KingdomDestroyed": []
+    "KingdomDestroyed": [],
+    "HeroCaptured": []
   }
 }

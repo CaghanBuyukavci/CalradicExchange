@@ -12,5 +12,8 @@ namespace CalradicExchange.Core.Model
         SeasonChanged,
         FamineStarted,
         KingdomDestroyed,
+
+        /// <summary>A kingdom lord was taken prisoner. News only; no shock rules by default.</summary>
+        HeroCaptured,
     }
 }

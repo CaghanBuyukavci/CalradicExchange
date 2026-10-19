@@ -118,6 +118,36 @@ namespace CalradicExchange.Core.Tests
         }
 
         [Fact]
+        public void Raids_StackOnTheKingdomIndex_OnlyUpToMaxStack()
+        {
+            MarketEngine engine = Engine();
+            engine.Tick(World(1));
+            for (int i = 0; i < 10; i++)
+            {
+                engine.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 2, SettlementId = "v" + i, ItemId = "grain", TownId = "town_A", KingdomId = "k1" });
+            }
+            double live = engine.Get(K1).Shocks.Where(c => c.Source == "VillageLooted:kingdomIndex:eventKingdom").Sum(c => c.Value);
+            Assert.Equal(-0.09, live, 6); // 3 x -0.03
+        }
+
+        [Fact]
+        public void HeroCaptured_IsNewsOnly_AndNewsKeepsTheNewest20()
+        {
+            MarketEngine engine = Engine();
+            engine.Tick(World(1));
+            IReadOnlyList<string> affected = engine.ApplyEvent(new MarketEvent
+            {
+                Type = MarketEventType.HeroCaptured, Day = 2, HeroId = "lord_1", KingdomId = "k1", OtherHeroId = "lord_2", OtherKingdomId = "k2",
+            });
+            Assert.Empty(affected);
+            Assert.Equal("lord_1", engine.State.News.Last().Event.HeroId);
+
+            for (int i = 0; i < 30; i++) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.HeroCaptured, Day = 3 + i, HeroId = "h" + i });
+            Assert.Equal(20, engine.State.News.Count);
+            Assert.Equal("h29", engine.State.News.Last().Event.HeroId);
+        }
+
+        [Fact]
         public void EmptyKingdomList_ChangesNothing()
         {
             var state = new MarketState();

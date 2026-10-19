@@ -8,6 +8,7 @@ namespace CalradicExchange.UI
     {
         private readonly Action _onBuy;
         private readonly Action _onSell;
+        private bool _isAlternate;
 
         /// <summary>A section header row (e.g. "Your shares in other towns").</summary>
         public TradeRowVM(string sectionText)
@@ -32,7 +33,7 @@ namespace CalradicExchange.UI
             Held = held;
             CanBuy = canBuy;
             CanSell = canSell;
-            IsAlternate = alternate;
+            _isAlternate = alternate;
             _onBuy = onBuy;
             _onSell = onSell;
         }
@@ -52,7 +53,18 @@ namespace CalradicExchange.UI
         /// <summary>The Sell button is shown only for instruments the player holds.</summary>
         [DataSourceProperty] public bool CanSell { get; }
 
-        [DataSourceProperty] public bool IsAlternate { get; }
+        /// <summary>Settable so the shading can follow the rows left after a search.</summary>
+        [DataSourceProperty]
+        public bool IsAlternate
+        {
+            get => _isAlternate;
+            set
+            {
+                if (_isAlternate == value) return;
+                _isAlternate = value;
+                OnPropertyChanged();
+            }
+        }
         [DataSourceProperty] public string BuyText { get; }
         [DataSourceProperty] public string SellText { get; }
 
