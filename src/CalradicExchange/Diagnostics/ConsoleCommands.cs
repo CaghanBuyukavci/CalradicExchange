@@ -180,6 +180,29 @@ namespace CalradicExchange.Diagnostics
         }
 
         /// <summary>
+        /// Test helper for guild payouts (ADR-027): optionally books a loss on the first held guild, then runs the
+        /// weekly payout now. Usage: exchange.guild_settle [loss in denars].
+        /// </summary>
+        [CommandLineFunctionality.CommandLineArgumentFunction("guild_settle", Group)]
+        public static string GuildSettle(List<string> args)
+        {
+            return RunReady("guild_settle", args, b =>
+            {
+                int loss = args != null && args.Count > 0 && int.TryParse(args[0], out int n) ? Math.Abs(n) : 0;
+                if (loss > 0)
+                {
+                    Position held = b.Portfolio.Positions.FirstOrDefault(p => b.Market.Find(p.InstrumentId)?.Class == InstrumentClass.Guild);
+                    if (held == null) return "Hold some guild partnership shares first.";
+                    b.Portfolio.GuildAccruals.TryGetValue(held.InstrumentId, out decimal acc);
+                    b.Portfolio.GuildAccruals[held.InstrumentId] = acc - loss;
+                }
+                string pending = string.Join(", ", b.Portfolio.GuildAccruals.Select(kv => $"{kv.Key} {kv.Value:0.##}"));
+                b.GuildPayouts.Settle(b.State.Market.LastTickDay);
+                return $"Settled. Accruals were: {(pending.Length > 0 ? pending : "none")}. Debt now {b.Portfolio.TotalGuildDebt:0}, gold {Hero.MainHero.Gold}.";
+            });
+        }
+
+        /// <summary>
         /// Lists the most profitable guilds (town, workshop type) by average daily profit and writes all of them to
         /// Logs/guilds_day{N}.csv. Usage: exchange.dump_guilds [count, default 25].
         /// </summary>

@@ -43,6 +43,8 @@ namespace CalradicExchange.Behaviors
         private MarketEngine _market;
         private OrderEngine _orders;
         private GuildPayouts _guildPayouts;
+
+        public GuildPayouts GuildPayouts => _guildPayouts;
         private WorldReader _reader;
 
         public static ExchangeCampaignBehavior Current => Campaign.Current?.GetCampaignBehavior<ExchangeCampaignBehavior>();

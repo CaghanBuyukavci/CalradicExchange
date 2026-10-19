@@ -61,7 +61,8 @@ namespace CalradicExchange.Behaviors
             ExchangeLog.Info($"Guild closed: {id}, bought back {qty} shares at {ps.Price} for {gold}.");
         }
 
-        private void Settle(int day)
+        /// <summary>Runs the weekly payout now (console exchange.guild_settle). Also used on payout days.</summary>
+        public void Settle(int day)
         {
             Portfolio pf = _b.Portfolio;
             if (pf.GuildAccruals.Count == 0 && pf.GuildDebts.Count == 0) return;
