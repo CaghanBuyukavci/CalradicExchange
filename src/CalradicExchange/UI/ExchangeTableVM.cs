@@ -4,7 +4,7 @@ using TaleWorlds.Library;
 namespace CalradicExchange.UI
 {
     /// <summary>
-    /// Data source of the table popups (GUI/Prefabs/CxMarketTable.xml, CxPortfolioTable.xml, CxTradeTable.xml,
+    /// Data source of the table popups (GUI/Prefabs/CxPortfolioTable.xml, CxTradeTable.xml,
     /// CxHistoryTable.xml). Column headers are generic slots H1..H8 so all tables share one view model.
     /// </summary>
     public sealed class ExchangeTableVM : ViewModel
@@ -36,7 +36,6 @@ namespace CalradicExchange.UI
         [DataSourceProperty] public string Footer { get; }
         [DataSourceProperty] public bool HasFooter => Footer.Length > 0;
         [DataSourceProperty] public string CloseText { get; }
-        [DataSourceProperty] public MBBindingList<MarketRowVM> MarketRows { get; } = new MBBindingList<MarketRowVM>();
         [DataSourceProperty] public MBBindingList<PortfolioRowVM> PortfolioRows { get; } = new MBBindingList<PortfolioRowVM>();
         [DataSourceProperty] public MBBindingList<GridRowVM> Rows { get; } = new MBBindingList<GridRowVM>();
         [DataSourceProperty] public MBBindingList<TradeRowVM> TradeRows { get; } = new MBBindingList<TradeRowVM>();

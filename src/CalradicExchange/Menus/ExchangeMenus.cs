@@ -32,8 +32,6 @@ namespace CalradicExchange.Menus
                 OnVisitCondition, args => Guard("visit", () => GameMenu.SwitchToMenu(ExchangeMenuId)), isLeave: false, index: VisitOptionIndex);
 
             starter.AddGameMenu(ExchangeMenuId, "{=!}{" + MenuTextVariable + "}", OnExchangeInit, GameMenu.MenuOverlayType.SettlementWithBoth);
-            starter.AddGameMenuOption(ExchangeMenuId, "cx_market", Strings.OptMarket,
-                args => Option(args, GameMenuOption.LeaveType.Submenu), args => Guard("market", MarketReport.ShowMarket));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_commodity_market", Strings.OptCommodityMarket,
                 args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("commodity market", () => TradeFlow.ShowMarket(InstrumentClass.Commodity)));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_basket_market", Strings.OptBasketMarket,

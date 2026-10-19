@@ -14,7 +14,7 @@ using TaleWorlds.Localization;
 
 namespace CalradicExchange.Menus
 {
-    /// <summary>Builds the read-only texts: menu summary, market list, portfolio and news (PLAN 1.18).</summary>
+    /// <summary>Builds the read-only texts: menu summary, portfolio and news (PLAN 1.18). Prices are in the market tables (TradeFlow).</summary>
     public static class MarketReport
     {
         public static string MenuText()
@@ -36,21 +36,6 @@ namespace CalradicExchange.Menus
             t.SetTextVariable("FEE", Fmt.Pct(b.Orders.CommissionRate(trader.TradeSkill)).TrimStart('+'));
             t.SetTextVariable("TAX", Fmt.Pct(b.Market.Settings.Trading.ProfitTaxRate).TrimStart('+'));
             return t.ToString();
-        }
-
-        public static void ShowMarket()
-        {
-            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
-            if (b == null || !b.IsReady) return;
-            if (TablePopup.Show("CxMarketTable", close => MarketTable(b, close))) return;
-
-            var sb = new StringBuilder();
-            sb.AppendLine(Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare).ToString());
-            AppendClass(sb, b, InstrumentClass.Commodity);
-            sb.AppendLine(" ");
-            sb.AppendLine(Strings.HeaderSectors.ToString());
-            AppendClass(sb, b, InstrumentClass.Sector);
-            Show(Strings.MarketTitle.ToString(), sb.ToString());
         }
 
         public static void ShowPortfolio()
@@ -82,40 +67,6 @@ namespace CalradicExchange.Menus
             totals.SetTextVariable("TAXES", Fmt.Denars(pf.TotalProfitTaxPaid));
             sb.AppendLine(totals.ToString());
             Show(Strings.PortfolioTitle.ToString(), sb.ToString());
-        }
-
-        private static ExchangeTableVM MarketTable(ExchangeCampaignBehavior b, Action close)
-        {
-            var vm = new ExchangeTableVM(Strings.MarketTitle.ToString(),
-                new[] { Strings.ColInstrument.ToString(), Strings.ColPrice.ToString(), Strings.ColToday.ToString(), Strings.ColWeek.ToString() },
-                null, Strings.Close.ToString(), close);
-
-            vm.MarketRows.Add(MarketRowVM.Section(Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare).ToString()));
-            AddMarketRows(vm, b, InstrumentClass.Commodity);
-            vm.MarketRows.Add(MarketRowVM.Section(Strings.HeaderSectors.ToString()));
-            AddMarketRows(vm, b, InstrumentClass.Sector);
-            return vm;
-        }
-
-        private static void AddMarketRows(ExchangeTableVM vm, ExchangeCampaignBehavior b, InstrumentClass cls)
-        {
-            bool alternate = false;
-            foreach (InstrumentDefinition def in b.Catalog.Instruments.Where(i => i.Class == cls))
-            {
-                PriceState ps = b.Market.Get(def.Id);
-                string none = Strings.NoPrice.ToString();
-                if (ps == null || !ps.HasPrice)
-                {
-                    vm.MarketRows.Add(MarketRowVM.Instrument(Names.Instrument(def), none, none, TableColors.Neutral, none, TableColors.Neutral, alternate));
-                }
-                else
-                {
-                    double day = ps.ChangeOver(1), week = ps.ChangeOver(7);
-                    vm.MarketRows.Add(MarketRowVM.Instrument(Names.Instrument(def), Fmt.Price(ps.Price),
-                        Fmt.Pct(day), TableColors.ForChange(day), Fmt.Pct(week), TableColors.ForChange(week), alternate));
-                }
-                alternate = !alternate;
-            }
         }
 
         private static ExchangeTableVM PortfolioTable(ExchangeCampaignBehavior b, Action close)
@@ -188,25 +139,6 @@ namespace CalradicExchange.Menus
         {
             PriceState ps = b.Market.Get(id);
             return ps != null && ps.HasPrice ? ps.Price : 0;
-        }
-
-        private static void AppendClass(StringBuilder sb, ExchangeCampaignBehavior b, InstrumentClass cls)
-        {
-            foreach (InstrumentDefinition def in b.Catalog.Instruments.Where(i => i.Class == cls))
-            {
-                PriceState ps = b.Market.Get(def.Id);
-                if (ps == null || !ps.HasPrice)
-                {
-                    sb.AppendLine(Strings.NoPriceYet.SetTextVariable("NAME", Names.Instrument(def)).ToString());
-                    continue;
-                }
-                TextObject line = Strings.MarketLine;
-                line.SetTextVariable("NAME", Names.Instrument(def));
-                line.SetTextVariable("PRICE", Fmt.Price(ps.Price));
-                line.SetTextVariable("DAY", Fmt.Pct(ps.ChangeOver(1)));
-                line.SetTextVariable("WEEK", Fmt.Pct(ps.ChangeOver(7)));
-                sb.AppendLine(line.ToString());
-            }
         }
 
         private static void Show(string title, string text)

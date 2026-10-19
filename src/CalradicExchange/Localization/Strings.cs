@@ -17,7 +17,6 @@ namespace CalradicExchange.Localization
         // Exchange menu
         public static TextObject ExchangeMenuText => new TextObject("{=cx_menu_exchange_text}Money changers sit behind their tables in the back room of the inn, calling out prices for shares and baskets.\n \nYour holdings: {VALUE} denars ({PNL}).\nInvestment limit used: {USED} / {LIMIT} denars.\nBroker's fee: {FEE}. Tax on profit: {TAX}.");
         public static TextObject ExchangeClosedText => new TextObject("{=cx_menu_exchange_closed}The exchange is closed today. ({REASON})");
-        public const string OptMarket = "{=cx_opt_market}Look at the market";
         public const string OptCommodityMarket = "{=cx_opt_commodity_market}Commodity market";
         public const string OptBasketMarket = "{=cx_opt_basket_market}Basket market";
         public const string OptPortfolio = "{=cx_opt_portfolio}Your portfolio";
@@ -34,10 +33,7 @@ namespace CalradicExchange.Localization
         public static TextObject Continue => new TextObject("{=cx_btn_continue}Continue");
 
         // Market report
-        public static TextObject MarketTitle => new TextObject("{=cx_market_title}Market prices");
         public static TextObject HeaderCommodities => new TextObject("{=cx_hdr_commodities}Commodity shares (1 share = {UNITS} units)");
-        public static TextObject HeaderSectors => new TextObject("{=cx_hdr_sectors}Baskets");
-        public static TextObject MarketLine => new TextObject("{=cx_line_market}{NAME}: {PRICE}   today {DAY}   7 days {WEEK}");
         // Table column headers
         public static TextObject ColInstrument => new TextObject("{=cx_col_instrument}Instrument");
         public static TextObject ColPrice => new TextObject("{=cx_col_price}Price");
@@ -55,7 +51,6 @@ namespace CalradicExchange.Localization
         public static TextObject ColCosts => new TextObject("{=cx_col_costs}Fees");
         public static TextObject NoPrice => new TextObject("{=cx_no_price_short}-");
 
-        public static TextObject NoPriceYet => new TextObject("{=cx_no_price}{NAME}: no price yet");
 
         // Buy / sell flow
         public static TextObject BuyTitle => new TextObject("{=cx_buy_title}Buy shares");

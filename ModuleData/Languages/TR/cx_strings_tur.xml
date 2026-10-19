@@ -46,7 +46,6 @@
     <string id="cx_guild_wood" text="Marangozlar loncası" />
     <string id="cx_guild_wool_weavery" text="Yün dokumacıları loncası" />
     <string id="cx_hdr_commodities" text="Emtia hisseleri (1 hisse = {UNITS} birim)" />
-    <string id="cx_hdr_sectors" text="Sepetler" />
     <string id="cx_inst_date_fruit" text="Hurma hissesi" />
     <string id="cx_inst_flax" text="Keten hissesi" />
     <string id="cx_inst_grain" text="Tahıl hissesi" />
@@ -59,8 +58,6 @@
     <string id="cx_inst_velvet" text="Kadife hissesi" />
     <string id="cx_inst_wine" text="Şarap hissesi" />
     <string id="cx_inst_wool" text="Yün hissesi" />
-    <string id="cx_line_market" text="{NAME}: {PRICE}   bugün {DAY}   7 gün {WEEK}" />
-    <string id="cx_market_title" text="Piyasa fiyatları" />
     <string id="cx_menu_exchange_closed" text="Borsa bugün kapalı. ({REASON})" />
     <string id="cx_menu_exchange_text" text="Hanın arka odasında sarraflar masalarının başında oturmuş, hisseler ve sepetler için fiyat bağırıyor.&#10; &#10;Portföyün: {VALUE} dinar ({PNL}).&#10;Kullanılan yatırım limiti: {USED} / {LIMIT} dinar.&#10;Komisyon: {FEE}. Kâr vergisi: {TAX}." />
     <string id="cx_menu_visit_exchange" text="Borsaya git" />
@@ -73,9 +70,7 @@
     <string id="cx_news_line" text="{WHEN}: {TEXT}" />
     <string id="cx_news_title" text="Borsadaki haberler" />
     <string id="cx_news_today" text="Bugün" />
-    <string id="cx_no_price" text="{NAME}: henüz fiyat yok" />
     <string id="cx_opt_leave" text="Ayrıl" />
-    <string id="cx_opt_market" text="Piyasaya bak" />
     <string id="cx_opt_news" text="Haberler" />
     <string id="cx_opt_portfolio" text="Portföyün" />
     <string id="cx_portfolio_empty" text="Elinde hiç hisse yok." />
