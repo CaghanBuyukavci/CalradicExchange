@@ -36,6 +36,17 @@ namespace CalradicExchange.Localization
             return t.ToString();
         }
 
+        /// <summary>Unsigned share of a fraction, e.g. 0.083 -> "8.3%" (EN) or "%8,3" (TR); whole percents from 10%.</summary>
+        public static string Share(double fraction)
+        {
+            double pct = Math.Abs(fraction * 100);
+            string abs = pct.ToString(pct >= 10 ? "0" : "0.0", CultureInfo.InvariantCulture).Replace(".", Strings.DecimalSeparator.ToString());
+            TextObject t = Strings.PercentFormat;
+            t.SetTextVariable("SIGN", "");
+            t.SetTextVariable("ABS", abs);
+            return t.ToString();
+        }
+
         /// <summary>Signed whole denars, e.g. "+120" or "-35".</summary>
         public static string SignedDenars(decimal value)
         {

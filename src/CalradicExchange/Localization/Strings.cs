@@ -145,6 +145,7 @@ namespace CalradicExchange.Localization
         public static TextObject NewsToday => new TextObject("{=cx_news_today}Today");
         public static TextObject NewsDaysAgo => new TextObject("{=cx_news_days_ago}{DAYS} days ago");
         public static TextObject NewsLine => new TextObject("{=cx_news_line}{WHEN}: {TEXT}");
+        public static TextObject NewsMessage => new TextObject("{=cx_news_message}{KIND}: {TEXT}");
         public static TextObject ColWhen => new TextObject("{=cx_col_when}When");
         public static TextObject ColNewsKind => new TextObject("{=cx_col_news_kind}Kind");
         public static TextObject ColNews => new TextObject("{=cx_col_news}News");
@@ -169,6 +170,8 @@ namespace CalradicExchange.Localization
                 case MarketEventType.WarEnded: return new TextObject("{=cx_news_cat_war_end}War's end");
                 case MarketEventType.ClanChangedKingdom: return new TextObject("{=cx_news_cat_clan}Clan");
                 case MarketEventType.WhaleTrade: return new TextObject("{=cx_news_cat_whale}Whale");
+                case MarketEventType.MarketNews: return new TextObject("{=cx_news_cat_market}Market");
+                case MarketEventType.MarketRumor: return new TextObject("{=cx_news_cat_rumor}Rumor");
                 default: return new TextObject(type.ToString());
             }
         }
@@ -193,6 +196,9 @@ namespace CalradicExchange.Localization
             }
         }
 
+        /// <summary>A raid with the village's share of world production (ADR-040).</summary>
+        public static TextObject VillageLootedShare => new TextObject("{=cx_ev_village_looted_share}{VILLAGE} was raided: world {ITEM} output is down {SHARE}.");
+
         public static TextObject RulerDied => new TextObject("{=cx_ev_ruler_died}{HERO}, ruler of {K1}, has died{CAUSE}.");
         public static TextObject ClanLeaderDied => new TextObject("{=cx_ev_clan_leader_died}{HERO}, clan leader of {K1}, has died{CAUSE}.");
 
@@ -208,6 +214,31 @@ namespace CalradicExchange.Localization
                 case "Murdered": return new TextObject("{=cx_cause_murdered}, murdered");
                 case "DiedInLabor": return new TextObject("{=cx_cause_labor} in childbirth");
                 default: return TextObject.GetEmpty();
+            }
+        }
+
+        /// <summary>Text of a piece of market news or its rumor, by template id (ADR-040).</summary>
+        public static TextObject MarketNewsText(string templateId, bool rumor)
+        {
+            switch (templateId)
+            {
+                case "mine_collapse": return rumor ? new TextObject("{=cx_mrumor_mine_collapse}Talk in the taverns of a mine collapse that would stop {ITEM} output.") : new TextObject("{=cx_mnews_mine_collapse}A mine collapsed: {ITEM} output will be short for weeks.");
+                case "new_vein": return rumor ? new TextObject("{=cx_mrumor_new_vein}Miners are said to have found a new {ITEM} vein.") : new TextObject("{=cx_mnews_new_vein}A rich new vein was found: {ITEM} will be plentiful.");
+                case "blight": return rumor ? new TextObject("{=cx_mrumor_blight}Talk of a blight in the fields that threatens the {ITEM} harvest.") : new TextObject("{=cx_mnews_blight}Blight in the fields: the {ITEM} harvest is badly hit.");
+                case "bumper_harvest": return rumor ? new TextObject("{=cx_mrumor_bumper_harvest}Farmers say this year's {ITEM} harvest will be a rich one.") : new TextObject("{=cx_mnews_bumper_harvest}A bumper harvest: {ITEM} floods the markets.");
+                case "livestock_plague": return rumor ? new TextObject("{=cx_mrumor_livestock_plague}Talk of plague among the herds; {ITEM} may grow scarce.") : new TextObject("{=cx_mnews_livestock_plague}Plague among the herds: {ITEM} supply has fallen hard.");
+                case "army_order": return rumor ? new TextObject("{=cx_mrumor_army_order}Talk of the armies preparing a big {ITEM} order.") : new TextObject("{=cx_mnews_army_order}The armies placed a big order: {ITEM} demand has soared.");
+                case "fashion_craze": return rumor ? new TextObject("{=cx_mrumor_fashion_craze}Nobles are said to have taken a fancy to {ITEM}.") : new TextObject("{=cx_mnews_fashion_craze}A new fashion at court: {ITEM} sells as fast as it arrives.");
+                case "fashion_fades": return rumor ? new TextObject("{=cx_mrumor_fashion_fades}Talk at court that {ITEM} is going out of fashion.") : new TextObject("{=cx_mnews_fashion_fades}The fashion has passed: {ITEM} demand collapsed.");
+                case "storm_at_sea": return rumor ? new TextObject("{=cx_mrumor_storm_at_sea}Talk of a great storm at sea delaying the {ITEM} cargoes.") : new TextObject("{=cx_mnews_storm_at_sea}A storm struck the fleet: {ITEM} cargoes were lost.");
+                case "festival": return rumor ? new TextObject("{=cx_mrumor_festival}Talk of a great festival soon; {ITEM} demand would rise.") : new TextObject("{=cx_mnews_festival}A great festival was proclaimed: {ITEM} demand is up.");
+                case "merchant_hoard": return rumor ? new TextObject("{=cx_mrumor_merchant_hoard}A guild is said to be buying up {ITEM} in secret.") : new TextObject("{=cx_mnews_merchant_hoard}A merchant guild is hoarding {ITEM}: the markets are bare.");
+                case "warehouse_dump": return rumor ? new TextObject("{=cx_mrumor_warehouse_dump}Talk of a merchant about to sell his whole {ITEM} stock.") : new TextObject("{=cx_mnews_warehouse_dump}A great warehouse was emptied: the markets are flooded with {ITEM}.");
+                case "herds_thrive": return rumor ? new TextObject("{=cx_mrumor_herds_thrive}Herders say the herds grew well this year; {ITEM} would be plentiful.") : new TextObject("{=cx_mnews_herds_thrive}The herds have thrived: {ITEM} is plentiful.");
+                case "army_disbanded": return rumor ? new TextObject("{=cx_mrumor_army_disbanded}Talk of the armies cancelling their {ITEM} orders.") : new TextObject("{=cx_mnews_army_disbanded}Armies were disbanded: {ITEM} orders were cancelled.");
+                case "big_catch": return rumor ? new TextObject("{=cx_mrumor_big_catch}In the ports they say {ITEM} cargoes will be plentiful this season.") : new TextObject("{=cx_mnews_big_catch}Calm seas and rich catches: {ITEM} cargoes are plentiful.");
+                case "trade_route": return rumor ? new TextObject("{=cx_mrumor_trade_route}Talk of a new trade route that would make {ITEM} cheaper.") : new TextObject("{=cx_mnews_trade_route}A new trade route opened: {ITEM} is getting cheaper.");
+                default: return rumor ? new TextObject("{=cx_mrumor_default}Talk in the taverns that {ITEM} prices will move.") : new TextObject("{=cx_mnews_default}News moves the {ITEM} market.");
             }
         }
 

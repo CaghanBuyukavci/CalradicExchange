@@ -136,7 +136,7 @@ namespace CalradicExchange.Core.Tests
             for (int d = 1; d <= 30; d++)
             {
                 if (d == 5) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.SiegeStarted, Day = d, TownId = "town_B", KingdomId = "k1" });
-                if (d == 28) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = d, ItemId = "grain", TownId = "town_A", SettlementId = "village_A1" });
+                if (d == 28) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = d, ItemId = "grain", TownId = "town_A", SettlementId = "village_A1" });
                 if (d == 29) orders.Execute("cx_grain", OrderSide.Buy, 10, new TraderProfile(100000, 3, 50), state.Portfolio, d);
 
                 WorldSnapshot w = TestData.World(d, d < 20 ? Season.Spring : Season.Summer);

@@ -49,5 +49,8 @@ namespace CalradicExchange.Core.Pricing
 
         /// <summary>Kingdoms behind the kingdom indices (PLAN 2.4). Added in schema 10.</summary>
         public List<KingdomRecord> Kingdoms { get; set; } = new List<KingdomRecord>();
+
+        /// <summary>Market news announced by a rumor, waiting for its day (ADR-040). Added in schema 15.</summary>
+        public List<ScheduledMarketNews> ScheduledNews { get; set; } = new List<ScheduledMarketNews>();
     }
 }

@@ -32,6 +32,14 @@ namespace CalradicExchange.Core.Config
         [JsonProperty("townShareMultiplier")] public double TownShareMultiplier { get; set; } = 1.0;
 
         /// <summary>
+        /// Multiply the impulse by the event's item share (the raided village's share of world production of its
+        /// product) x <see cref="ItemShareMultiplier"/> (ADR-040). Events without a share get no impulse.
+        /// </summary>
+        [JsonProperty("scaleByItemShare")] public bool ScaleByItemShare { get; set; }
+
+        [JsonProperty("itemShareMultiplier")] public double ItemShareMultiplier { get; set; } = 1.0;
+
+        /// <summary>
         /// When above 0, live components of this rule on one instrument never add up to more than
         /// impulse x maxStack: repeated news of the same kind is worth less (ADR-022, self-raid manipulation cap).
         /// </summary>

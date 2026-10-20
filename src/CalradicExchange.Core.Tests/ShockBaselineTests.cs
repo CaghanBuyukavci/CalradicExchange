@@ -13,13 +13,14 @@ namespace CalradicExchange.Core.Tests
         {
             MarketSettings s = TestData.NoNoiseSettings();
             s.ShockBaselineHalfLifeDays = halfLife;
+            s.Classes[InstrumentClass.Commodity].ShockBaseline = true; // off for commodities by default (ADR-040)
             var e = new MarketEngine(TestData.Catalog(), s, new MarketState(), new XorShift128Plus(1));
             e.Tick(TestData.World(1));
             return e;
         }
 
         private static void Raid(MarketEngine e, int day) =>
-            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = day, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = day, ItemId = "grain" });
 
         [Fact]
         public void FirstSurprise_IsFeltInFull()

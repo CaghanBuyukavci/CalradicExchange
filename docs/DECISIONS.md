@@ -427,3 +427,38 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Geçmiş ve bildirim:** Sadece gerçekleşen emirler Takas Geçmişim'de görünür ("Kar Al" / "Zarar Durdur" türüyle) ve oturum sayacına girer. Gerçekleşme, süre dolması, iptal ve piyasa kapanması sol alttaki mesajlara yazılır.
 - **Kayıt:** Şema 14: `portfolio.orders`, `portfolio.nextOrderId`, `history[].order`. Eski kayıtlarda emir yok.
 - **Konsol:** `exchange.dump_portfolio` kilitli adetleri ve emirleri de listeliyor.
+
+## ADR-040 — Emtia 2.0: olayların etkisi görünür, sürprizler, haberi izleyen kazanır (2026-10-21)
+
+**Bağlam:** Kullanıcı emtia alım satımını sıkıcı buldu: fiyatlar oyuncudan ve dünyadan etkileniyor gibi görünmüyordu, sürpriz yoktu, haberi izlemek kazandırmıyordu. Ölçüm (oyun log'u, gün 277–388):
+- 31 emtianın günlük oynaklığı %3,0–4,0 arasında ve neredeyse aynıydı, yani bizim %3'lük gürültümüzdü.
+- En büyük günlük hareket çoğu üründe %8–10'du; şok terimi çoğunda hiç oluşmamıştı.
+- Sık yağmalanan ürünlerde beklenen şok tabanı yağmaları siliyordu.
+- Oyunun pazarı bir akış ekonomisi. Köyler her gün üretiyor, yağmalanan köy üretmiyor, şehirler refahlarına göre tüketiyor, kervanlar şehirler arası farkı kapatıyor. Kaynaklar tükenmiyor.
+- Şehirler arası fiyat farkı 10 kata kadar çıkıyor. Bazı malların dünya stoğu çok küçük: mücevher 84, gümüş 105, demir 153 birim.
+
+**Karar (1. aşama, bu sürüm; formüller ECONOMY_MODEL §4.3):**
+- Yerel bir olay fiyatı ancak dünya arzından götürdüğü kadar oynatır. Yağma şoku, köyün dünya üretim kapasitesindeki payıyla ölçeklenir ve haber bu payı yazar.
+- Emtialarda beklenen şok tabanı kapalı.
+- Gürültü %3'ten %1,8'e indi, yerine nadir habersiz sıçramalar geldi (kullanıcı onayı).
+- Oyun dışı piyasa haberleri eklendi (kullanıcı onayı): 16 şablon, olumlu ve olumsuz dengeli. Etki ilk gün yaklaşık üçte bir, kalanı birkaç günde gelir; haberi erken okuyan kazanır.
+- Söylentiler eklendi. Bir kısmı yalan (kullanıcı onayı: olsun). Yalan oranı ilerde borsacı seviyesine bağlanacak (kullanıcı kararı).
+- Ölçüm: Günlük dünya stoğu CSV'si ve oyuncunun mal alım satım log'u.
+- Kayıt: Şema 15 (`market.scheduledNews`, `news[].event.itemShare`).
+
+**Karar (2. aşama, stok verisi gelince):**
+- Emtia fiyatı dünya stoğu ve talep oranına bağlanacak. Oyuncunun malı piyasadan toplaması (köşeleme) ya da boşaltması fiyatı doğrudan oynatacak.
+- Manipülasyon soruşturması (kullanıcı onayı): hem hisse tutup hem malı toplayan oyuncu belli bir olasılıkla ceza ve itibar kaybı yer. Olasılık borsacı seviyesi arttıkça düşecek (kullanıcı kararı).
+
+**Simülatör (336 gün, 20 tohum):**
+
+| | Önce | Sonra |
+|---|---|---|
+| Günlük oynaklık (medyan) | %3,5 | %3,1 |
+| %5'ten büyük gün sayısı (ürün başına yılda) | 49 | 26 |
+| En büyük 5 günlük hareket (medyan) | %24 | %31 |
+| Al ve tut | +%1,1 | +%13,2 |
+| Rastgele | −%8,0 | −%0,6 |
+| Yağma kovalayan bot (erken oyun) | −%0,5 | +%6,1 |
+
+Bütün hedefler geçiyor; sadece işlenmiş mallarda yıllık oynaklık %23–25'te kalıyor (hedef ≥ %25).

@@ -29,6 +29,9 @@ namespace CalradicExchange.Core.Tests
         /// <summary>A fresh copy each call, so tests may mutate it.</summary>
         public static MarketSettings Settings() => SettingsLoader.Parse(SettingsJson);
 
+        /// <summary>Village share of world production that makes a default raid shock +0.15, as before ADR-040 (2.5 x 0.06).</summary>
+        public const double RaidShare = 0.06;
+
         /// <summary>
         /// Settings with sigma = 0 for every class, no shock baseline and the economy model off (F = world value): prices move only through kappa and
         /// raw shocks, so expected values can be computed by hand.
@@ -36,8 +39,13 @@ namespace CalradicExchange.Core.Tests
         public static MarketSettings NoNoiseSettings()
         {
             MarketSettings s = Settings();
-            foreach (ClassParameters p in s.Classes.Values) p.Sigma = 0;
+            foreach (ClassParameters p in s.Classes.Values)
+            {
+                p.Sigma = 0;
+                p.JumpChance = 0;
+            }
             s.ShockBaselineHalfLifeDays = 0;
+            s.MarketNews.Enabled = false;
             s.EconomyWeight = 0;
             s.Npc.Enabled = false;
             return s;

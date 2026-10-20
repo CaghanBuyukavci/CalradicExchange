@@ -64,6 +64,10 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // Schema 14 (ADR-039) adds portfolio.orders / nextOrderId (take-profit / stop-loss orders) and
                         // history[].order. All default when missing: no orders.
                         break;
+                    case 14:
+                        // Schema 15 (ADR-040) adds market.scheduledNews (rumored market news) and news[].event.itemShare.
+                        // Both default when missing.
+                        break;
                 }
             }
 

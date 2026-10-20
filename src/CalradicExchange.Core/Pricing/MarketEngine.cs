@@ -121,6 +121,7 @@ namespace CalradicExchange.Core.Pricing
                 if (rule.HeroRank != null && ev.HeroRank != rule.HeroRank) continue;
                 double stackUnit = impulse; // maxStack counts in unscaled impulses
                 if (rule.ScaleByTownShare) impulse *= (ev.TownShare ?? 0) * rule.TownShareMultiplier;
+                if (rule.ScaleByItemShare) impulse *= (ev.ItemShare ?? 0) * rule.ItemShareMultiplier;
                 if (rule.ScaleByMagnitude) impulse *= ev.Magnitude ?? 1;
 
                 foreach (InstrumentDefinition def in ShockMapper.Resolve(rule.Target, ev, Instruments, Find))
@@ -190,6 +191,7 @@ namespace CalradicExchange.Core.Pricing
             }
 
             DetectGeneratedEvents(world, summary);
+            Dictionary<string, double> jumps = RunMarketNews(world.Day, summary);
 
             Dictionary<string, decimal> observed = ObserveFundamentals(world);
             Dictionary<InstrumentClass, double> common = CommonMoves(observed);
@@ -201,6 +203,7 @@ namespace CalradicExchange.Core.Pricing
                 PriceState ps = _byId[def.Id];
                 // Always draw, so one instrument's data gap does not shift the noise of all the others.
                 double eps = _rng.NextGaussian();
+                double jumpRoll = _rng.NextDouble(), jumpEps = _rng.NextGaussian();
                 if (def.Class == InstrumentClass.Guild) UpdateGuildLifecycle(def, ps, summary);
                 if (def.Class == InstrumentClass.Kingdom && !ps.Closed && KingdomRecord(def.Id)?.Eliminated == true)
                 {
@@ -217,12 +220,19 @@ namespace CalradicExchange.Core.Pricing
                 }
                 if (seen) UpdateFundamental(ps, def.Class, f, common);
 
-                ps.Shock = ClampShock(EffectiveShock(ps, DecayAndSumShocks(ps)));
-                double volMult = ActiveVolMultiplier(ps, world.Day);
                 ClassParameters cp = _settings.For(def.Class);
+                double raw = DecayAndSumShocks(ps);
+                ps.Shock = ClampShock(cp.ShockBaseline ? EffectiveShock(ps, raw) : raw);
+                double volMult = ActiveVolMultiplier(ps, world.Day);
                 double sigma = cp.Sigma * _settings.VolatilityMultiplier * volMult;
 
-                double r = PriceMath.LogReturn(ps.Price, ps.Fundamental, ps.Shock, cp.Kappa, sigma, eps, _settings.MaxDailyLogReturn);
+                // Fat tails (ADR-040): now and then the noise jumps; market news jumps the price on its day.
+                double extra = jumpRoll < cp.JumpChance ? cp.JumpSigma * _settings.VolatilityMultiplier * jumpEps : 0;
+                if (jumps.TryGetValue(def.Id, out double jump)) extra += jump;
+
+                double max = _settings.MaxDailyLogReturn;
+                double r = PriceMath.LogReturn(ps.Price, ps.Fundamental, ps.Shock, cp.Kappa, sigma, eps, max);
+                r = Math.Max(-max, Math.Min(max, r + extra));
                 ps.Price = PriceMath.Apply(ps.Price, r);
                 ps.LastReturn = r;
                 AddHistory(ps, world.Day);
@@ -239,6 +249,131 @@ namespace CalradicExchange.Core.Pricing
             State.LastTickDay = world.Day;
             SaveRng();
             return summary;
+        }
+
+        /// <summary>
+        /// Market news and rumors (ADR-040). Fires the rumored news whose day has come, then maybe sets off a new
+        /// piece (as news today or as a rumor now and news later) and maybe a false rumor. Returns today's price
+        /// jump per instrument. Draws the same random numbers every day, for determinism.
+        /// </summary>
+        private Dictionary<string, double> RunMarketNews(int day, TickSummary summary)
+        {
+            var jumps = new Dictionary<string, double>();
+            MarketNewsSettings mn = _settings.MarketNews;
+            if (mn == null || !mn.Enabled || mn.Templates.Count == 0) return jumps;
+
+            for (int i = 0; i < State.ScheduledNews.Count; i++)
+            {
+                ScheduledMarketNews due = State.ScheduledNews[i];
+                if (due.Day > day) continue;
+                State.ScheduledNews.RemoveAt(i--);
+                MarketNewsTemplate tpl = mn.Templates.Find(t => t.Id == due.TemplateId);
+                if (tpl != null && IsOpen(due.InstrumentId)) FireMarketNews(tpl, due.InstrumentId, due.Impulse, day, jumps, summary);
+            }
+
+            double roll = _rng.NextDouble(), pickTemplate = _rng.NextDouble(), pickItem = _rng.NextDouble(), size = _rng.NextDouble();
+            double rumorRoll = _rng.NextDouble(), lead = _rng.NextDouble();
+            double falseRoll = _rng.NextDouble(), falseTemplate = _rng.NextDouble(), falseItem = _rng.NextDouble(), falseSize = _rng.NextDouble();
+
+            if (roll < mn.DailyChance && Pick(mn, pickTemplate, pickItem, size, out MarketNewsTemplate template, out string id, out double impulse))
+            {
+                if (rumorRoll < mn.RumorChance)
+                {
+                    int leadDays = mn.RumorLeadMinDays + Math.Min(mn.RumorLeadMaxDays - mn.RumorLeadMinDays, (int)(lead * (mn.RumorLeadMaxDays - mn.RumorLeadMinDays + 1)));
+                    State.ScheduledNews.Add(new ScheduledMarketNews { Day = day + leadDays, TemplateId = template.Id, InstrumentId = id, Impulse = impulse });
+                    FireRumor(template, id, impulse, day, summary);
+                }
+                else
+                {
+                    FireMarketNews(template, id, impulse, day, jumps, summary);
+                }
+            }
+
+            // False rumors come at a rate that makes them falseRumorShare of all rumors.
+            double share = mn.FalseRumorShare;
+            double falseRate = share < 1 ? mn.DailyChance * mn.RumorChance * share / (1 - share) : 0;
+            if (falseRoll < falseRate && Pick(mn, falseTemplate, falseItem, falseSize, out MarketNewsTemplate ft, out string fid, out double fimpulse))
+            {
+                FireRumor(ft, fid, fimpulse, day, summary);
+            }
+            return jumps;
+        }
+
+        /// <summary>A template, one of its open commodities and an impulse from three uniform draws. False when nothing fits.</summary>
+        private bool Pick(MarketNewsSettings mn, double pickTemplate, double pickItem, double size, out MarketNewsTemplate template, out string instrumentId, out double impulse)
+        {
+            template = mn.Templates[Math.Min(mn.Templates.Count - 1, (int)(pickTemplate * mn.Templates.Count))];
+            var candidates = new List<string>();
+            foreach (InstrumentDefinition def in _catalog.Instruments)
+            {
+                if (def.Class != InstrumentClass.Commodity || !IsOpen(def.Id)) continue;
+                if (template.Items.Count == 0 || template.Items.Contains(def.ItemId)) candidates.Add(def.Id);
+            }
+            instrumentId = candidates.Count > 0 ? candidates[Math.Min(candidates.Count - 1, (int)(pickItem * candidates.Count))] : null;
+            impulse = template.MinImpulse + (template.MaxImpulse - template.MinImpulse) * size;
+            return instrumentId != null;
+        }
+
+        private bool IsOpen(string instrumentId)
+        {
+            PriceState ps = Get(instrumentId);
+            return ps != null && ps.HasPrice && !ps.Closed;
+        }
+
+        private void FireMarketNews(MarketNewsTemplate template, string instrumentId, double impulse, int day, Dictionary<string, double> jumps, TickSummary summary)
+        {
+            MarketNewsSettings mn = _settings.MarketNews;
+            PriceState ps = Get(instrumentId);
+            ps.Shocks.Add(new ShockComponent { Value = impulse, Source = "MarketNews:" + template.Id, HalfLifeDays = template.HalfLifeDays, Pending = true });
+            jumps[instrumentId] = (jumps.TryGetValue(instrumentId, out double j) ? j : 0) + mn.ImmediateFraction * impulse;
+            AnnounceMarketNews(MarketEventType.MarketNews, template, instrumentId, impulse, day, summary);
+        }
+
+        private void FireRumor(MarketNewsTemplate template, string instrumentId, double impulse, int day, TickSummary summary)
+        {
+            MarketNewsSettings mn = _settings.MarketNews;
+            double push = mn.RumorImpulseFraction * impulse;
+            if (Math.Abs(push) >= NegligibleShock)
+            {
+                Get(instrumentId).Shocks.Add(new ShockComponent { Value = push, Source = "MarketRumor:" + template.Id, HalfLifeDays = mn.RumorHalfLifeDays, Pending = true });
+            }
+            AnnounceMarketNews(MarketEventType.MarketRumor, template, instrumentId, impulse, day, summary);
+        }
+
+        private void AnnounceMarketNews(MarketEventType type, MarketNewsTemplate template, string instrumentId, double impulse, int day, TickSummary summary)
+        {
+            var ev = new MarketEvent
+            {
+                Type = type,
+                Day = day,
+                InstrumentId = instrumentId,
+                ItemId = Find(instrumentId)?.ItemId,
+                Detail = template.Id,
+                Magnitude = Math.Round(impulse, 4),
+            };
+            AddNews(ev, new List<string> { instrumentId });
+            summary?.GeneratedEvents.Add(ev);
+        }
+
+        /// <summary>
+        /// Debug (console exchange.market_news): the news of a template on an instrument on the next tick, or with
+        /// <paramref name="rumor"/> a rumor now and the news after the shortest lead. Null impulse: the template's middle.
+        /// Returns the made-up event (the rumor, or the news to come), or null when the template or instrument is unknown.
+        /// </summary>
+        public MarketEvent TriggerMarketNews(string templateId, string instrumentId, double? impulse, bool rumor, int day)
+        {
+            MarketNewsSettings mn = _settings.MarketNews;
+            MarketNewsTemplate template = mn?.Templates.Find(t => t.Id == templateId);
+            if (template == null || !IsOpen(instrumentId)) return null;
+            double push = impulse ?? (template.MinImpulse + template.MaxImpulse) / 2;
+            int newsDay = day;
+            if (rumor)
+            {
+                FireRumor(template, instrumentId, push, day, null);
+                newsDay = day + mn.RumorLeadMinDays;
+            }
+            State.ScheduledNews.Add(new ScheduledMarketNews { Day = newsDay, TemplateId = template.Id, InstrumentId = instrumentId, Impulse = push });
+            return new MarketEvent { Type = rumor ? MarketEventType.MarketRumor : MarketEventType.MarketNews, Day = newsDay, InstrumentId = instrumentId, Detail = template.Id, Magnitude = push };
         }
 
         /// <summary>

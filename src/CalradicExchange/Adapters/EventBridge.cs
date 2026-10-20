@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Diagnostics;
 using TaleWorlds.CampaignSystem;
@@ -45,14 +46,50 @@ namespace CalradicExchange.Adapters
         private static MarketEvent FromVillage(Village village)
         {
             if (village == null) return null;
+            ItemObject product = village.VillageType?.PrimaryProduction;
             return new MarketEvent
             {
                 Type = MarketEventType.VillageLooted,
                 SettlementId = village.Settlement?.StringId,
-                ItemId = village.VillageType?.PrimaryProduction?.StringId,
+                ItemId = product?.StringId,
                 TownId = village.Bound?.StringId,
                 KingdomId = village.Settlement?.MapFaction?.StringId,
+                ItemShare = ProductionShare(village, product),
             };
+        }
+
+        /// <summary>
+        /// The village's share of world production capacity of an item (ADR-040). Null when no village makes it.
+        /// </summary>
+        public static double? ProductionShare(Village village, ItemObject item)
+        {
+            if (village == null || item == null) return null;
+            double all = 0;
+            foreach (Village v in Village.All) all += ProductionCapacity(v, item);
+            return all > 0 ? ProductionCapacity(village, item) / all : (double?)null;
+        }
+
+        /// <summary>Share of one average producer of the item (console raids without a village). Null when no village makes it.</summary>
+        public static double? AverageProducerShare(ItemObject item)
+        {
+            if (item == null) return null;
+            int producers = Village.All.Count(v => ProductionCapacity(v, item) > 0);
+            return producers > 0 ? 1.0 / producers : (double?)null;
+        }
+
+        /// <summary>
+        /// Daily production of an item by a village in normal state, before perks and buildings: amount of its village
+        /// type x (hearth level + 1) x 0.5 (DefaultVillageProductionCalculatorModel.CalculateDailyProductionAmount).
+        /// </summary>
+        public static double ProductionCapacity(Village village, ItemObject item)
+        {
+            if (village?.VillageType?.Productions == null || item == null) return 0;
+            double amount = 0;
+            foreach ((ItemObject produced, float perDay) in village.VillageType.Productions)
+            {
+                if (produced == item) amount += perDay;
+            }
+            return amount * (village.GetHearthLevel() + 1) * 0.5;
         }
 
         private static MarketEvent FromSiege(SiegeEvent siege, MarketEventType type)

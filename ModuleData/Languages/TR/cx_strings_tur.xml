@@ -288,6 +288,44 @@
     <string id="cx_news_cat_war_end" text="Savaş sonu" />
     <string id="cx_news_cat_clan" text="Klan" />
     <string id="cx_news_cat_whale" text="Balina" />
+    <string id="cx_news_message" text="{KIND}: {TEXT}" />
+    <string id="cx_news_cat_market" text="Piyasa" />
+    <string id="cx_news_cat_rumor" text="Söylenti" />
+    <string id="cx_ev_village_looted_share" text="{VILLAGE} yağmalandı: dünya {ITEM} üretimi {SHARE} azaldı." />
+    <string id="cx_mnews_default" text="Haberler {ITEM} piyasasını hareketlendirdi." />
+    <string id="cx_mrumor_default" text="Tavernalarda {ITEM} fiyatlarının oynayacağı konuşuluyor." />
+    <string id="cx_mnews_mine_collapse" text="Maden göçüğü: {ITEM} üretimi haftalarca aksayacak." />
+    <string id="cx_mrumor_mine_collapse" text="Madenlerde göçük olduğu, {ITEM} üretiminin duracağı konuşuluyor." />
+    <string id="cx_mnews_new_vein" text="Zengin bir damar bulundu: {ITEM} arzı bollaşacak." />
+    <string id="cx_mrumor_new_vein" text="Madencilerin yeni bir {ITEM} damarı bulduğu söyleniyor." />
+    <string id="cx_mnews_blight" text="Ürün hastalığı: {ITEM} hasadı büyük zarar gördü." />
+    <string id="cx_mrumor_blight" text="Tarlalarda hastalık başladığı, {ITEM} hasadının tehlikede olduğu konuşuluyor." />
+    <string id="cx_mnews_bumper_harvest" text="Bereketli hasat: {ITEM} piyasaya bol miktarda geliyor." />
+    <string id="cx_mrumor_bumper_harvest" text="Çiftçiler bu yıl {ITEM} hasadının çok bereketli olacağını söylüyor." />
+    <string id="cx_mnews_livestock_plague" text="Hayvan vebası: {ITEM} arzı sert düştü." />
+    <string id="cx_mrumor_livestock_plague" text="Sürülerde veba görüldüğü, {ITEM} arzının düşeceği konuşuluyor." />
+    <string id="cx_mnews_army_order" text="Ordu büyük sipariş verdi: {ITEM} talebi patladı." />
+    <string id="cx_mrumor_army_order" text="Ordunun büyük bir {ITEM} siparişi hazırladığı konuşuluyor." />
+    <string id="cx_mnews_fashion_craze" text="Saraylarda yeni moda: {ITEM} kapış kapış satılıyor." />
+    <string id="cx_mrumor_fashion_craze" text="Soylular arasında {ITEM} modasının başladığı söyleniyor." />
+    <string id="cx_mnews_fashion_fades" text="Moda geçti: {ITEM} talebi çöktü." />
+    <string id="cx_mrumor_fashion_fades" text="Saraylarda {ITEM} modasının geçtiği konuşuluyor." />
+    <string id="cx_mnews_storm_at_sea" text="Fırtına filoyu vurdu: {ITEM} sevkiyatı battı." />
+    <string id="cx_mrumor_storm_at_sea" text="Denizde büyük bir fırtına çıktığı, {ITEM} sevkiyatının geciktiği konuşuluyor." />
+    <string id="cx_mnews_festival" text="Büyük şenlik ilan edildi: {ITEM} talebi arttı." />
+    <string id="cx_mrumor_festival" text="Yakında büyük bir şenlik ilan edileceği, {ITEM} talebinin artacağı konuşuluyor." />
+    <string id="cx_mnews_merchant_hoard" text="Bir tüccar loncası {ITEM} stokluyor: piyasada mal kalmadı." />
+    <string id="cx_mrumor_merchant_hoard" text="Bir loncanın gizlice {ITEM} topladığı söyleniyor." />
+    <string id="cx_mnews_warehouse_dump" text="Büyük bir depo boşaltıldı: piyasa {ITEM} ile doldu." />
+    <string id="cx_mrumor_warehouse_dump" text="Bir tüccarın elindeki bütün {ITEM} stoğunu satacağı konuşuluyor." />
+    <string id="cx_mnews_herds_thrive" text="Sürüler çoğaldı: {ITEM} arzı bollaştı." />
+    <string id="cx_mrumor_herds_thrive" text="Bu yıl sürülerin çok çoğaldığı, {ITEM} arzının artacağı söyleniyor." />
+    <string id="cx_mnews_army_disbanded" text="Ordular dağıtıldı: {ITEM} siparişleri iptal edildi." />
+    <string id="cx_mrumor_army_disbanded" text="Ordunun {ITEM} siparişlerini iptal edeceği konuşuluyor." />
+    <string id="cx_mnews_big_catch" text="Sakin deniz, bol av: {ITEM} sevkiyatı bollaştı." />
+    <string id="cx_mrumor_big_catch" text="Limanlarda bu mevsim {ITEM} sevkiyatının çok bol olacağı söyleniyor." />
+    <string id="cx_mnews_trade_route" text="Yeni ticaret yolu açıldı: {ITEM} ucuzlayacak." />
+    <string id="cx_mrumor_trade_route" text="Yeni bir ticaret yolu açılacağı, {ITEM} fiyatlarının düşeceği konuşuluyor." />
     <string id="cx_ev_whale_buy" text="Bir {TOWN} tüccarı {QTY} adet {NAME} hissesi topladı ({CHANGE})." />
     <string id="cx_ev_whale_sell" text="Bir {TOWN} tüccarı {QTY} adet {NAME} hissesini elden çıkardı ({CHANGE})." />
     <string id="cx_ev_whale_buy_any" text="Büyük bir yatırımcı {QTY} adet {NAME} hissesi topladı ({CHANGE})." />

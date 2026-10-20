@@ -22,6 +22,8 @@ namespace CalradicExchange.Core.Model
     /// Detail = ChangeKingdomActionDetail, Magnitude = 1 (rebellion more).
     /// WhaleTrade: InstrumentId, TownId = the whale's home town, Detail = "buy" or "sell", Amount = shares,
     /// Magnitude = price change of the trade (signed fraction).
+    /// MarketNews / MarketRumor (ADR-040): InstrumentId and ItemId = the commodity, Detail = template id,
+    /// Magnitude = the news' log impulse (a rumor carries the impulse of the news it announces, or of a made-up one).
     /// </summary>
     public sealed class MarketEvent
     {
@@ -72,10 +74,13 @@ namespace CalradicExchange.Core.Model
         /// <summary>FamineStarted: the town's share of total town prosperity (0-1), for share-scaled shocks.</summary>
         public double? TownShare { get; set; }
 
+        /// <summary>VillageLooted: the village's share of world production of ItemId (0-1, ADR-040). Schema 15.</summary>
+        public double? ItemShare { get; set; }
+
         public override string ToString()
         {
             return $"{Type} day={Day} settlement={SettlementId} item={ItemId} town={TownId} kingdom={KingdomId} other={OtherKingdomId} season={Season}" + (HeroId != null ? $" hero={HeroId} captor={OtherHeroId} rank={HeroRank}" : "")
-                + (ClanId != null ? $" clan={ClanId}" : "") + (Detail != null ? $" detail={Detail}" : "")
+                + (ClanId != null ? $" clan={ClanId}" : "") + (ItemShare != null ? $" share={ItemShare:0.000}" : "") + (Detail != null ? $" detail={Detail}" : "")
                 + (Magnitude != null ? $" magnitude={Magnitude:0.00}" : "") + (Casualties > 0 ? $" casualties={Casualties}" : "")
                 + (Amount > 0 ? $" amount={Amount}" : "") + (InstrumentId != null ? $" instrument={InstrumentId}" : "") + (Quiet ? " quiet" : "");
         }

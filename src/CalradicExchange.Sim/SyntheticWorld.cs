@@ -50,6 +50,9 @@ namespace CalradicExchange.Sim
         public const int KingdomCount = 6;
         public const int VillagesPerTown = 3;
 
+        /// <summary>The real map has 274 villages (SandBox settlements.xml, v1.4.8); production shares are scaled to it.</summary>
+        private const double RealVillagesPerSimVillage = 274.0 / (TownCount * VillagesPerTown);
+
         private const double LocalReversion = 0.08;
         private const double LocalSigma = 0.08;
         private const double GlobalReversion = 0.03;
@@ -211,6 +214,7 @@ namespace CalradicExchange.Sim
                 ItemId = v.Product,
                 TownId = v.Town.Id,
                 KingdomId = KingdomId(v.Town.Kingdom),
+                ItemShare = 1.0 / (_villages.Count(x => x.Product == v.Product) * RealVillagesPerSimVillage),
             };
         }
 

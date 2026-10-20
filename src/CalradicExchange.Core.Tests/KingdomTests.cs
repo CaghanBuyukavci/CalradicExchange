@@ -124,14 +124,14 @@ namespace CalradicExchange.Core.Tests
             engine.Tick(World(1));
             for (int i = 0; i < 10; i++)
             {
-                engine.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 2, SettlementId = "v" + i, ItemId = "grain", TownId = "town_A", KingdomId = "k1" });
+                engine.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 2, SettlementId = "v" + i, ItemId = "grain", TownId = "town_A", KingdomId = "k1" });
             }
             double live = engine.Get(K1).Shocks.Where(c => c.Source == "VillageLooted:kingdomIndex:eventKingdom").Sum(c => c.Value);
             Assert.Equal(-0.09, live, 6); // 3 x -0.03
         }
 
         [Fact]
-        public void HeroCaptured_IsNewsOnly_AndNewsKeepsTheNewest20()
+        public void HeroCaptured_IsNewsOnly_AndNewsKeepsTheNewest40()
         {
             MarketEngine engine = Engine();
             engine.Tick(World(1));
@@ -142,9 +142,9 @@ namespace CalradicExchange.Core.Tests
             Assert.Empty(affected);
             Assert.Equal("lord_1", engine.State.News.Last().Event.HeroId);
 
-            for (int i = 0; i < 30; i++) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.HeroCaptured, Day = 3 + i, HeroId = "h" + i });
-            Assert.Equal(20, engine.State.News.Count);
-            Assert.Equal("h29", engine.State.News.Last().Event.HeroId);
+            for (int i = 0; i < 50; i++) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.HeroCaptured, Day = 3 + i, HeroId = "h" + i });
+            Assert.Equal(40, engine.State.News.Count);
+            Assert.Equal("h49", engine.State.News.Last().Event.HeroId);
         }
 
         private static KingdomSnapshot Full(string id, double prosperity = 10000, int towns = 4, int castles = 4, double hearth = 5000,

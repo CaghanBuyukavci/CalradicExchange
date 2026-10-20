@@ -252,6 +252,18 @@ namespace CalradicExchange.Menus
                     t.SetTextVariable("CHANGE", Fmt.Pct(ev.Magnitude ?? 0));
                     t.SetTextVariable("TOWN", Names.Settlement(ev.TownId));
                     return t.ToString();
+                case MarketEventType.MarketNews:
+                case MarketEventType.MarketRumor:
+                    t = Strings.MarketNewsText(ev.Detail, ev.Type == MarketEventType.MarketRumor);
+                    t.SetTextVariable("ITEM", Names.Item(ev.ItemId));
+                    return t.ToString();
+                case MarketEventType.VillageLooted:
+                    if (ev.ItemShare != null)
+                    {
+                        t = Strings.VillageLootedShare;
+                        t.SetTextVariable("SHARE", Fmt.Share(ev.ItemShare.Value));
+                    }
+                    break;
                 case MarketEventType.ClanChangedKingdom:
                     if (ev.Detail == "CreateKingdom") t = Strings.ClanRebelledFounded;
                     else if (ev.Detail == "LeaveWithRebellion") t = Strings.ClanRebelled;

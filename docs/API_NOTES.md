@@ -157,6 +157,10 @@ Sources: `Modules\SandBoxCore\ModuleData\items\horses_and_others.xml`, `TaleWorl
 | `IDataStore.SyncData<T>(key, ref data)` on load | missing key returns false, leaves `data` | VERIFIED | Chunk keys `cx_state_v1_N` |
 | `abstract Sprite(string, int, int, SpriteNinePatchParameters)` + `Texture`, `GetMinUvs`, `GetMaxUvs` | subclassable | VERIFIED | `UI/TextureSprite` |
 | `TaleWorlds.Engine.Texture.LoadTextureFromPath(fileName, folder)`, `CreateFromMemory(byte[])` | native; no vanilla caller | VERIFIED (signature) | PNG loads from path. **24-bit RGB PNGs show red/blue swapped; 32-bit RGBA PNGs are correct** (in-game test). Deploy writes 32-bit RGBA |
+| `CampaignEvents.PlayerInventoryExchangeEvent` | `IMbEvent<List<(ItemRosterElement, int)>, List<(ItemRosterElement, int)>, bool>`: bought, sold (int = total denars), isTrading; fired by `InventoryLogic` when the trade screen closes | VERIFIED (signature) | Goods trade log (ADR-040) |
+| `Village.All`, `Village.VillageType.Productions` (`MBReadOnlyList<(ItemObject, float)>`), `Village.GetHearthLevel()` (0/1/2 at hearth 200/600), `Village.VillageState` | production per day = amount x (hearth level + 1) x 0.5 in state Normal, 0 otherwise (`DefaultVillageProductionCalculatorModel`) | VERIFIED | Raid production share (ADR-040) |
+| `MobileParty.AllCaravanParties`, `MobileParty.AllVillagerParties`, `MobileParty.MainParty`, `ItemRoster.GetItemNumber(ItemObject)`, `Settlement.ItemRoster` | | VERIFIED (signature) | `SupplyDump` world stock (ADR-040) |
+| Town market price | `DefaultTradeItemPriceFactorModel.GetBasePriceFactor`: (demand / (0.1 supply + 0.04 inStoreValue + 2))^0.6, clamped 0.1-10 for trade goods; supply = EMA(0.15) of in-store value, demand = EMA of prosperity x category demand | VERIFIED | Background for ADR-040 |
 
 ## 9. After every game update
 

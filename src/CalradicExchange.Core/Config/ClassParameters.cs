@@ -19,5 +19,17 @@ namespace CalradicExchange.Core.Config
 
         /// <summary>Slippage coefficient.</summary>
         [JsonProperty("lambda")] public double Lambda { get; set; }
+
+        /// <summary>Daily chance of an unannounced jump in the noise (fat tails, ADR-040). 0 = none.</summary>
+        [JsonProperty("jumpChance")] public double JumpChance { get; set; }
+
+        /// <summary>Standard deviation of a jump, in log units.</summary>
+        [JsonProperty("jumpSigma")] public double JumpSigma { get; set; }
+
+        /// <summary>
+        /// Subtract the slow baseline of expected shocks from S (ADR-019). Off for commodities (ADR-040): their raid
+        /// shocks are scaled by the village's share of world production, so frequent small raids stay small by themselves.
+        /// </summary>
+        [JsonProperty("shockBaseline")] public bool ShockBaseline { get; set; } = true;
     }
 }

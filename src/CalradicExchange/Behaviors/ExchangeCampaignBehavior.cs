@@ -16,6 +16,7 @@ using CalradicExchange.Localization;
 using CalradicExchange.Menus;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.Core;
@@ -76,6 +77,7 @@ namespace CalradicExchange.Behaviors
             });
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, OnDailyTick);
             EventBridge.Register(this, OnWorldEvent);
+            CampaignEvents.PlayerInventoryExchangeEvent.AddNonSerializedListener(this, OnPlayerGoodsTrade);
             CampaignEvents.WorkshopOwnerChangedEvent.AddNonSerializedListener(this, (workshop, oldOwner) =>
             {
                 if (workshop?.Owner == Hero.MainHero) SellOwnWorkshopShares("bought");
@@ -213,6 +215,7 @@ namespace CalradicExchange.Behaviors
             ExchangeLog.Info($"Daily tick {summary} (towns {world.Towns.Count}, kingdoms {world.KingdomCount}, wars {world.ActiveWarPairs}, season {world.Season})");
             foreach (MarketEvent ev in summary.GeneratedEvents) ExchangeLog.Info($"Generated event {ev}");
             if (summary.Processed && !summary.Initialized) NotifyWhales(summary);
+            if (summary.Processed && !summary.Initialized) NotifyMarketNews(summary);
             if (summary.Processed)
             {
                 ExchangeLog.Info("Guilds: " + GuildReport.Summary(_state.Market.Guilds));
@@ -236,6 +239,7 @@ namespace CalradicExchange.Behaviors
             if (summary.Processed) RecordPerformance(summary.Day);
             if (summary.Processed && !summary.Initialized) NotifyBigMoves();
             if (summary.Processed && _state.Market.LastTickDay <= MarketDump.AutoDumpDays) MarketDump.Append(this);
+            if (summary.Processed) SupplyDump.Append(this);
             return summary;
         }
 
@@ -425,6 +429,48 @@ namespace CalradicExchange.Behaviors
                 parts.Add($"{def.KingdomId} P {ps?.Price:0.0} F {ps?.Fundamental:0.0} ({state})");
             }
             return parts.Count == 0 ? "none listed" : string.Join("; ", parts);
+        }
+
+        /// <summary>
+        /// Logs the player's trade in commodity goods (calibration of the stock-based price, ADR-040): units and denars
+        /// bought and sold per item.
+        /// </summary>
+        private void OnPlayerGoodsTrade(List<(ItemRosterElement, int)> bought, List<(ItemRosterElement, int)> sold, bool isTrading)
+        {
+            try
+            {
+                if (_catalog == null) return;
+                var tracked = new HashSet<string>(_catalog.Instruments.Where(d => d.Class == InstrumentClass.Commodity && d.ItemId != null).Select(d => d.ItemId));
+                var parts = new List<string>();
+                void Add(string verb, List<(ItemRosterElement, int)> list)
+                {
+                    if (list == null) return;
+                    foreach ((ItemRosterElement element, int value) in list)
+                    {
+                        string id = element.EquipmentElement.Item?.StringId;
+                        if (id != null && tracked.Contains(id)) parts.Add($"{verb} {element.Amount} {id} for {value}");
+                    }
+                }
+                Add("bought", bought);
+                Add("sold", sold);
+                if (parts.Count > 0) ExchangeLog.Info($"Goods trade at {Settlement.CurrentSettlement?.StringId ?? "-"} (day {NextDay}): {string.Join(", ", parts)}.");
+            }
+            catch (Exception ex)
+            {
+                ExchangeLog.Error("Logging a goods trade failed", ex);
+            }
+        }
+
+        /// <summary>Market news and rumors (ADR-040) are shown as messages too: following them is part of the game.</summary>
+        private static void NotifyMarketNews(TickSummary summary)
+        {
+            foreach (MarketEvent ev in summary.GeneratedEvents.Where(e => e.Type == MarketEventType.MarketNews || e.Type == MarketEventType.MarketRumor))
+            {
+                TextObject line = Strings.NewsMessage;
+                line.SetTextVariable("KIND", Strings.NewsCategory(ev.Type));
+                line.SetTextVariable("TEXT", MarketReport.Describe(ev));
+                InformationManager.DisplayMessage(new InformationMessage(line.ToString(), UI.NewsColors.For(ev.Type)));
+            }
         }
 
         /// <summary>A whale's trade is news (ADR-037); it is also shown as a message, like a big move.</summary>

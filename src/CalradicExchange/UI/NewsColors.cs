@@ -20,6 +20,8 @@ namespace CalradicExchange.UI
         private static readonly Color WarEnd = Color.ConvertStringToColor("#9FB8F0FF");
         private static readonly Color Clan = Color.ConvertStringToColor("#C8C864FF");
         private static readonly Color Whale = Color.ConvertStringToColor("#5FA8FFFF");
+        private static readonly Color Market = Color.ConvertStringToColor("#FFD24DFF");
+        private static readonly Color Rumor = Color.ConvertStringToColor("#A8A8D8FF");
 
         public static Color For(MarketEventType type)
         {
@@ -35,6 +37,8 @@ namespace CalradicExchange.UI
                 case MarketEventType.WarEnded: return WarEnd;
                 case MarketEventType.ClanChangedKingdom: return Clan;
                 case MarketEventType.WhaleTrade: return Whale;
+                case MarketEventType.MarketNews: return Market;
+                case MarketEventType.MarketRumor: return Rumor;
                 case MarketEventType.WarDeclared: return War;
                 case MarketEventType.PeaceMade: return Peace;
                 case MarketEventType.SeasonChanged: return Season;

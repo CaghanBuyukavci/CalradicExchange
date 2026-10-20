@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CalradicExchange.Adapters;
 using CalradicExchange.Behaviors;
 using CalradicExchange.Core;
 using CalradicExchange.Core.Model;
@@ -12,7 +13,9 @@ using CalradicExchange.Core.Trading;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.Core;
 using TaleWorlds.Library;
+using TaleWorlds.ObjectSystem;
 
 namespace CalradicExchange.Diagnostics
 {
@@ -105,6 +108,7 @@ namespace CalradicExchange.Diagnostics
                 {
                     case MarketEventType.VillageLooted:
                         ev.ItemId = Arg(1); ev.TownId = Arg(2); ev.SettlementId = "console";
+                        ev.ItemShare = EventBridge.AverageProducerShare(MBObjectManager.Instance.GetObject<ItemObject>(ev.ItemId ?? ""));
                         break;
                     case MarketEventType.SettlementCaptured:
                         ev.TownId = Arg(1); ev.KingdomId = Arg(2); ev.OtherKingdomId = Arg(3);
@@ -268,6 +272,26 @@ namespace CalradicExchange.Diagnostics
                 string path = Path.Combine(ModulePaths.LogsFolder, $"guilds_day{b.State.Market.LastTickDay}.csv");
                 File.WriteAllText(path, GuildReport.Csv(b.State.Market.Guilds));
                 return GuildReport.Top(b.State.Market.Guilds, count) + "\nWrote " + path;
+            });
+        }
+
+        /// <summary>
+        /// exchange.market_news &lt;templateId&gt; &lt;itemId|instrumentId&gt; [impulse] [rumor]: market news on the next tick, or a
+        /// rumor now and its news after the shortest lead (ADR-040).
+        /// </summary>
+        [CommandLineFunctionality.CommandLineArgumentFunction("market_news", Group)]
+        public static string MarketNews(List<string> args)
+        {
+            return RunReady("market_news", args, b =>
+            {
+                List<string> ids = b.Market.Settings.MarketNews?.Templates.Select(t => t.Id).ToList() ?? new List<string>();
+                if (args.Count < 2) return "Usage: exchange.market_news <templateId> <itemId|instrumentId> [impulse] [rumor]. Templates: " + string.Join(", ", ids);
+                string id = args[1].StartsWith("cx_") ? args[1] : "cx_" + args[1];
+                double? impulse = args.Count > 2 && double.TryParse(args[2], NumberStyles.Float, Inv, out double v) ? v : (double?)null;
+                bool rumor = args.Skip(2).Any(a => a.Equals("rumor", StringComparison.OrdinalIgnoreCase));
+                MarketEvent ev = b.Market.TriggerMarketNews(args[0], id, impulse, rumor, b.NextDay);
+                if (ev == null) return $"Unknown template or closed instrument. Templates: {string.Join(", ", ids)}";
+                return rumor ? $"Rumor out now; the news comes on exchange day {ev.Day} ({ev.Magnitude:0.00})." : $"News on the next tick ({ev.Magnitude:0.00}).";
             });
         }
 

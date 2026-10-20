@@ -5,7 +5,7 @@
   "maxDailyLogReturn": 0.25,
   "maxAbsShock": 1.0,
   "historyDays": 112,
-  "newsKeep": 20,
+  "newsKeep": 40,
   "famineCooldownDays": 21,
   "shockBaselineHalfLifeDays": 42,
   "_economyHelp": "ADR-022: F = anchor x exp(E). E = decaying sum of the item's daily town-price move minus the median move of its class, times economyWeight, clamped to economyMaxAbs. The anchor drifts to the town price with anchorHalfLifeDays.",
@@ -16,11 +16,15 @@
   "anchorHalfLifeDays": 120,
   "classes": {
     "Commodity": {
+      "_comment": "ADR-040: less everyday noise, rare unannounced jumps (jumpChance a day, jumpSigma log size), no expected-shock baseline: raid shocks are scaled by production share instead.",
       "kappa": 0.2,
-      "sigma": 0.03,
+      "sigma": 0.018,
       "spread": 0.01,
       "depth": 40000,
-      "lambda": 0.1
+      "lambda": 0.1,
+      "jumpChance": 0.03,
+      "jumpSigma": 0.06,
+      "shockBaseline": false
     },
     "Sector": {
       "kappa": 0.15,
@@ -38,7 +42,7 @@
     },
     "Kingdom": {
       "kappa": 0.08,
-      "sigma": 0.015,
+      "sigma": 0.018,
       "spread": 0.008,
       "depth": 60000,
       "lambda": 0.08
@@ -131,10 +135,13 @@
   "eventShocks": {
     "VillageLooted": [
       {
+        "_comment": "ADR-040: impulse x the village's share of world production of its product x itemShareMultiplier (a silver mine, 1 of 7, about +0.35; a wheat farm, 1 of 49, about +0.05). Live raid shocks on one commodity stay under impulse x maxStack.",
         "target": "eventItem",
-        "impulse": 0.15,
+        "impulse": 1.0,
+        "scaleByItemShare": true,
+        "itemShareMultiplier": 2.5,
         "halfLifeDays": 10,
-        "maxStack": 4
+        "maxStack": 0.6
       },
       {
         "target": "kingdomIndex:eventKingdom",
@@ -335,6 +342,36 @@
         "halfLifeDays": 21,
         "scaleByMagnitude": true
       }
+    ]
+  },
+  "marketNews": {
+    "_comment": "Made-up market news (ADR-040). dailyChance a day one piece hits one commodity of a template (items empty = any). With rumorChance it is first heard as a rumor rumorLead days before; falseRumorShare of all rumors are false. A rumor pushes S by rumorImpulseFraction x impulse; the news pushes S by the impulse and the price jumps by immediateFraction x impulse on the day.",
+    "enabled": true,
+    "dailyChance": 0.6,
+    "rumorChance": 0.6,
+    "falseRumorShare": 0.33,
+    "rumorLeadMinDays": 1,
+    "rumorLeadMaxDays": 3,
+    "rumorImpulseFraction": 0.25,
+    "rumorHalfLifeDays": 4,
+    "immediateFraction": 0.15,
+    "templates": [
+      { "id": "mine_collapse", "items": ["iron", "silver", "salt", "clay"], "minImpulse": 0.2, "maxImpulse": 0.4, "halfLifeDays": 20 },
+      { "id": "new_vein", "items": ["iron", "silver", "salt", "clay"], "minImpulse": -0.3, "maxImpulse": -0.15, "halfLifeDays": 20 },
+      { "id": "blight", "items": ["grain", "olives", "grape", "flax", "cotton", "date_fruit"], "minImpulse": 0.2, "maxImpulse": 0.35, "halfLifeDays": 20 },
+      { "id": "bumper_harvest", "items": ["grain", "olives", "grape", "flax", "cotton", "date_fruit"], "minImpulse": -0.25, "maxImpulse": -0.15, "halfLifeDays": 20 },
+      { "id": "livestock_plague", "items": ["sheep", "hog", "meat", "cheese", "butter", "hides", "wool"], "minImpulse": 0.2, "maxImpulse": 0.4, "halfLifeDays": 20 },
+      { "id": "army_order", "items": ["iron", "tools", "leather", "hides", "hardwood", "planks", "linen"], "minImpulse": 0.15, "maxImpulse": 0.3, "halfLifeDays": 20 },
+      { "id": "fashion_craze", "items": ["velvet", "jewelry", "fur", "wine", "linen", "felt"], "minImpulse": 0.2, "maxImpulse": 0.4, "halfLifeDays": 20 },
+      { "id": "fashion_fades", "items": ["velvet", "jewelry", "fur", "wine", "linen", "felt"], "minImpulse": -0.3, "maxImpulse": -0.15, "halfLifeDays": 20 },
+      { "id": "storm_at_sea", "items": ["fish", "salt", "oil"], "minImpulse": 0.15, "maxImpulse": 0.3, "halfLifeDays": 20 },
+      { "id": "festival", "items": ["beer", "wine", "meat", "cheese", "grape"], "minImpulse": 0.15, "maxImpulse": 0.25, "halfLifeDays": 20 },
+      { "id": "merchant_hoard", "items": [], "minImpulse": 0.15, "maxImpulse": 0.3, "halfLifeDays": 20 },
+      { "id": "warehouse_dump", "items": [], "minImpulse": -0.25, "maxImpulse": -0.15, "halfLifeDays": 20 },
+      { "id": "herds_thrive", "items": ["sheep", "hog", "meat", "cheese", "butter", "hides", "wool"], "minImpulse": -0.30, "maxImpulse": -0.15, "halfLifeDays": 20 },
+      { "id": "army_disbanded", "items": ["iron", "tools", "leather", "hides", "hardwood", "planks", "linen"], "minImpulse": -0.30, "maxImpulse": -0.15, "halfLifeDays": 20 },
+      { "id": "big_catch", "items": ["fish", "salt", "oil"], "minImpulse": -0.25, "maxImpulse": -0.15, "halfLifeDays": 20 },
+      { "id": "trade_route", "items": [], "minImpulse": -0.30, "maxImpulse": -0.15, "halfLifeDays": 20 }
     ]
   }
 }

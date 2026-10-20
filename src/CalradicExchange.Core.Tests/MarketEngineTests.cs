@@ -69,7 +69,7 @@ namespace CalradicExchange.Core.Tests
         {
             MarketEngine e = NewEngine();
             e.Tick(TestData.World(1));
-            IReadOnlyList<string> affected = e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "grain", TownId = "town_A" });
+            IReadOnlyList<string> affected = e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 1, ItemId = "grain", TownId = "town_A" });
 
             Assert.Equal(new[] { "cx_grain" }, affected);
             e.Tick(TestData.World(2));
@@ -87,7 +87,7 @@ namespace CalradicExchange.Core.Tests
         {
             MarketEngine e = NewEngine();
             e.Tick(TestData.World(1));
-            Assert.Empty(e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "spice" }));
+            Assert.Empty(e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 1, ItemId = "spice" }));
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace CalradicExchange.Core.Tests
             s.RulesFor(MarketEventType.VillageLooted)[0].MaxStack = 0;
             var e = new MarketEngine(TestData.Catalog(), s, new MarketState(), new XorShift128Plus(1));
             e.Tick(TestData.World(1));
-            for (int i = 0; i < 40; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "grain" });
+            for (int i = 0; i < 40; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 1, ItemId = "grain" });
             e.Tick(TestData.World(2));
 
             Assert.Equal(1.0, e.Get("cx_grain").Shock, 9);
@@ -108,7 +108,7 @@ namespace CalradicExchange.Core.Tests
         {
             MarketEngine e = NewEngine();
             e.Tick(TestData.World(1));
-            for (int i = 0; i < 40; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "grain" });
+            for (int i = 0; i < 40; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 1, ItemId = "grain" });
             e.Tick(TestData.World(2));
 
             Assert.Equal(0.15 * 4, e.Get("cx_grain").Shock, 9);
@@ -119,13 +119,13 @@ namespace CalradicExchange.Core.Tests
         {
             MarketEngine e = NewEngine();
             e.Tick(TestData.World(1));
-            for (int i = 0; i < 4; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "grain" });
-            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "salt" });
+            for (int i = 0; i < 4; i++) e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 1, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 1, ItemId = "salt" });
             for (int d = 2; d <= 11; d++) e.Tick(TestData.World(d)); // day 2 applies, days 3..11 decay 9 times
 
-            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 11, ItemId = "grain" });
-            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 11, ItemId = "grain" });
-            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 11, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 11, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 11, ItemId = "grain" });
+            e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, ItemShare = TestData.RaidShare, Day = 11, ItemId = "grain" });
             e.Tick(TestData.World(12));
 
             // The new raids only fill the room left under 4 x 0.15 (not 3 x 0.15); then the old ones decay once more.

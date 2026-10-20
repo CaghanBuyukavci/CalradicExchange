@@ -204,6 +204,35 @@ haber_hızı = 40 harita birimi / gün       (harita ölçeğine göre Faz 4'te 
 - İşlemler yerel fiyattan yapılır.
 - Bellek: olay kuyruğu, en uzak şehre ulaştıktan sonra silinir.
 
+### 4.3 Emtia 2.0: payla ölçeklenen yağma, sıçramalar, piyasa haberleri ve söylentiler (ADR-040)
+
+**Yağma, köyün dünya üretimindeki payıyla ölçeklenir:**
+
+```
+pay = köyün_kapasitesi(ürün) / Σ_köyler kapasite(ürün)
+kapasite = köy_tipi_üretim_miktarı × (ocak_seviyesi + 1) × 0,5        (oyunun kendi formülü, perk ve binalar hariç)
+dürtü    = 1,0 × pay × 2,5        bir emtiadaki canlı yağma dürtüleri en fazla 0,6
+```
+
+Örnek: 7 gümüş madeninden biri ≈ +0,35; 49 buğday çiftliğinden biri ≈ +0,05. Haber "dünya üretimi %X azaldı" diye payı yazar. Emtialarda beklenen şok tabanı (§4, ADR-019) kapalıdır: sık yağmalar zaten küçük paylı köylerde olur.
+
+**Gürültü:** Emtia σ 0,030 → 0,018. Her gün %3 olasılıkla habersiz bir sıçrama eklenir: N(0; 0,06). Gürültü artık daha sakin, ama arada sert günler var (kalın kuyruk).
+
+**Piyasa haberleri** (`settings.json` → `marketNews`): Günde 0,6 olasılıkla bir şablon (maden göçüğü, yeni damar, ürün hastalığı, bereketli hasat, hayvan vebası, sürüler çoğaldı, ordu siparişi, ordu dağıtıldı, moda, moda geçti, deniz fırtınası, bol av, şenlik, lonca stoku, depo boşaltma, yeni ticaret yolu) ve şablonun emtialarından biri seçilir. Dürtü şablonun aralığından düzgün çekilir (±0,15–0,40), yarı ömrü 20 gün. Olumlu ve olumsuz şablonlar dengelidir.
+
+```
+haber günü:  S += dürtü;  fiyat ayrıca e^(0,15 × dürtü) sıçrar
+sonraki günler: κ fiyatı F × e^S'ye çeker   → etkinin yaklaşık üçte biri ilk gün, kalanı 3–5 günde
+```
+
+- %60 olasılıkla haber önce söylenti olarak duyulur, 1–3 gün sonra haber gelir.
+- Söylentilerin %33'ü yalandır (haber gelmez). Yalan söylenti oranı: günlük_olasılık × söylenti_olasılığı × y / (1 − y).
+- Söylenti S'yi dürtünün %25'i kadar iter, yarı ömrü 4 gün; yalan söylenti de aynı. Yalan çıkınca fiyat geri döner.
+- Sonraki aşamada yalan söylenti oranı borsacı seviyesiyle düşecek.
+- Haberler ve söylentiler sol alttaki mesajlarda da görünür.
+
+**Ölçüm:** Her günlük tick'ten sonra `Logs/world_supply.csv`'ye her emtianın dünya stoğu yazılır: şehir pazarı, köy deposu, kervan, köylü ve oyuncu, şehirlerin talebi ve köy kapasitesi. Oyuncunun mal alım satımı `exchange.log`'a yazılır. Stoğa dayalı fiyat (dünya stoğu ve talep) ve manipülasyon soruşturması bu veriyle ayarlanacak (ADR-040, 2. aşama).
+
 ## 5. İşlem maliyetleri
 
 ```

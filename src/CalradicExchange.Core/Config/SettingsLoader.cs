@@ -62,6 +62,8 @@ namespace CalradicExchange.Core.Config
                 Range(e, w + ".spread", p.Spread, 0, 0.5);
                 RangeOpenLow(e, w + ".depth", p.Depth, 0, 1e9);
                 Range(e, w + ".lambda", p.Lambda, 0, 10);
+                Range(e, w + ".jumpChance", p.JumpChance, 0, 1);
+                Range(e, w + ".jumpSigma", p.JumpSigma, 0, 1);
             }
 
             if (s.Guilds != null) Range(e, "guilds.profitWindowDays", s.Guilds.ProfitWindowDays, 1, 336);
@@ -91,6 +93,30 @@ namespace CalradicExchange.Core.Config
                 Range(e, "orders.ordersKept", s.Orders.OrdersKept, 1, 1000);
             }
             if (s.Kingdoms != null) Range(e, "kingdoms.minListingDays", s.Kingdoms.MinListingDays, 0, 336);
+            if (s.MarketNews != null)
+            {
+                MarketNewsSettings n = s.MarketNews;
+                Range(e, "marketNews.dailyChance", n.DailyChance, 0, 1);
+                Range(e, "marketNews.rumorChance", n.RumorChance, 0, 1);
+                Range(e, "marketNews.falseRumorShare", n.FalseRumorShare, 0, 0.9);
+                Range(e, "marketNews.rumorLeadMinDays", n.RumorLeadMinDays, 1, 60);
+                Range(e, "marketNews.rumorLeadMaxDays", n.RumorLeadMaxDays, n.RumorLeadMinDays, 60);
+                Range(e, "marketNews.rumorImpulseFraction", n.RumorImpulseFraction, 0, 1);
+                RangeOpenLow(e, "marketNews.rumorHalfLifeDays", n.RumorHalfLifeDays, 0, 1000);
+                Range(e, "marketNews.immediateFraction", n.ImmediateFraction, 0, 1);
+                if (n.Templates == null) n.Templates = new List<MarketNewsTemplate>();
+                for (int i = 0; i < n.Templates.Count; i++)
+                {
+                    MarketNewsTemplate t = n.Templates[i];
+                    string w = $"marketNews.templates[{i}]";
+                    if (t == null || string.IsNullOrEmpty(t.Id)) { e.Add(w + ".id is missing."); continue; }
+                    if (t.Items == null) t.Items = new List<string>();
+                    Range(e, w + ".minImpulse", t.MinImpulse, -2, 2);
+                    Range(e, w + ".maxImpulse", t.MaxImpulse, -2, 2);
+                    if (System.Math.Sign(t.MinImpulse) * System.Math.Sign(t.MaxImpulse) < 0) e.Add(w + ": minImpulse and maxImpulse must have the same sign.");
+                    RangeOpenLow(e, w + ".halfLifeDays", t.HalfLifeDays, 0, 1000);
+                }
+            }
             if (s.Trading == null) e.Add("trading is missing.");
             else
             {
@@ -129,6 +155,7 @@ namespace CalradicExchange.Core.Config
                     if (r.VolMultiplier != 0) Range(e, w + ".volMultiplier", r.VolMultiplier, 1, 10);
                     Range(e, w + ".volDays", r.VolDays, 0, 10000);
                     Range(e, w + ".townShareMultiplier", r.TownShareMultiplier, 0, 1000);
+                    Range(e, w + ".itemShareMultiplier", r.ItemShareMultiplier, 0, 1000);
                 }
             }
         }
