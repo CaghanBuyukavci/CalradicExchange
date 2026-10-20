@@ -161,6 +161,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 2.17 Emtia 2.0, 1. aşama: yağma payla ölçeklenir, sakin gürültü ve sıçramalar, piyasa haberleri ve söylentiler, dünya stoğu ölçümü (ADR-040)
   - Şema 15. Oyun içi test bekleniyor. Tutsak alma haberleri listeden çıktı (ADR-041).
 - [ ] 2.18 Emtia 2.0, 2. aşama: dünya stoğuna dayalı emtia fiyatı ve manipülasyon soruşturması (ADR-040, world_supply.csv verisiyle)
+  - Piyasa haberleri fiziksel dünyaya da yansır: üretim haberleri haber etkisi sürdükçe köy ve atölye üretimini değiştirir, talep haberleri şehir pazarlarından mal çeker. Gıdada etki yarım, kuşatma altındaki şehirlere dokunulmaz (kullanıcı onayı, 2026-10-21).
 - [ ] 2.19 Otomatik Al/Sat emirleri (kullanıcı detayları verecek)
 
 ### 2C. Ayarlar ve yerelleştirme
