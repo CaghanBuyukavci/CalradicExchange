@@ -407,3 +407,5 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Lonca Piyasası:** İkinci bölümün başlığı "Başka Şehirlerdeki Ortaklıkların". Bölümün yüksekliği bu şehrin satır sayısına göre hesaplanıyor (`OtherHeight`, 236–400 px); bölüm üstteki listenin hemen altında başlıyor, boşluk altta kalıyor.
 - **Performans:** Grafik 700'den 820 px'e genişledi; pencere 1140 px. Alttaki tablo aynı genişlikte kaldı.
 - **Haberler:** Muharebe haberi yer adı vermiyor ("Vlandia, Battania ordusunu yendi (118 kayıp)").
+
+**ADR-037 ek (2026-10-20):** Balina alımından sonraki satış artık garanti değil (kullanıcı isteği). Yatırımcıların paylarını başlangıç seviyesine çekmesi her araç için her gün `holdingReversionChance` (0,4) olasılıkla oluyor; o gün güç `holdingReversion` 1 (önceden her gün 0,5). Ortalama geri dönüş biraz yavaşladı (günde fazlanın ~%8'inden ~%7'sine). Simülatör 8/8 geçiyor; emtia oynaklığı medyanı %31,9, erken oyunda en iyi bot günde 46,0 dinar.

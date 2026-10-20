@@ -89,7 +89,7 @@
     "siegeFloor": 0.6
   },
   "npc": {
-    "_comment": "Limited supply and the town's investors (ADR-037, ECONOMY_MODEL 5.1). Shares issued = depth x supplyDepthMultiple / listing price; investors hold initialHoldingFraction of them at listing. Slippage x (free float at listing / free float during the order), clamped. Each day every commodity, basket and kingdom index gets one net investor order of depth x (flowNoise x N(0,1) + flowMomentum x 5-day change + holdingReversion x holding gap). With whaleDailyChance one whale trades whaleMinDepths..whaleMaxDepths x depth in one instrument and makes the news.",
+    "_comment": "Limited supply and the town's investors (ADR-037, ECONOMY_MODEL 5.1). Shares issued = depth x supplyDepthMultiple / listing price; investors hold initialHoldingFraction of them at listing. Slippage x (free float at listing / free float during the order), clamped. Each day every commodity, basket and kingdom index gets one net investor order of depth x (flowNoise x N(0,1) + flowMomentum x 5-day change + holdingReversion x holding gap, the last term only on a day with holdingReversionChance). With whaleDailyChance one whale trades whaleMinDepths..whaleMaxDepths x depth in one instrument and makes the news.",
     "enabled": true,
     "supplyDepthMultiple": 6,
     "initialHoldingFraction": 0.3,
@@ -97,7 +97,8 @@
     "impactMultiplierMax": 4,
     "flowNoise": 0.15,
     "flowMomentum": 0,
-    "holdingReversion": 0.5,
+    "holdingReversion": 1,
+    "holdingReversionChance": 0.4,
     "whaleDailyChance": 0.1,
     "whaleMinDepths": 1,
     "whaleMaxDepths": 3,

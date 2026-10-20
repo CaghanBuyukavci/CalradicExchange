@@ -32,9 +32,15 @@ namespace CalradicExchange.Core.Config
 
         /// <summary>
         /// Pull of the investors' holding back to its listing level, as a fraction of depth per unit of the gap
-        /// (gap in supply fractions). A whale's pile is sold off over the following days this way.
+        /// (gap in supply fractions), on the days it happens. A whale's pile is sold off over the following days this way.
         /// </summary>
-        [JsonProperty("holdingReversion")] public double HoldingReversion { get; set; } = 0.5;
+        [JsonProperty("holdingReversion")] public double HoldingReversion { get; set; } = 1;
+
+        /// <summary>
+        /// Chance per day and instrument that the investors pull their holding back. Not every day: after a whale
+        /// buys, the selling comes on random days, so the price does not fall back on a schedule.
+        /// </summary>
+        [JsonProperty("holdingReversionChance")] public double HoldingReversionChance { get; set; } = 0.4;
 
         /// <summary>Chance per day that one whale trades somewhere in the market.</summary>
         [JsonProperty("whaleDailyChance")] public double WhaleDailyChance { get; set; } = 0.1;

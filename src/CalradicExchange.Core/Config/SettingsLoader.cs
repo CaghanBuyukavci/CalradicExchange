@@ -74,6 +74,7 @@ namespace CalradicExchange.Core.Config
                 Range(e, "npc.flowNoise", s.Npc.FlowNoise, 0, 5);
                 Range(e, "npc.flowMomentum", s.Npc.FlowMomentum, -10, 10);
                 Range(e, "npc.holdingReversion", s.Npc.HoldingReversion, 0, 10);
+                Range(e, "npc.holdingReversionChance", s.Npc.HoldingReversionChance, 0, 1);
                 Range(e, "npc.whaleDailyChance", s.Npc.WhaleDailyChance, 0, 1);
                 Range(e, "npc.whaleMinDepths", s.Npc.WhaleMinDepths, 0, 100);
                 Range(e, "npc.whaleMaxDepths", s.Npc.WhaleMaxDepths, s.Npc.WhaleMinDepths, 100);

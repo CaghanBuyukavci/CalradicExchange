@@ -122,6 +122,27 @@ namespace CalradicExchange.Core.Tests
         }
 
         [Fact]
+        public void AfterAWhaleBuys_TheSellOffComesOnRandomDays_NotEveryDay()
+        {
+            MarketEngine e = NewEngine(true);
+            e.Settings.Npc.FlowNoise = 0;
+            e.Settings.Npc.WhaleDailyChance = 0;
+            e.Tick(TestData.World(1));
+            PriceState grain = e.Get("cx_grain");
+            e.WhaleTrade("cx_grain", true, 2, null, 1);
+
+            int sellDays = 0, quietDays = 0, held = grain.NpcShares;
+            for (int d = 2; d <= 21; d++)
+            {
+                e.Tick(TestData.World(d));
+                if (grain.NpcShares < held) sellDays++;
+                else quietDays++;
+                held = grain.NpcShares;
+            }
+            Assert.True(sellDays >= 3 && quietDays >= 3, $"sell {sellDays}, quiet {quietDays}");
+        }
+
+        [Fact]
         public void InvestorFlow_IsDeterministic_AndProducesWhalesOverAYear()
         {
             MarketEngine a = NewEngine(true, 7), b = NewEngine(true, 7);

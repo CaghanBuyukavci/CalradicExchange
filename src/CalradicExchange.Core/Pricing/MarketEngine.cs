@@ -340,7 +340,7 @@ namespace CalradicExchange.Core.Pricing
 
         /// <summary>
         /// The town's investors (ADR-037): every tradable instrument gets one net order a day (noise, trend following,
-        /// and a pull of their holding back to its listing level), and now and then one whale trades a big block,
+        /// and on random days a pull of their holding back to its listing level), and now and then one whale trades a big block,
         /// which makes the news. Draws the same random numbers whatever the prices, for determinism.
         /// </summary>
         private void RunInvestors(WorldSnapshot world, TickSummary summary)
@@ -354,10 +354,11 @@ namespace CalradicExchange.Core.Pricing
                 if (!Liquidity.TradedByInvestors(def.Class)) continue;
                 PriceState ps = _byId[def.Id];
                 double eps = _rng.NextGaussian();
+                bool revert = _rng.NextDouble() < npc.HoldingReversionChance;
                 if (ps.Closed || !ps.HasPrice || ps.TotalShares <= 0) continue;
                 open.Add(def);
 
-                double gap = (npc.InitialHoldingFraction * ps.TotalShares - ps.NpcShares) / ps.TotalShares;
+                double gap = revert ? (npc.InitialHoldingFraction * ps.TotalShares - ps.NpcShares) / ps.TotalShares : 0;
                 double fraction = npc.FlowNoise * eps + npc.FlowMomentum * ps.ChangeOver(5) + npc.HoldingReversion * gap;
                 InvestorTrade(def, ps, fraction * _settings.For(def.Class).Depth, world.Day);
             }

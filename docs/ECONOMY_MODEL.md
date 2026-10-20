@@ -241,13 +241,14 @@ etki = λ × (emir_değeri / derinlik) × çarpan
 - **Yatırımcılar (NPC):** Portföyleri yok; araç başına yalnızca toplam payları (`npcShares`) kaydediliyor. Emtia, sepet ve krallık endekslerinde her gün bir net emir veriyorlar. Lonca ortaklıklarını sadece oyuncu alıp satıyor.
 
 ```
-günlük_net_emir = derinlik × ( 0,15 × N(0,1)  +  0 × 5_günlük_değişim  +  0,5 × (başlangıç_payı − pay) / çıkarılan )
+günlük_net_emir = derinlik × ( 0,15 × N(0,1)  +  0 × 5_günlük_değişim  +  G × 1,0 × (başlangıç_payı − pay) / çıkarılan )
+G = 1 olasılık 0,4 ile (her araç, her gün ayrı zar), yoksa 0
 ```
 
 - Trend takibi katsayısı (`flowMomentum`) 0. Simülatörde 0,5 değeri, kendi köyünü yağmalayıp fiyatı iten manipülatörün kazancını hedefin üstüne çıkardı.
 - Alım serbest payla, satış yatırımcıların elindeki payla sınırlı. Fiyat etkisi oyuncunun emriyle aynı formül (kalıcı etki × 0,5, κ ile geri döner).
 - **Balina:** Her gün %10 olasılıkla, açık araçlardan rastgele birinde bir balina derinliğin 1–3 katı büyüklükte işlem yapıyor. %60 alım; yatırımcılar zaten başlangıç payının 1,5 katından fazlasını tutuyorsa %60 satış. Haberlere ve mesaja düşüyor ("Bir Pravend tüccarı 800 adet tahıl hissesi topladı (+%13,1)").
-- Bir balinanın topladığı paylar sonraki günlerde geri dönüş terimiyle satılıyor (günde fazlanın yaklaşık %8'i); fiyat bu sırada aşağı baskı görüyor.
+- Bir balinanın topladığı paylar sonraki günlerde geri dönüş terimiyle satılıyor, ama her gün değil: her gün %40 olasılıkla, o gün fazlanın yaklaşık %17'si (ortalama günde %7). Fiyat düşüşü belli bir takvime bağlı değil.
 
 ## 6. Limitler ve teminat
 
