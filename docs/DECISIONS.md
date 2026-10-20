@@ -447,7 +447,7 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - Kayıt: Şema 15 (`market.scheduledNews`, `news[].event.itemShare`).
 
 **Karar (2. aşama, stok verisi gelince):**
-- Emtia fiyatı dünya stoğu ve talep oranına bağlanacak. Oyuncunun malı piyasadan toplaması (köşeleme) ya da boşaltması fiyatı doğrudan oynatacak.
+- Emtia fiyatı dünya stoğu ve talep oranına bağlanacak. Dünya stoğuna kervanların taşıdığı mal da girer (kullanıcı kararı, 2026-10-21; oyun içi ölçümde malın çoğu kervanlarda). Oyuncunun malı piyasadan toplaması (köşeleme) ya da boşaltması fiyatı doğrudan oynatacak.
 - Manipülasyon soruşturması (kullanıcı onayı): hem hisse tutup hem malı toplayan oyuncu belli bir olasılıkla ceza ve itibar kaybı yer. Olasılık borsacı seviyesi arttıkça düşecek (kullanıcı kararı).
 
 **Simülatör (336 gün, 20 tohum):**

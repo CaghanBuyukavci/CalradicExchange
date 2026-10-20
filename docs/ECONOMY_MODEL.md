@@ -228,6 +228,7 @@ sonraki günler: κ fiyatı F × e^S'ye çeker   → etkinin yaklaşık üçte b
 - %60 olasılıkla haber önce söylenti olarak duyulur, 1–3 gün sonra haber gelir.
 - Söylentilerin %33'ü yalandır (haber gelmez). Yalan söylenti oranı: günlük_olasılık × söylenti_olasılığı × y / (1 − y).
 - Söylenti S'yi dürtünün %25'i kadar iter, yarı ömrü 4 gün; yalan söylenti de aynı. Yalan çıkınca fiyat geri döner.
+- Bir emtiada aynı anda tek hikâye: bugün haberi olan ya da söylentisinin haberi bekleyen emtia yeni haber ve söylenti için seçilmez.
 - Sonraki aşamada yalan söylenti oranı borsacı seviyesiyle düşecek.
 - Haberler ve söylentiler sol alttaki mesajlarda da görünür.
 

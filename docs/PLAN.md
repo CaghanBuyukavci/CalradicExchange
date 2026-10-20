@@ -159,9 +159,11 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 2.16 Kar Al / Zarar Durdur emirleri: portföyde EMİR butonu, Emirlerim penceresi, günlük kontrol (ADR-039)
   - Şema 14. Oyunda test edildi (kar al, zarar durdur, süre dolması). Otomatik Al/Sat sonraki adım.
 - [x] 2.17 Emtia 2.0, 1. aşama: yağma payla ölçeklenir, sakin gürültü ve sıçramalar, piyasa haberleri ve söylentiler, dünya stoğu ölçümü (ADR-040)
-  - Şema 15. Oyun içi test bekleniyor. Tutsak alma haberleri listeden çıktı (ADR-041).
+  - Şema 15. Oyunda test edildi (gün 389–403). Tutsak alma haberleri listeden çıktı (ADR-041). Bir emtiada aynı anda tek hikâye: bugün haberi olan ya da haberi bekleyen emtiaya yeni söylenti düşmez.
 - [ ] 2.18 Emtia 2.0, 2. aşama: dünya stoğuna dayalı emtia fiyatı ve manipülasyon soruşturması (ADR-040, world_supply.csv verisiyle)
   - Piyasa haberleri fiziksel dünyaya da yansır: üretim haberleri haber etkisi sürdükçe köy ve atölye üretimini değiştirir, talep haberleri şehir pazarlarından mal çeker. Gıdada etki yarım, kuşatma altındaki şehirlere dokunulmaz (kullanıcı onayı, 2026-10-21).
+  - Dünya stoğu = şehir pazarı + köy deposu + kervan + köylü (+ oyuncu). Kervanlar dahil (kullanıcı kararı, 2026-10-21): demirde kervanlar ~1.280, şehirler 115–330 birim taşıyor.
+  - Önce `town_demand`'in kategori bazında mı okunduğunu kontrol et (demir ve gümüşte birebir aynı çıktı).
 - [ ] 2.19 Otomatik Al/Sat emirleri (kullanıcı detayları verecek)
 
 ### 2C. Ayarlar ve yerelleştirme

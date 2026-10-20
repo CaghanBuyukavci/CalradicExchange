@@ -271,12 +271,17 @@ namespace CalradicExchange.Core.Pricing
                 if (tpl != null && IsOpen(due.InstrumentId)) FireMarketNews(tpl, due.InstrumentId, due.Impulse, day, jumps, summary);
             }
 
+            // One story per commodity at a time: skip those with news today or a rumored news still to come.
+            var busy = new HashSet<string>(jumps.Keys);
+            foreach (ScheduledMarketNews n in State.ScheduledNews) busy.Add(n.InstrumentId);
+
             double roll = _rng.NextDouble(), pickTemplate = _rng.NextDouble(), pickItem = _rng.NextDouble(), size = _rng.NextDouble();
             double rumorRoll = _rng.NextDouble(), lead = _rng.NextDouble();
             double falseRoll = _rng.NextDouble(), falseTemplate = _rng.NextDouble(), falseItem = _rng.NextDouble(), falseSize = _rng.NextDouble();
 
-            if (roll < mn.DailyChance && Pick(mn, pickTemplate, pickItem, size, out MarketNewsTemplate template, out string id, out double impulse))
+            if (roll < mn.DailyChance && Pick(mn, busy, pickTemplate, pickItem, size, out MarketNewsTemplate template, out string id, out double impulse))
             {
+                busy.Add(id);
                 if (rumorRoll < mn.RumorChance)
                 {
                     int leadDays = mn.RumorLeadMinDays + Math.Min(mn.RumorLeadMaxDays - mn.RumorLeadMinDays, (int)(lead * (mn.RumorLeadMaxDays - mn.RumorLeadMinDays + 1)));
@@ -292,21 +297,21 @@ namespace CalradicExchange.Core.Pricing
             // False rumors come at a rate that makes them falseRumorShare of all rumors.
             double share = mn.FalseRumorShare;
             double falseRate = share < 1 ? mn.DailyChance * mn.RumorChance * share / (1 - share) : 0;
-            if (falseRoll < falseRate && Pick(mn, falseTemplate, falseItem, falseSize, out MarketNewsTemplate ft, out string fid, out double fimpulse))
+            if (falseRoll < falseRate && Pick(mn, busy, falseTemplate, falseItem, falseSize, out MarketNewsTemplate ft, out string fid, out double fimpulse))
             {
                 FireRumor(ft, fid, fimpulse, day, summary);
             }
             return jumps;
         }
 
-        /// <summary>A template, one of its open commodities and an impulse from three uniform draws. False when nothing fits.</summary>
-        private bool Pick(MarketNewsSettings mn, double pickTemplate, double pickItem, double size, out MarketNewsTemplate template, out string instrumentId, out double impulse)
+        /// <summary>A template, one of its open commodities not in <paramref name="busy"/> and an impulse from three uniform draws. False when nothing fits.</summary>
+        private bool Pick(MarketNewsSettings mn, HashSet<string> busy, double pickTemplate, double pickItem, double size, out MarketNewsTemplate template, out string instrumentId, out double impulse)
         {
             template = mn.Templates[Math.Min(mn.Templates.Count - 1, (int)(pickTemplate * mn.Templates.Count))];
             var candidates = new List<string>();
             foreach (InstrumentDefinition def in _catalog.Instruments)
             {
-                if (def.Class != InstrumentClass.Commodity || !IsOpen(def.Id)) continue;
+                if (def.Class != InstrumentClass.Commodity || !IsOpen(def.Id) || busy.Contains(def.Id)) continue;
                 if (template.Items.Count == 0 || template.Items.Contains(def.ItemId)) candidates.Add(def.Id);
             }
             instrumentId = candidates.Count > 0 ? candidates[Math.Min(candidates.Count - 1, (int)(pickItem * candidates.Count))] : null;

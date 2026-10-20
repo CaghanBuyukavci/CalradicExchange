@@ -78,7 +78,9 @@ namespace CalradicExchange.Core.Tests
         [Fact]
         public void FalseRumors_AreTheConfiguredShareOfAllRumors()
         {
-            MarketEngine e = Start(NewsOnGrain(0.5, 1, 0.5));
+            MarketSettings s = NewsOnGrain(0.5, 1, 0.5);
+            s.MarketNews.Templates[0].Items.Clear(); // any commodity, so one story at a time rarely blocks a pick
+            MarketEngine e = Start(s);
             int rumors = 0, news = 0;
             for (int d = 2; d <= 1201; d++)
             {
@@ -89,6 +91,19 @@ namespace CalradicExchange.Core.Tests
 
             double falseShare = 1 - (double)news / rumors;
             Assert.InRange(falseShare, 0.42, 0.58);
+        }
+
+        [Fact]
+        public void ACommodity_HasOneStoryAtATime()
+        {
+            // Every day a rumor and a false rumor, and grain is the only commodity: only the first can land on it.
+            MarketEngine e = Start(NewsOnGrain(1, 1, 0.5));
+            for (int d = 2; d <= 60; d++)
+            {
+                TickSummary t = e.Tick(TestData.World(d));
+                Assert.True(t.GeneratedEvents.Count(ev => ev.InstrumentId == Grain && (ev.Type == MarketEventType.MarketRumor || ev.Type == MarketEventType.MarketNews)) <= 1, $"day {d}");
+                Assert.True(e.State.ScheduledNews.Count(n => n.InstrumentId == Grain) <= 1, $"day {d}");
+            }
         }
 
         [Fact]
