@@ -339,7 +339,7 @@ namespace CalradicExchange.Behaviors
             {
                 PriceState ps = _market.Get(def.Id);
                 KingdomSnapshot k = world.Kingdoms.Find(x => x.Id == def.KingdomId);
-                string state = k == null ? "fallen" : $"fiefs {k.FiefCount}, prosperity {k.Prosperity:0}, enemies {k.EnemyCount}, sieges {k.FiefsUnderSiege}";
+                string state = k == null ? "fallen" : $"towns {k.Towns}, castles {k.Castles}, prosperity {k.Prosperity:0}, villages {k.Villages} hearth {k.VillageHearth:0} raided {k.VillagesRaided}, strength {k.Strength:0}, clans {k.Clans}, enemies {k.EnemyCount}, sieges {k.FiefsUnderSiege}";
                 parts.Add($"{def.KingdomId} P {ps?.Price:0.0} F {ps?.Fundamental:0.0} ({state})");
             }
             return parts.Count == 0 ? "none listed" : string.Join("; ", parts);

@@ -52,6 +52,10 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // Schema 11 adds news[].event.heroId / otherHeroId (HeroCaptured news) and portfolio.performance
                         // (daily total profit for the chart, ADR-031). Both default when missing; the chart starts empty.
                         break;
+                    case 11:
+                        // Schema 12 (ADR-032) adds kingdoms[].baseFiefScore / baseHearth / baseStrength / baseClans, set from
+                        // the next reading (KingdomInstruments.SetMissingBases), and new news event fields. Nothing to do here.
+                        break;
                 }
             }
 

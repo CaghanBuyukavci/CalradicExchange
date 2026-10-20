@@ -207,5 +207,26 @@
     <string id="cx_perf_change_partial" text="Son {DAYS} gün: {CHANGE} dinar ({COVERED} günlük kayıt var)" />
     <string id="cx_perf_totals" text="Toplam kâr/zarar: {PNL} dinar. Portföy değeri: {VALUE} dinar." />
     <string id="cx_perf_not_enough" text="Her gün bir nokta kaydedilir. Grafik ilk kayıtlı günden sonra görünür." />
+    <string id="cx_news_cat_death" text="Ölüm" />
+    <string id="cx_news_cat_battle" text="Muharebe" />
+    <string id="cx_news_cat_war_end" text="Savaş sonu" />
+    <string id="cx_news_cat_clan" text="Klan" />
+    <string id="cx_ev_castle_captured" text="{SETTLEMENT}, {K1} krallığından {K2} krallığına geçti." />
+    <string id="cx_ev_war_ended" text="{K1}, {K2} ile savaşı kazandı. {K2} günde {AMOUNT} dinar haraç ödeyecek." />
+    <string id="cx_ev_ruler_died" text="{K1} hükümdarı {HERO}{CAUSE} öldü." />
+    <string id="cx_ev_clan_leader_died" text="{K1} klan liderlerinden {HERO}{CAUSE} öldü." />
+    <string id="cx_cause_battle" text=" savaşta" />
+    <string id="cx_cause_wounds" text=" yaralarından" />
+    <string id="cx_cause_old_age" text=" yaşlılıktan" />
+    <string id="cx_cause_executed" text=" idam edilerek" />
+    <string id="cx_cause_murdered" text=" suikastle" />
+    <string id="cx_cause_labor" text=" doğumda" />
+    <string id="cx_ev_battle" text="{K1}, {K2} ordusunu yendi ({CASUALTIES} kayıp)." />
+    <string id="cx_ev_battle_near" text="{K1}, {SETTLEMENT} yakınında {K2} ordusunu yendi ({CASUALTIES} kayıp)." />
+    <string id="cx_ev_clan_rebelled" text="{CLAN} klanı {K1} krallığına isyan etti." />
+    <string id="cx_ev_clan_founded" text="{CLAN} klanı {K1} krallığına isyan edip {K2} krallığını kurdu." />
+    <string id="cx_ev_clan_defected" text="{CLAN} klanı {K1} krallığını bırakıp {K2} krallığına geçti." />
+    <string id="cx_ev_clan_left" text="{CLAN} klanı {K1} krallığından ayrıldı." />
+    <string id="cx_ev_clan_joined" text="{CLAN} klanı {K2} krallığına bağlılık yemini etti." />
   </strings>
 </base>

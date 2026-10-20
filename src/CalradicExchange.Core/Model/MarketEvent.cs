@@ -12,7 +12,14 @@ namespace CalradicExchange.Core.Model
     /// WarDeclared/PeaceMade: KingdomId and OtherKingdomId.
     /// SeasonChanged: Season = the new season.
     /// HeroCaptured: HeroId = prisoner, KingdomId = the prisoner's kingdom, OtherHeroId = captor (null when the
-    /// capturing party had no leader), OtherKingdomId = the captor's faction.
+    /// capturing party had no leader), OtherKingdomId = the captor's faction, HeroRank.
+    /// CastleCaptured: SettlementId = castle, KingdomId = loser, OtherKingdomId = winner.
+    /// HeroDied: HeroId, KingdomId = the hero's kingdom, HeroRank, Detail = cause (KillCharacterActionDetail).
+    /// BattleEnded: KingdomId = winner, OtherKingdomId = loser, SettlementId = nearby settlement (may be null),
+    /// Casualties, Magnitude = battle size 0-1.
+    /// WarEnded: KingdomId = winner, OtherKingdomId = loser (the tribute payer), Amount = daily tribute.
+    /// ClanChangedKingdom: ClanId, KingdomId = old kingdom, OtherKingdomId = new kingdom (either may be null),
+    /// Detail = ChangeKingdomActionDetail, Magnitude = 1 (rebellion more).
     /// </summary>
     public sealed class MarketEvent
     {
@@ -32,6 +39,28 @@ namespace CalradicExchange.Core.Model
         /// <summary>HeroCaptured only. Added in schema 11.</summary>
         public string OtherHeroId { get; set; }
 
+        /// <summary>HeroDied, HeroCaptured. Schema 12.</summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public HeroRank? HeroRank { get; set; }
+
+        /// <summary>ClanChangedKingdom. Schema 12.</summary>
+        public string ClanId { get; set; }
+
+        /// <summary>Cause or kind, for the news text (death cause, kind of kingdom change). Schema 12.</summary>
+        public string Detail { get; set; }
+
+        /// <summary>Size of the event, 0 and up; rules with scaleByMagnitude multiply their impulse by it. Schema 12.</summary>
+        public double? Magnitude { get; set; }
+
+        /// <summary>BattleEnded: troops lost on both sides. Schema 12.</summary>
+        public int Casualties { get; set; }
+
+        /// <summary>WarEnded: daily tribute. Schema 12.</summary>
+        public int Amount { get; set; }
+
+        /// <summary>Moves prices but is not kept as news (small battles). Not saved.</summary>
+        [JsonIgnore] public bool Quiet { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public Season? Season { get; set; }
 
@@ -40,7 +69,10 @@ namespace CalradicExchange.Core.Model
 
         public override string ToString()
         {
-            return $"{Type} day={Day} settlement={SettlementId} item={ItemId} town={TownId} kingdom={KingdomId} other={OtherKingdomId} season={Season}" + (HeroId != null ? $" hero={HeroId} captor={OtherHeroId}" : "");
+            return $"{Type} day={Day} settlement={SettlementId} item={ItemId} town={TownId} kingdom={KingdomId} other={OtherKingdomId} season={Season}" + (HeroId != null ? $" hero={HeroId} captor={OtherHeroId} rank={HeroRank}" : "")
+                + (ClanId != null ? $" clan={ClanId}" : "") + (Detail != null ? $" detail={Detail}" : "")
+                + (Magnitude != null ? $" magnitude={Magnitude:0.00}" : "") + (Casualties > 0 ? $" casualties={Casualties}" : "")
+                + (Amount > 0 ? $" amount={Amount}" : "") + (Quiet ? " quiet" : "");
         }
     }
 }

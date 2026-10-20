@@ -159,6 +159,11 @@ namespace CalradicExchange.Localization
                 case MarketEventType.FamineStarted: return new TextObject("{=cx_news_cat_famine}Famine");
                 case MarketEventType.KingdomDestroyed: return new TextObject("{=cx_news_cat_fall}Fall");
                 case MarketEventType.HeroCaptured: return new TextObject("{=cx_news_cat_captive}Captive");
+                case MarketEventType.CastleCaptured: return new TextObject("{=cx_news_cat_conquest}Conquest");
+                case MarketEventType.HeroDied: return new TextObject("{=cx_news_cat_death}Death");
+                case MarketEventType.BattleEnded: return new TextObject("{=cx_news_cat_battle}Battle");
+                case MarketEventType.WarEnded: return new TextObject("{=cx_news_cat_war_end}War's end");
+                case MarketEventType.ClanChangedKingdom: return new TextObject("{=cx_news_cat_clan}Clan");
                 default: return new TextObject(type.ToString());
             }
         }
@@ -177,9 +182,37 @@ namespace CalradicExchange.Localization
                 case MarketEventType.FamineStarted: return new TextObject("{=cx_ev_famine}Famine in {TOWN}.");
                 case MarketEventType.KingdomDestroyed: return new TextObject("{=cx_ev_kingdom_destroyed}{K1} has fallen.");
                 case MarketEventType.HeroCaptured: return new TextObject("{=cx_ev_hero_captured}{HERO} ({K1}) was taken prisoner by {CAPTOR} ({K2}).");
+                case MarketEventType.CastleCaptured: return new TextObject("{=cx_ev_castle_captured}{SETTLEMENT} passed from {K1} to {K2}.");
+                case MarketEventType.WarEnded: return new TextObject("{=cx_ev_war_ended}{K1} won the war against {K2}. {K2} pays {AMOUNT} denars a day in tribute.");
                 default: return new TextObject(type.ToString());
             }
         }
+
+        public static TextObject RulerDied => new TextObject("{=cx_ev_ruler_died}{HERO}, ruler of {K1}, has died{CAUSE}.");
+        public static TextObject ClanLeaderDied => new TextObject("{=cx_ev_clan_leader_died}{HERO}, clan leader of {K1}, has died{CAUSE}.");
+
+        public static TextObject DeathCause(string detail)
+        {
+            switch (detail)
+            {
+                case "DiedInBattle": return new TextObject("{=cx_cause_battle} in battle");
+                case "WoundedInBattle": return new TextObject("{=cx_cause_wounds} of wounds");
+                case "DiedOfOldAge": return new TextObject("{=cx_cause_old_age} of old age");
+                case "Executed":
+                case "ExecutionAfterMapEvent": return new TextObject("{=cx_cause_executed}, executed");
+                case "Murdered": return new TextObject("{=cx_cause_murdered}, murdered");
+                case "DiedInLabor": return new TextObject("{=cx_cause_labor} in childbirth");
+                default: return TextObject.GetEmpty();
+            }
+        }
+
+        public static TextObject BattleWon => new TextObject("{=cx_ev_battle}{K1} defeated {K2} ({CASUALTIES} casualties).");
+        public static TextObject BattleWonNear => new TextObject("{=cx_ev_battle_near}{K1} defeated {K2} near {SETTLEMENT} ({CASUALTIES} casualties).");
+        public static TextObject ClanRebelled => new TextObject("{=cx_ev_clan_rebelled}{CLAN} rebelled against {K1}.");
+        public static TextObject ClanRebelledFounded => new TextObject("{=cx_ev_clan_founded}{CLAN} rebelled against {K1} and founded {K2}.");
+        public static TextObject ClanDefected => new TextObject("{=cx_ev_clan_defected}{CLAN} left {K1} for {K2}.");
+        public static TextObject ClanLeft => new TextObject("{=cx_ev_clan_left}{CLAN} left {K1}.");
+        public static TextObject ClanJoined => new TextObject("{=cx_ev_clan_joined}{CLAN} swore fealty to {K2}.");
 
         /// <summary>HeroCaptured when the capturing party had no leader (e.g. a garrison): the faction only.</summary>
         public static TextObject HeroCapturedByFaction => new TextObject("{=cx_ev_hero_captured_faction}{HERO} ({K1}) was taken prisoner by {K2}.");

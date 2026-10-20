@@ -15,6 +15,10 @@ namespace CalradicExchange.UI
         private static readonly Color Famine = Color.ConvertStringToColor("#E8D060FF");
         private static readonly Color Fall = Color.ConvertStringToColor("#B0B0B0FF");
         private static readonly Color Captive = Color.ConvertStringToColor("#4FD1C5FF");
+        private static readonly Color Death = Color.ConvertStringToColor("#DCDCDCFF");
+        private static readonly Color Battle = Color.ConvertStringToColor("#FF8A65FF");
+        private static readonly Color WarEnd = Color.ConvertStringToColor("#9FB8F0FF");
+        private static readonly Color Clan = Color.ConvertStringToColor("#C8C864FF");
 
         public static Color For(MarketEventType type)
         {
@@ -23,7 +27,12 @@ namespace CalradicExchange.UI
                 case MarketEventType.VillageLooted: return Raid;
                 case MarketEventType.SiegeStarted:
                 case MarketEventType.SiegeEnded: return Siege;
-                case MarketEventType.SettlementCaptured: return Conquest;
+                case MarketEventType.SettlementCaptured:
+                case MarketEventType.CastleCaptured: return Conquest;
+                case MarketEventType.HeroDied: return Death;
+                case MarketEventType.BattleEnded: return Battle;
+                case MarketEventType.WarEnded: return WarEnd;
+                case MarketEventType.ClanChangedKingdom: return Clan;
                 case MarketEventType.WarDeclared: return War;
                 case MarketEventType.PeaceMade: return Peace;
                 case MarketEventType.SeasonChanged: return Season;

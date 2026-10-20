@@ -147,6 +147,104 @@ namespace CalradicExchange.Core.Tests
             Assert.Equal("h29", engine.State.News.Last().Event.HeroId);
         }
 
+        private static KingdomSnapshot Full(string id, double prosperity = 10000, int towns = 4, int castles = 4, double hearth = 5000,
+            int raided = 0, double strength = 20000, int clans = 8)
+        {
+            return new KingdomSnapshot
+            {
+                Id = id, Prosperity = prosperity, Towns = towns, Castles = castles, FiefCount = towns + castles,
+                VillageHearth = hearth, Villages = 16, VillagesRaided = raided, Strength = strength, Clans = clans,
+            };
+        }
+
+        [Fact]
+        public void ObservedValue_WeighsTownsVillagesStrengthClansAndRaids()
+        {
+            var s = new KingdomSettings();
+            var records = new List<KingdomRecord>();
+            WorldSnapshot w = TestData.World(1);
+            w.Kingdoms = new List<KingdomSnapshot> { Full("k1") };
+            KingdomInstruments.Track(records, w, s);
+            KingdomRecord r = records.Single();
+            Assert.Equal(12, r.BaseFiefScore); // 4 towns x 2 + 4 castles x 1
+
+            Assert.Equal(100m, KingdomInstruments.ObservedValue(r, Full("k1"), s));
+            // Losing a town weighs twice a castle.
+            decimal town = KingdomInstruments.ObservedValue(r, Full("k1", towns: 3), s);
+            decimal castle = KingdomInstruments.ObservedValue(r, Full("k1", castles: 3), s);
+            Assert.True(town < castle && castle < 100m);
+            Assert.True(KingdomInstruments.ObservedValue(r, Full("k1", hearth: 2500), s) < 100m);
+            Assert.True(KingdomInstruments.ObservedValue(r, Full("k1", strength: 10000), s) < 100m);
+            Assert.True(KingdomInstruments.ObservedValue(r, Full("k1", clans: 6), s) < 100m);
+            Assert.Equal(97m, KingdomInstruments.ObservedValue(r, Full("k1", raided: 2), s)); // 1 - 2 x 0.015
+            Assert.Equal(85m, KingdomInstruments.ObservedValue(r, Full("k1", raided: 30), s)); // raid floor
+            // Strength is clamped: a wiped-out army does not take the index to zero.
+            Assert.True(KingdomInstruments.ObservedValue(r, Full("k1", strength: 0), s) > 70m);
+        }
+
+        [Fact]
+        public void OldRecords_GetTheNewBases_AndKeepFiefsLostSinceTheOldBase()
+        {
+            var s = new KingdomSettings();
+            var old = new KingdomRecord { KingdomId = "k1", BaseProsperity = 10000, BaseFiefs = 10, Listed = true };
+            var records = new List<KingdomRecord> { old };
+            WorldSnapshot w = TestData.World(5);
+            w.Kingdoms = new List<KingdomSnapshot> { Full("k1") }; // 8 fiefs now, 10 at the old base
+            KingdomInstruments.Track(records, w, s);
+
+            Assert.Equal(15, old.BaseFiefScore); // 12 / 8 x 10
+            Assert.Equal(5000, old.BaseHearth);
+            Assert.Equal(20000, old.BaseStrength);
+            Assert.Equal(8, old.BaseClans);
+            Assert.True(KingdomInstruments.ObservedValue(old, Full("k1"), s) < 100m);
+        }
+
+        [Fact]
+        public void HeroRules_ApplyOnlyToTheirRank()
+        {
+            MarketEngine engine = Engine();
+            engine.Tick(World(1));
+            engine.ApplyEvent(new MarketEvent { Type = MarketEventType.HeroDied, Day = 2, HeroId = "lord", KingdomId = "k1", HeroRank = HeroRank.Lord });
+            Assert.Empty(engine.Get(K1).Shocks);
+
+            engine.ApplyEvent(new MarketEvent { Type = MarketEventType.HeroDied, Day = 2, HeroId = "king", KingdomId = "k1", HeroRank = HeroRank.Ruler });
+            Assert.Equal(-0.15, engine.Get(K1).Shocks.Sum(c => c.Value), 6);
+
+            for (int i = 0; i < 5; i++)
+            {
+                engine.ApplyEvent(new MarketEvent { Type = MarketEventType.HeroDied, Day = 2, HeroId = "c" + i, KingdomId = "k2", HeroRank = HeroRank.ClanLeader });
+            }
+            Assert.Equal(-0.12, engine.Get(K2).Shocks.Sum(c => c.Value), 6); // 3 x -0.04
+        }
+
+        [Fact]
+        public void Battles_ScaleWithSize_AndStackInUnscaledImpulses()
+        {
+            MarketEngine engine = Engine();
+            engine.Tick(World(1));
+            engine.ApplyEvent(new MarketEvent { Type = MarketEventType.BattleEnded, Day = 2, KingdomId = "k1", OtherKingdomId = "k2", Magnitude = 0.5, Quiet = true });
+            Assert.Equal(0.02, engine.Get(K1).Shocks.Sum(c => c.Value), 6);
+            Assert.Equal(-0.025, engine.Get(K2).Shocks.Sum(c => c.Value), 6);
+            Assert.Empty(engine.State.News); // quiet: prices only
+
+            for (int i = 0; i < 20; i++) engine.ApplyEvent(new MarketEvent { Type = MarketEventType.BattleEnded, Day = 2, KingdomId = "k1", OtherKingdomId = "k2", Magnitude = 1 });
+            Assert.Equal(0.16, engine.Get(K1).Shocks.Sum(c => c.Value), 6); // 4 x 0.04
+            Assert.Equal(-0.2, engine.Get(K2).Shocks.Sum(c => c.Value), 6);
+        }
+
+        [Fact]
+        public void CastlesWarsAndClans_MoveTheRightIndex()
+        {
+            MarketEngine engine = Engine();
+            engine.Tick(World(1));
+            engine.ApplyEvent(new MarketEvent { Type = MarketEventType.CastleCaptured, Day = 2, SettlementId = "castle_1", KingdomId = "k1", OtherKingdomId = "k2" });
+            engine.ApplyEvent(new MarketEvent { Type = MarketEventType.WarEnded, Day = 2, KingdomId = "k2", OtherKingdomId = "k1", Amount = 100 });
+            engine.ApplyEvent(new MarketEvent { Type = MarketEventType.ClanChangedKingdom, Day = 2, ClanId = "c", KingdomId = "k1", OtherKingdomId = "k2", Magnitude = 2 });
+
+            Assert.Equal(-0.1 - 0.1 - 0.1, engine.Get(K1).Shocks.Sum(c => c.Value), 6);
+            Assert.Equal(0.06 + 0.08 + 0.06, engine.Get(K2).Shocks.Sum(c => c.Value), 6);
+        }
+
         [Fact]
         public void EmptyKingdomList_ChangesNothing()
         {

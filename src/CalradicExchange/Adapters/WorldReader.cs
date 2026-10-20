@@ -110,7 +110,10 @@ namespace CalradicExchange.Adapters
             return world;
         }
 
-        /// <summary>Prosperity and fiefs (towns and castles), sieges and enemies of one living kingdom (PLAN 2.4).</summary>
+        /// <summary>
+        /// One living kingdom (PLAN 2.4, ADR-032): towns and castles with their prosperity and sieges, villages with
+        /// their hearths and raids, military strength, sworn clans and enemies.
+        /// </summary>
         private static KingdomSnapshot ReadKingdom(Kingdom k, List<Kingdom> alive)
         {
             var snap = new KingdomSnapshot { Id = k.StringId };
@@ -118,9 +121,20 @@ namespace CalradicExchange.Adapters
             {
                 if (fief == null) continue;
                 snap.FiefCount++;
+                if (fief.Settlement != null && fief.Settlement.IsCastle) snap.Castles++;
+                else snap.Towns++;
                 snap.Prosperity += Math.Max(0, fief.Prosperity);
                 if (fief.IsUnderSiege) snap.FiefsUnderSiege++;
             }
+            foreach (Village v in k.Villages)
+            {
+                if (v == null) continue;
+                snap.Villages++;
+                snap.VillageHearth += Math.Max(0, v.Hearth);
+                if (v.VillageState == Village.VillageStates.Looted || v.VillageState == Village.VillageStates.BeingRaided) snap.VillagesRaided++;
+            }
+            snap.Strength = Math.Max(0, k.CurrentTotalStrength);
+            snap.Clans = k.Clans.Count(c => c != null && !c.IsEliminated && !c.IsUnderMercenaryService);
             foreach (Kingdom other in alive)
             {
                 if (other != k && FactionManager.IsAtWarAgainstFaction(k, other)) snap.EnemyCount++;

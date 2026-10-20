@@ -125,6 +125,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 2.3a Lonca Piyasası tablosu: bulunulan şehrin loncaları (AL/SAT) + başka şehirlerde elde tutulan loncalar (sadece SAT) (ADR-026)
 - [x] 2.4 Krallık endeksi (§2.4); krallık yok olunca kapanış; Krallık Piyasası tablosu
   - ADR-030: her şehirde alınır, açığa satış yok, yıkılınca sıfır, oyuncunun krallığı da listelenir. Şema 10. Oyun içi test bekleniyor.
+  - 2026-10-20 (ADR-032): Endekse köyler, kaleler, askeri güç ve klan sayısı eklendi; olaylara kale fethi, hükümdar ve klan lideri ölümü ve esareti, muharebeler, savaşın kazananı/kaybedeni (haraç), barış ve klan iltihak/ayrılmaları eklendi.
 - [ ] 2.5 Simülatöre yeni araçları ekle, hedefleri yeniden kontrol et (özellikle temettülü al-tut getirisi)
 
 ### 2B. Gauntlet ekranı

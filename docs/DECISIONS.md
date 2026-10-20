@@ -312,3 +312,42 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
   - Vlandia 28 günde 15 yağma yedi. Her biri −0,06 ve yığılma sınırı yoktu, bu yüzden fiyat temel değerin %25 altına indi (P 67,8, F 90,5).
   - Kural −0,03'e indi, `maxStack` 3 (canlı en fazla −0,09).
   - Diğer krallıklarda fiyat/temel değer farkı %3–5.
+
+## ADR-032 — Krallık endeksine bütün krallık verileri (2026-10-20)
+
+- **Kullanıcı isteği:** Krallıkla ilgili her şey endekse girsin: şehirler, kaleler, köyler, yağma, fethedilme ve fethetme, klan liderlerinin ve kralın ölümü, savaş kazanma/kaybetme, savaş ve barış ilanları. Hepsi farklı ağırlıkta olsun. Ağırlıkları ben seçtim; hepsi `settings.json`'da.
+- **Temel değer (günlük okuma):**
+  - F = 100 × refah^0,6 × fief puanı^0,5 × köy hane^0,3 × askeri güç^0,2 × klan^0,3 × savaş × kuşatma × yağma.
+  - Her oran bugünkü değer / krallığın taban değeri.
+  - Fief puanı = şehir × 2 + kale × 1. Bir şehir kaybı iki kale kaybı kadar ağır.
+  - Köy hanesi `Village.Hearth` toplamı. Köyler fiefleriyle birlikte el değiştirdiği için ayrıca olay gerekmez.
+  - Askeri güç `Kingdom.CurrentTotalStrength`. Oranı 0,25–3 arasında tutuluyor; ordusu dağılan krallık sıfıra inmiyor.
+  - Klan sayısına paralı askerler girmiyor.
+  - Yağma çarpanı: o gün yağmalanmış ya da yağmalanan köy başına −%1,5, en az 0,85.
+  - Savaş (düşman başına −%5, en az 0,7) ve kuşatma (−%8, en az 0,6) çarpanları değişmedi.
+  - Refah üssü 1'den 0,6'ya indi, çünkü artık yükü başka parçalar da taşıyor.
+- **Olay şokları (fiyatı hemen iter, sonra söner):**
+
+| Olay | Krallık | Etki | Yarı ömür |
+|---|---|---|---|
+| Köy yağması | sahibi | −0,03 (en fazla 3 birikir) | 10 gün |
+| Şehir fethi | kaybeden / kazanan | −0,24 / +0,15 | 21 gün |
+| Kale fethi | kaybeden / kazanan | −0,10 / +0,06 | 21 gün |
+| Hükümdar ölümü | kendi | −0,15, oynaklık ×1,5 (21 gün) | 21 gün |
+| Klan lideri ölümü | kendi | −0,04 (en fazla 3 birikir) | 14 gün |
+| Hükümdar esir düştü | kendi | −0,08 | 14 gün |
+| Klan lideri esir düştü | kendi | −0,015 (en fazla 3 birikir) | 10 gün |
+| Muharebe | kazanan / kaybeden | +0,04 / −0,05 × büyüklük (en fazla 4 birikir) | 10 gün |
+| Savaş ilanı | iki taraf | −0,06, oynaklık ×1,5 | 14 gün |
+| Barış | iki taraf | +0,03 | 14 gün |
+| Savaşın sonu (haraçlı barış) | kazanan / kaybeden | +0,08 / −0,10 | 28 gün |
+| Klan ayrıldı / katıldı | eski / yeni | −0,05 / +0,03 (isyanda ×1,6) | 21 gün |
+| Yıkılış | kendi | endeks 0 | — |
+
+- **Muharebe:** Savaştaki iki krallık arasında, kazananı olan, yağma olmayan çarpışmalar. İki tarafın toplam kaybı 20'den azsa sayılmaz. Büyüklük = kayıp / 300 (en fazla 1). 100 kayıptan küçük muharebeler fiyatı oynatır ama habere yazılmaz (`MarketEvent.Quiet`), yoksa 20 haberlik liste dolardı.
+  - Birikme sınırı ölçeksiz şoka göre sayılır (`maxStack` × 0,04). Küçük muharebeler sınırı genişletmez.
+- **Savaşın kazananı:** Barışta haraç ödeyen kaybetmiştir. Haraçsız barışın kazananı yok; sadece barış şoku uygulanır.
+- **Ölüm ve esaret rütbesi:** `BeforeHeroKilledEvent` kullanılıyor, çünkü `HeroKilledEvent` geldiğinde klan liderliği ve taht varise geçmiş olur. Sadece hükümdar ve klan lideri ölümleri olay olur; sıradan lordların ölümü değil. Kurallarda yeni `heroRank` filtresi ve `scaleByMagnitude` alanı var.
+- **Klan değişikliği:** Paralı asker sözleşmeleri ve yıkılışla gelen ayrılmalar sayılmaz. İsyan (`LeaveWithRebellion`, `CreateKingdom`) ×1,6.
+- **Şema 12:** `kingdoms[].baseFiefScore / baseHearth / baseStrength / baseClans` eklendi ve ilk okumada doldurulur. Eski kayıtlarda fief puanı tabanı eski fief sayısı tabanından ölçeklenir, böylece o güne kadar kaybedilen fiefler sayılmaya devam eder. Yeni parçalar (köy, güç, klan) eski kayıtlarda bugünden itibaren ölçülür.
+- **Henüz kullanılmayan:** StanceLink'teki savaş istatistikleri (kayıp, başarılı kuşatma ve yağma sayıları). Haraçsız barışta kazananı bunlardan çıkarmak sonraki ayar turuna kalabilir.

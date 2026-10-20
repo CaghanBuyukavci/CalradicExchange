@@ -112,15 +112,18 @@ namespace CalradicExchange.Core.Pricing
                 {
                     if (ev.Season == null || !_settings.SeasonImpulses.TryGetValue(ev.Season.Value, out impulse)) continue;
                 }
+                if (rule.HeroRank != null && ev.HeroRank != rule.HeroRank) continue;
+                double stackUnit = impulse; // maxStack counts in unscaled impulses
                 if (rule.ScaleByTownShare) impulse *= (ev.TownShare ?? 0) * rule.TownShareMultiplier;
+                if (rule.ScaleByMagnitude) impulse *= ev.Magnitude ?? 1;
 
                 foreach (InstrumentDefinition def in ShockMapper.Resolve(rule.Target, ev, Instruments, Find))
                 {
                     PriceState ps = Get(def.Id);
                     if (ps == null || ps.Closed) continue;
 
-                    string source = ev.Type + ":" + rule.Target;
-                    double added = StackLimited(ps, source, impulse, rule.MaxStack);
+                    string source = ev.Type + ":" + rule.Target + (rule.HeroRank != null ? ":" + rule.HeroRank : "");
+                    double added = StackLimited(ps, source, impulse, stackUnit, rule.MaxStack);
                     if (added != 0)
                     {
                         ps.Shocks.Add(new ShockComponent
@@ -430,15 +433,15 @@ namespace CalradicExchange.Core.Pricing
         }
 
         /// <summary>The part of an impulse that still fits under the rule's maxStack on this instrument.</summary>
-        private static double StackLimited(PriceState ps, string source, double impulse, double maxStack)
+        private static double StackLimited(PriceState ps, string source, double impulse, double unit, double maxStack)
         {
-            if (maxStack <= 0 || impulse == 0) return impulse;
+            if (maxStack <= 0 || impulse == 0 || unit == 0) return impulse;
             double live = 0;
             foreach (ShockComponent c in ps.Shocks)
             {
                 if (c.Source == source && Math.Sign(c.Value) == Math.Sign(impulse)) live += c.Value;
             }
-            double room = impulse * maxStack - live;
+            double room = Math.Sign(impulse) * Math.Abs(unit) * maxStack - live;
             if (Math.Sign(room) != Math.Sign(impulse)) return 0;
             double added = Math.Abs(room) < Math.Abs(impulse) ? room : impulse;
             return Math.Abs(added) < NegligibleShock ? 0 : added;
@@ -546,7 +549,7 @@ namespace CalradicExchange.Core.Pricing
 
         private void AddNews(MarketEvent ev, List<string> affected)
         {
-            if (_settings.NewsKeep <= 0) return;
+            if (_settings.NewsKeep <= 0 || ev.Quiet) return;
             State.News.Add(new NewsItem { Day = ev.Day, Event = ev, AffectedInstruments = new List<string>(affected) });
             int excess = State.News.Count - _settings.NewsKeep;
             if (excess > 0) State.News.RemoveRange(0, excess);

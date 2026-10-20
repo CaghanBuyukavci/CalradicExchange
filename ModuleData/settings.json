@@ -71,9 +71,19 @@
     "debtRelationPenalty": 2
   },
   "kingdoms": {
-    "_comment": "Kingdom indices (PLAN 2.4, ADR-030). F = 100 x prosperity/base x (fiefs/base)^fiefExponent x max(warFloor, 1 - warStep x enemies) x max(siegeFloor, 1 - siegeStep x fiefs under siege). Kingdoms founded later wait minListingDays.",
+    "_comment": "Kingdom indices (PLAN 2.4, ADR-030, ADR-032). F = 100 x (prosperity/base)^prosperityExponent x (fief score/base)^fiefExponent x (village hearth/base)^villageExponent x (strength/base, clamped)^strengthExponent x (clans/base)^clanExponent x max(warFloor, 1 - warStep x enemies) x max(siegeFloor, 1 - siegeStep x fiefs under siege) x max(raidFloor, 1 - raidStep x villages raided). Fief score = towns x townWeight + castles x castleWeight. Kingdoms founded later wait minListingDays.",
     "minListingDays": 7,
+    "prosperityExponent": 0.6,
     "fiefExponent": 0.5,
+    "townWeight": 2,
+    "castleWeight": 1,
+    "villageExponent": 0.3,
+    "strengthExponent": 0.2,
+    "strengthRatioMin": 0.25,
+    "strengthRatioMax": 3,
+    "clanExponent": 0.3,
+    "raidStep": 0.015,
+    "raidFloor": 0.85,
     "prosperityFloor": 100,
     "warStep": 0.05,
     "warFloor": 0.7,
@@ -174,6 +184,11 @@
     ],
     "PeaceMade": [
       {
+        "target": "kingdomIndex:both",
+        "impulse": 0.03,
+        "halfLifeDays": 14
+      },
+      {
         "target": "instrument:cx_sector_luxury",
         "impulse": 0.09,
         "halfLifeDays": 21
@@ -211,6 +226,91 @@
       }
     ],
     "KingdomDestroyed": [],
-    "HeroCaptured": []
+    "HeroCaptured": [
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "heroRank": "Ruler",
+        "impulse": -0.08,
+        "halfLifeDays": 14
+      },
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "heroRank": "ClanLeader",
+        "impulse": -0.015,
+        "halfLifeDays": 10,
+        "maxStack": 3
+      }
+    ],
+    "CastleCaptured": [
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "impulse": -0.1,
+        "halfLifeDays": 21
+      },
+      {
+        "target": "kingdomIndex:otherKingdom",
+        "impulse": 0.06,
+        "halfLifeDays": 21
+      }
+    ],
+    "HeroDied": [
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "heroRank": "Ruler",
+        "impulse": -0.15,
+        "halfLifeDays": 21,
+        "volMultiplier": 1.5,
+        "volDays": 21
+      },
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "heroRank": "ClanLeader",
+        "impulse": -0.04,
+        "halfLifeDays": 14,
+        "maxStack": 3
+      }
+    ],
+    "BattleEnded": [
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "impulse": 0.04,
+        "halfLifeDays": 10,
+        "scaleByMagnitude": true,
+        "maxStack": 4
+      },
+      {
+        "target": "kingdomIndex:otherKingdom",
+        "impulse": -0.05,
+        "halfLifeDays": 10,
+        "scaleByMagnitude": true,
+        "maxStack": 4
+      }
+    ],
+    "WarEnded": [
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "impulse": 0.08,
+        "halfLifeDays": 28
+      },
+      {
+        "target": "kingdomIndex:otherKingdom",
+        "impulse": -0.1,
+        "halfLifeDays": 28
+      }
+    ],
+    "ClanChangedKingdom": [
+      {
+        "target": "kingdomIndex:eventKingdom",
+        "impulse": -0.05,
+        "halfLifeDays": 21,
+        "scaleByMagnitude": true
+      },
+      {
+        "target": "kingdomIndex:otherKingdom",
+        "impulse": 0.03,
+        "halfLifeDays": 21,
+        "scaleByMagnitude": true
+      }
+    ]
   }
 }

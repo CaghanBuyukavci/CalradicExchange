@@ -79,6 +79,9 @@ namespace CalradicExchange.Diagnostics
         /// exchange.fire_event VillageLooted &lt;itemId&gt; [townId] | SiegeStarted|SiegeEnded|FamineStarted &lt;townId&gt;
         /// | SettlementCaptured &lt;townId&gt; &lt;loserKingdom&gt; &lt;winnerKingdom&gt; | WarDeclared|PeaceMade &lt;k1&gt; &lt;k2&gt;
         /// | SeasonChanged &lt;Spring|Summer|Autumn|Winter&gt; | KingdomDestroyed &lt;kingdom&gt;
+        /// | CastleCaptured &lt;castleId&gt; &lt;loser&gt; &lt;winner&gt; | HeroDied|HeroCaptured &lt;kingdom&gt; &lt;Ruler|ClanLeader&gt; [heroId]
+        /// | BattleEnded &lt;winner&gt; &lt;loser&gt; [casualties] | WarEnded &lt;winner&gt; &lt;loser&gt; [tribute]
+        /// | ClanChangedKingdom &lt;clanId&gt; &lt;oldKingdom|-&gt; &lt;newKingdom|-&gt;
         /// </summary>
         [CommandLineFunctionality.CommandLineArgumentFunction("fire_event", Group)]
         public static string FireEvent(List<string> args)
@@ -109,6 +112,30 @@ namespace CalradicExchange.Diagnostics
                         break;
                     case MarketEventType.KingdomDestroyed:
                         ev.KingdomId = Arg(1);
+                        break;
+                    case MarketEventType.CastleCaptured:
+                        ev.SettlementId = Arg(1); ev.KingdomId = Arg(2); ev.OtherKingdomId = Arg(3);
+                        break;
+                    case MarketEventType.HeroDied:
+                    case MarketEventType.HeroCaptured:
+                        if (!Enum.TryParse(Arg(2) ?? "", true, out HeroRank rank)) return $"Usage: exchange.fire_event {type} <kingdom> <Ruler|ClanLeader> [heroId]";
+                        ev.KingdomId = Arg(1); ev.HeroRank = rank; ev.HeroId = Arg(3) ?? "console";
+                        break;
+                    case MarketEventType.BattleEnded:
+                        ev.KingdomId = Arg(1); ev.OtherKingdomId = Arg(2);
+                        ev.Casualties = int.TryParse(Arg(3), out int lost) ? lost : 300;
+                        ev.Magnitude = Math.Min(1.0, ev.Casualties / 300.0);
+                        break;
+                    case MarketEventType.WarEnded:
+                        ev.KingdomId = Arg(1); ev.OtherKingdomId = Arg(2);
+                        ev.Amount = int.TryParse(Arg(3), out int tribute) ? tribute : 100;
+                        break;
+                    case MarketEventType.ClanChangedKingdom:
+                        ev.ClanId = Arg(1);
+                        ev.KingdomId = Arg(2) == "-" ? null : Arg(2);
+                        ev.OtherKingdomId = Arg(3) == "-" ? null : Arg(3);
+                        ev.Detail = ev.OtherKingdomId == null ? "LeaveKingdom" : "JoinKingdomByDefection";
+                        ev.Magnitude = 1;
                         break;
                     default:
                         ev.TownId = Arg(1);

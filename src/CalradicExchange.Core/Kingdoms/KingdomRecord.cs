@@ -15,6 +15,15 @@ namespace CalradicExchange.Core.Kingdoms
         public bool Listed { get; set; }
         public double BaseProsperity { get; set; }
         public int BaseFiefs { get; set; }
+
+        /// <summary>
+        /// Bases of the parts added in schema 12 (ADR-032): weighted fiefs (towns count double), village hearths,
+        /// military strength and clans. 0 = not set yet; the next reading sets it.
+        /// </summary>
+        public double BaseFiefScore { get; set; }
+        public double BaseHearth { get; set; }
+        public double BaseStrength { get; set; }
+        public int BaseClans { get; set; }
         public int LastSeenDay { get; set; }
 
         /// <summary>The kingdom was destroyed. Its index is closed at zero and never reopens.</summary>

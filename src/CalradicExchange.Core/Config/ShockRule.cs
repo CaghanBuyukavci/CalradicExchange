@@ -1,4 +1,6 @@
+using CalradicExchange.Core.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CalradicExchange.Core.Config
 {
@@ -34,5 +36,11 @@ namespace CalradicExchange.Core.Config
         /// impulse x maxStack: repeated news of the same kind is worth less (ADR-022, self-raid manipulation cap).
         /// </summary>
         [JsonProperty("maxStack")] public double MaxStack { get; set; }
+
+        /// <summary>When set, the rule applies only to events whose hero has this rank (HeroDied, HeroCaptured; ADR-032).</summary>
+        [JsonProperty("heroRank"), JsonConverter(typeof(StringEnumConverter))] public HeroRank? HeroRank { get; set; }
+
+        /// <summary>Multiply the impulse by the event's Magnitude (battle size, rebellion). maxStack still counts in unscaled impulses.</summary>
+        [JsonProperty("scaleByMagnitude")] public bool ScaleByMagnitude { get; set; }
     }
 }

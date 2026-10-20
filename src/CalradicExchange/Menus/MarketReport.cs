@@ -243,8 +243,28 @@ namespace CalradicExchange.Menus
                 return Strings.HeroCapturedByFaction.SetTextVariable("HERO", Names.Hero(ev.HeroId))
                     .SetTextVariable("K1", Names.Faction(ev.KingdomId)).SetTextVariable("K2", Names.Faction(ev.OtherKingdomId)).ToString();
             }
-            bool owners = ev.Type != MarketEventType.SettlementCaptured;
+            bool owners = ev.Type != MarketEventType.SettlementCaptured && ev.Type != MarketEventType.CastleCaptured;
             TextObject t = Strings.EventText(ev.Type);
+            switch (ev.Type)
+            {
+                case MarketEventType.HeroDied:
+                    t = ev.HeroRank == HeroRank.Ruler ? Strings.RulerDied : Strings.ClanLeaderDied;
+                    t.SetTextVariable("CAUSE", Strings.DeathCause(ev.Detail));
+                    break;
+                case MarketEventType.BattleEnded:
+                    t = string.IsNullOrEmpty(ev.SettlementId) ? Strings.BattleWon : Strings.BattleWonNear;
+                    break;
+                case MarketEventType.ClanChangedKingdom:
+                    if (ev.Detail == "CreateKingdom") t = Strings.ClanRebelledFounded;
+                    else if (ev.Detail == "LeaveWithRebellion") t = Strings.ClanRebelled;
+                    else if (ev.KingdomId != null && ev.OtherKingdomId != null) t = Strings.ClanDefected;
+                    else t = ev.KingdomId != null ? Strings.ClanLeft : Strings.ClanJoined;
+                    break;
+            }
+            t.SetTextVariable("SETTLEMENT", owners ? Names.SettlementWithOwner(ev.SettlementId) : Names.Settlement(ev.SettlementId));
+            t.SetTextVariable("CLAN", Names.Faction(ev.ClanId));
+            t.SetTextVariable("CASUALTIES", ev.Casualties);
+            t.SetTextVariable("AMOUNT", ev.Amount);
             t.SetTextVariable("VILLAGE", owners ? Names.SettlementWithOwner(ev.SettlementId) : Names.Settlement(ev.SettlementId));
             t.SetTextVariable("ITEM", Names.Item(ev.ItemId));
             t.SetTextVariable("TOWN", owners ? Names.SettlementWithOwner(ev.TownId) : Names.Settlement(ev.TownId));
