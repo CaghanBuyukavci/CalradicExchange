@@ -31,6 +31,9 @@ namespace CalradicExchange.Core.Trading
         /// <summary>Executed trades, oldest first, trimmed to the configured limit. Added in schema 6.</summary>
         public List<TradeRecord> History { get; set; } = new List<TradeRecord>();
 
+        /// <summary>Trades recorded since this portfolio was created or loaded, forced sales included. Not saved.</summary>
+        [JsonIgnore] public int RecordedSinceLoad { get; private set; }
+
         /// <summary>Daily total profit for the performance chart, oldest first, one point per day. Added in schema 11.</summary>
         public List<PerformancePoint> Performance { get; set; } = new List<PerformancePoint>();
 
@@ -60,6 +63,7 @@ namespace CalradicExchange.Core.Trading
         public void Record(TradeRecord record, int limit)
         {
             History.Add(record);
+            RecordedSinceLoad++;
             int excess = History.Count - System.Math.Max(0, limit);
             if (excess > 0) History.RemoveRange(0, excess);
         }

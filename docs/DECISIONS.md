@@ -398,3 +398,12 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Test için konsol:** `exchange.whale <id> <buy|sell> [derinlik]`. `exchange.dump_prices` artık yatırımcı payı / arz sütununu da gösteriyor.
 
 **Gerekçe:** Tek sayı kaydetmek portföy tutmadan "balina topladı, sonra boşaltıyor" davranışını veriyor. Fiyat etkisini oyuncunun emriyle aynı formülden geçirmek, oyuncuya "büyük emir fiyatı oynatır, sığ piyasada daha çok" kuralını tutarlı biçimde öğretiyor. Simülatörün 8 hedefi geçiyor. Emtia yıllık oynaklığı medyanı %29,9'dan %31,7'ye çıktı. Erken oyunda en iyi bot günde 48,1 dinar kazanıyor.
+
+## ADR-038 — Arayüz turu 3: oturum sayacı, kısa adlar, lonca bölümü, geniş grafik, muharebe haberleri (2026-10-20)
+
+**Karar** (kullanıcı istekleri):
+- **Takas Geçmişim sayacı:** "Bu oturumda yapılan toplam işlem" artık zorunlu satışları da sayıyor (lonca kapanışı, lonca zararı için satış, kendi atölyenin payları, yıkılan krallık). Sayaç geçmişe yazılan her kaydı sayıyor (`Portfolio.RecordedSinceLoad`, kaydedilmiyor); yükleme ile sıfırlanıyor. Zorunlu satışlar zaten tabloda "Zorunlu satış" olarak listeleniyordu.
+- **Portföyüm:** Tablodaki adlar kısa ad: emtialarda sonda "hissesi" yok.
+- **Lonca Piyasası:** İkinci bölümün başlığı "Başka Şehirlerdeki Ortaklıkların". Bölümün yüksekliği bu şehrin satır sayısına göre hesaplanıyor (`OtherHeight`, 236–400 px); bölüm üstteki listenin hemen altında başlıyor, boşluk altta kalıyor.
+- **Performans:** Grafik 700'den 820 px'e genişledi; pencere 1140 px. Alttaki tablo aynı genişlikte kaldı.
+- **Haberler:** Muharebe haberi yer adı vermiyor ("Vlandia, Battania ordusunu yendi (118 kayıp)").

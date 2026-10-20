@@ -20,7 +20,7 @@ namespace CalradicExchange.Menus
         private static readonly int[] Periods = { 7, 14, 30 };
 
         /// <summary>Chart size in the prefab (CxPerformance.xml). Slices are SliceWidth pixels wide; day marks are DotSize squares.</summary>
-        public const float ChartWidth = 700, ChartHeight = 260, SliceWidth = 4, LineThickness = 3, DotSize = 6;
+        public const float ChartWidth = 820, ChartHeight = 260, SliceWidth = 4, LineThickness = 3, DotSize = 6;
 
         /// <summary>The selected period, kept while the game runs.</summary>
         private static int _period = 7;

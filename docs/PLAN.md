@@ -148,6 +148,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 2.11 Portföy ve Haberler pencereleri: portföy tablo (Hisseler / Sepetler / Loncalar sekmeleri), Haberler renkli tablo (olay türüne göre renk)
   - 2026-10-20 (ADR-031): Emtia araması, alt solda altın/limit, Portföy butonu ve geri dönüş, Gauntlet alım/satım onayı (satışta K/Z), haberlerde tutsak alınan lordlar ve yer adlarının yanında krallık, en fazla 20 haber, Portföy Performansı grafiği.
   - 2026-10-20: Takas Geçmişim'in sol altında bu oturumdaki işlem sayısı (kaydedilmiyor).
+  - 2026-10-20 (ADR-038): sayaç zorunlu satışları da sayıyor; portföyde kısa adlar; lonca ikinci bölümü yukarıda; geniş performans grafiği; muharebe haberinde yer adı yok.
 - [x] 2.12 Menü tabanlı arayüzü yedek olarak tut (Gauntlet hata verirse ona düş)
   - Her tablo penceresi açılamazsa vanilla inquiry'ye düşüyor.
 

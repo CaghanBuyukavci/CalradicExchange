@@ -158,7 +158,7 @@ namespace CalradicExchange.Menus
 
         /// <summary>
         /// Guild tab (ADR-026): partnership shares of this town's guilds (Buy and Sell); the player's shares in other
-        /// towns (Sell only) go to the second section, which has its own header and scroll.
+        /// towns (Sell only) go to the second section, which has its own header and scroll and sits right below.
         /// </summary>
         private static void FillGuilds(ExchangeCampaignBehavior b, ExchangeTableVM vm, Action back)
         {
@@ -191,6 +191,8 @@ namespace CalradicExchange.Menus
                 alternate = !alternate;
             }
             vm.OtherTitle = elsewhere.Count > 0 ? Strings.GuildSectionOther.ToString() : "";
+            // The main list and the second section share about 475 px; the second one starts right below this town's rows.
+            vm.OtherHeight = Math.Max(236, Math.Min(400, 475 - (vm.TradeRows.Count * 36 + 12)));
         }
 
         private static TradeRowVM GuildRow(ExchangeCampaignBehavior b, TraderProfile trader, InstrumentDefinition def, bool local, bool alternate, Action back)
@@ -433,7 +435,6 @@ namespace CalradicExchange.Menus
             }
 
             // Core already updated the portfolio; now move the gold. Null counterpart = the house.
-            b.SessionTradeCount++;
             if (r.GoldDelta < 0) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, -r.GoldDelta, true);
             else if (r.GoldDelta > 0) GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, r.GoldDelta, true);
 

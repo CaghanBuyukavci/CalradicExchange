@@ -70,7 +70,7 @@ namespace CalradicExchange.Localization
         public static TextObject GuildSectionLocal => new TextObject("{=cx_guild_section_local}Guilds of {TOWN}");
         public static TextObject OwnWorkshopSold => new TextObject("{=cx_own_workshop_sold}You now own a workshop of {NAME}. Your {QTY} partnership shares were sold at the current price for {TOTAL} denars ({PNL}).");
         public static TextObject OwnWorkshopMark => new TextObject("{=cx_own_workshop_mark}{NAME} (your workshop)");
-        public static TextObject GuildSectionOther => new TextObject("{=cx_guild_section_other}Your shares in other towns");
+        public static TextObject GuildSectionOther => new TextObject("{=cx_guild_section_other}Your Partnerships in Other Towns");
         public static TextObject GuildNoneHere => new TextObject("{=cx_guild_none_here}No guild of this town is listed yet.");
         public static TextObject GuildName => new TextObject("{=cx_guild_name}{TOWN} {GUILD}");
         public static TextObject BuyGuildTitle => new TextObject("{=cx_buy_guild_title}Buy partnership shares");
@@ -217,7 +217,6 @@ namespace CalradicExchange.Localization
         public static TextObject WhaleSoldNoTown => new TextObject("{=cx_ev_whale_sell_any}A large investor sold {QTY} {NAME} shares ({CHANGE}).");
 
         public static TextObject BattleWon => new TextObject("{=cx_ev_battle}{K1} defeated {K2} ({CASUALTIES} casualties).");
-        public static TextObject BattleWonNear => new TextObject("{=cx_ev_battle_near}{K1} defeated {K2} near {SETTLEMENT} ({CASUALTIES} casualties).");
         public static TextObject ClanRebelled => new TextObject("{=cx_ev_clan_rebelled}{CLAN} rebelled against {K1}.");
         public static TextObject ClanRebelledFounded => new TextObject("{=cx_ev_clan_founded}{CLAN} rebelled against {K1} and founded {K2}.");
         public static TextObject ClanDefected => new TextObject("{=cx_ev_clan_defected}{CLAN} left {K1} for {K2}.");

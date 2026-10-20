@@ -13,6 +13,7 @@ namespace CalradicExchange.UI
     {
         private readonly Action _onClose;
         private string _title = "", _description = "", _otherTitle = "";
+        private float _otherHeight = 236;
         private string _h1 = "", _h2 = "", _h3 = "", _h4 = "", _h5 = "", _h6 = "", _h7 = "", _h8 = "";
         private string _emptyText = "";
         private string _searchText = "";
@@ -100,6 +101,19 @@ namespace CalradicExchange.UI
         }
 
         [DataSourceProperty] public bool HasOtherRows => _otherTitle.Length > 0;
+
+        /// <summary>Height of the second section; a taller one sits closer to a short main list (CxTradeTable).</summary>
+        [DataSourceProperty]
+        public float OtherHeight
+        {
+            get => _otherHeight;
+            set
+            {
+                if (_otherHeight == value) return;
+                _otherHeight = value;
+                OnPropertyChanged(nameof(OtherHeight));
+            }
+        }
 
         /// <summary>Bottom-left line, e.g. gold and limit left.</summary>
         [DataSourceProperty]

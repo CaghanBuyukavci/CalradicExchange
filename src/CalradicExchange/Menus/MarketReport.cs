@@ -160,7 +160,7 @@ namespace CalradicExchange.Menus
                 string id = pos.InstrumentId;
                 InstrumentDefinition def = b.Market.Find(id);
                 bool canBuy = open && (def?.Class != InstrumentClass.Guild || def.TownId == here);
-                vm.PortfolioRows.Add(new PortfolioRowVM(Names.Instrument(b.Market.Find(id)), pos.Quantity.ToString(),
+                vm.PortfolioRows.Add(new PortfolioRowVM(Names.ShortInstrument(def), pos.Quantity.ToString(),
                     Fmt.Price(pos.AverageCost), Fmt.Price(price), Fmt.SignedDenars(pnl), Fmt.Pct(pct), TableColors.ForAmount(pnl), alternate,
                     canBuy, open, buyText, sellText,
                     () => TradeFlow.StartTrade(id, OrderSide.Buy, back),
@@ -237,7 +237,7 @@ namespace CalradicExchange.Menus
                     t.SetTextVariable("CAUSE", Strings.DeathCause(ev.Detail));
                     break;
                 case MarketEventType.BattleEnded:
-                    t = string.IsNullOrEmpty(ev.SettlementId) ? Strings.BattleWon : Strings.BattleWonNear;
+                    t = Strings.BattleWon; // the news does not name the battle's place
                     break;
                 case MarketEventType.WhaleTrade:
                     bool bought = ev.Detail == "buy";

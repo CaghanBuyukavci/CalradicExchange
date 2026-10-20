@@ -178,6 +178,9 @@ namespace CalradicExchange.Core.Tests
             TradeRecord forced = Assert.Single(pf.History);
             Assert.True(forced.Forced);
             Assert.Equal(0, forced.Commission);
+            // The trade history's session count includes forced sales; a loaded portfolio starts from zero.
+            Assert.Equal(1, pf.RecordedSinceLoad);
+            Assert.Equal(0, StateSerializer.Deserialize(StateSerializer.Serialize(new ExchangeState { Portfolio = pf })).Portfolio.RecordedSinceLoad);
         }
 
         [Fact]

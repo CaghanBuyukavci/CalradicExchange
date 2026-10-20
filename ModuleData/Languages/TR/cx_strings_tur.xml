@@ -142,7 +142,7 @@
     <string id="cx_guild_market_title" text="Lonca Piyasası" />
     <string id="cx_guild_market_desc" text="Bu şehrin atölyelerinde ortaklık payları. Her 7 günde bir her pay, loncanın kârından ya da zararından payına düşeni getirir. Başka şehirlerdeki paylarını her yerde satabilirsin." />
     <string id="cx_guild_section_local" text="{TOWN} loncaları" />
-    <string id="cx_guild_section_other" text="Başka şehirlerdeki payların" />
+    <string id="cx_guild_section_other" text="Başka Şehirlerdeki Ortaklıkların" />
     <string id="cx_guild_none_here" text="Bu şehrin hiçbir loncası henüz listelenmedi." />
     <string id="cx_guild_name" text="{TOWN} {GUILD}" />
     <string id="cx_buy_guild_title" text="Ortaklık payı al" />
@@ -262,7 +262,6 @@
     <string id="cx_cause_murdered" text=" suikastle" />
     <string id="cx_cause_labor" text=" doğumda" />
     <string id="cx_ev_battle" text="{K1}, {K2} ordusunu yendi ({CASUALTIES} kayıp)." />
-    <string id="cx_ev_battle_near" text="{K1}, {SETTLEMENT} yakınında {K2} ordusunu yendi ({CASUALTIES} kayıp)." />
     <string id="cx_ev_clan_rebelled" text="{CLAN} klanı {K1} krallığına isyan etti." />
     <string id="cx_ev_clan_founded" text="{CLAN} klanı {K1} krallığına isyan edip {K2} krallığını kurdu." />
     <string id="cx_ev_clan_defected" text="{CLAN} klanı {K1} krallığını bırakıp {K2} krallığına geçti." />

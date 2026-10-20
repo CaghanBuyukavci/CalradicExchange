@@ -108,7 +108,7 @@
                 </Widget>
 
                 <!-- Second section (guild tab): shares in other towns, with their own header, separator and scroll -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="236" IsVisible="@HasOtherRows">
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="@OtherHeight" IsVisible="@HasOtherRows">
                   <Children>
                     <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalTopToBottom">
                       <Children>
