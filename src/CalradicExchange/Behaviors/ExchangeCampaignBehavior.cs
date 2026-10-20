@@ -5,6 +5,7 @@ using System.Linq;
 using CalradicExchange.Adapters;
 using CalradicExchange.Core;
 using CalradicExchange.Core.Config;
+using CalradicExchange.Core.Guilds;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Persistence;
 using CalradicExchange.Core.Pricing;
@@ -16,6 +17,7 @@ using CalradicExchange.Menus;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -69,6 +71,14 @@ namespace CalradicExchange.Behaviors
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, OnDailyTick);
             EventBridge.Register(this, OnWorldEvent);
+            CampaignEvents.WorkshopOwnerChangedEvent.AddNonSerializedListener(this, (workshop, oldOwner) =>
+            {
+                if (workshop?.Owner == Hero.MainHero) SellOwnWorkshopShares("bought");
+            });
+            CampaignEvents.WorkshopTypeChangedEvent.AddNonSerializedListener(this, workshop =>
+            {
+                if (workshop?.Owner == Hero.MainHero) SellOwnWorkshopShares("type changed");
+            });
         }
 
         public override void SyncData(IDataStore dataStore)
@@ -124,8 +134,56 @@ namespace CalradicExchange.Behaviors
         {
             Hero hero = Hero.MainHero;
             Settlement here = Settlement.CurrentSettlement;
-            return new TraderProfile(hero.Gold, Clan.PlayerClan?.Tier ?? 0, hero.GetSkillValue(DefaultSkills.Trade),
+            var trader = new TraderProfile(hero.Gold, Clan.PlayerClan?.Tier ?? 0, hero.GetSkillValue(DefaultSkills.Trade),
                 here != null && here.IsTown ? here.StringId : null);
+            foreach (string id in OwnGuildIds()) trader.OwnGuilds.Add(id);
+            return trader;
+        }
+
+        /// <summary>Guild ids of the main hero's workshops (town + workshop type).</summary>
+        private static IEnumerable<string> OwnGuildIds()
+        {
+            var workshops = Hero.MainHero?.OwnedWorkshops;
+            if (workshops == null) yield break;
+            foreach (Workshop w in workshops)
+            {
+                if (w?.Settlement == null || w.WorkshopType == null) continue;
+                yield return GuildInstruments.IdFor(w.Settlement.StringId, w.WorkshopType.StringId);
+            }
+        }
+
+        /// <summary>
+        /// The player may not hold partnership shares of a guild they own a workshop of (ADR-034). After buying a
+        /// workshop or changing its type, those shares are sold at the current price, without commission or tax.
+        /// </summary>
+        private void SellOwnWorkshopShares(string reason)
+        {
+            try
+            {
+                if (_market == null || _state?.Portfolio == null) return;
+                int day = NextDay;
+                foreach (string id in OwnGuildIds().Distinct().ToList())
+                {
+                    int qty = _state.Portfolio.QuantityOf(id);
+                    if (qty <= 0) continue;
+                    PriceState ps = _market.Get(id);
+                    decimal price = ps != null && ps.HasPrice ? ps.Price : 0;
+                    decimal cost = _state.Portfolio.BasisFor(id, qty);
+                    int proceeds = _state.Portfolio.ForceSell(id, qty, price, day, _market.Settings.Trading.TradeHistoryLimit);
+                    if (proceeds > 0) GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, proceeds, true);
+                    TextObject msg = Strings.OwnWorkshopSold;
+                    msg.SetTextVariable("NAME", Names.Instrument(_market.Find(id)));
+                    msg.SetTextVariable("QTY", qty);
+                    msg.SetTextVariable("TOTAL", proceeds);
+                    msg.SetTextVariable("PNL", Fmt.SignedDenars(proceeds - cost));
+                    InformationManager.DisplayMessage(new InformationMessage(msg.ToString(), Colors.Yellow));
+                    ExchangeLog.Info($"Own workshop ({reason}): sold {qty} {id} @ {price:0.####} for {proceeds} (cost {cost:0}).");
+                }
+            }
+            catch (Exception ex)
+            {
+                ExchangeLog.Error("Selling own workshop shares failed", ex);
+            }
         }
 
         /// <summary>Applies an event now (also used by the console). Returns affected instrument ids.</summary>
@@ -167,6 +225,7 @@ namespace CalradicExchange.Behaviors
                 }
             }
             if (summary.Processed) WriteOffFallenKingdoms(summary.Day);
+            if (summary.Processed) SellOwnWorkshopShares("daily check");
             if (summary.Processed) RecordPerformance(summary.Day);
             if (summary.Processed && !summary.Initialized) NotifyBigMoves();
             if (summary.Processed && _state.Market.LastTickDay <= MarketDump.AutoDumpDays) MarketDump.Append(this);

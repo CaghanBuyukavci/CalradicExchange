@@ -106,6 +106,21 @@ namespace CalradicExchange.Core.Tests
         }
 
         [Fact]
+        public void OwnWorkshopsGuild_CannotBeBought_ButCanBeSold()
+        {
+            MarketEngine engine = Run(9);
+            var orders = new OrderEngine(engine);
+            var pf = new Portfolio();
+            Assert.True(orders.Execute(SmithyA, OrderSide.Buy, 10, new TraderProfile(100000, 6, 0, "town_A"), pf).Success);
+
+            var owner = new TraderProfile(100000, 6, 0, "town_A");
+            owner.OwnGuilds.Add(SmithyA);
+            Assert.Equal(TradeError.OwnWorkshop, orders.Quote(SmithyA, OrderSide.Buy, 1, owner, pf).Error);
+            Assert.Equal(0, orders.MaxBuyQuantity(SmithyA, owner, pf));
+            Assert.True(orders.Quote(SmithyA, OrderSide.Sell, 10, owner, pf).IsValid);
+        }
+
+        [Fact]
         public void Accrual_FollowsTodaysProfitAndSharesHeld()
         {
             var pf = new Portfolio();

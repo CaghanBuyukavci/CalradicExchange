@@ -122,6 +122,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 2.2 Lonca ortaklık payı: temel değer ve haftalık kâr/zarar dağıtımı (§2.3, ADR-027)
   - ADR-029: pay-gün hak edişi, alt sınırlı fiyat, borç ve ilişki cezası. Core testleri var; oyun içi test bekleniyor.
 - [x] 2.3 Lonca listesini dinamik yönet: atölye kaybolursa lonca kapanır, pozisyonlar son fiyattan nakde döner
+  - 2026-10-20 (ADR-034): Oyuncu kendi atölyesinin loncasından pay alamaz. Atölye alınca o loncadaki payları piyasa fiyatından, masrafsız satılır.
 - [x] 2.3a Lonca Piyasası tablosu: bulunulan şehrin loncaları (AL/SAT) + başka şehirlerde elde tutulan loncalar (sadece SAT) (ADR-026)
 - [x] 2.4 Krallık endeksi (§2.4); krallık yok olunca kapanış; Krallık Piyasası tablosu
   - ADR-030: her şehirde alınır, açığa satış yok, yıkılınca sıfır, oyuncunun krallığı da listelenir. Şema 10. Oyun içi test bekleniyor.

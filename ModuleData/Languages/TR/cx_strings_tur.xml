@@ -228,5 +228,8 @@
     <string id="cx_ev_clan_defected" text="{CLAN} klanı {K1} krallığını bırakıp {K2} krallığına geçti." />
     <string id="cx_ev_clan_left" text="{CLAN} klanı {K1} krallığından ayrıldı." />
     <string id="cx_ev_clan_joined" text="{CLAN} klanı {K2} krallığına bağlılık yemini etti." />
+    <string id="cx_err_own_workshop" text="Bu loncada senin de bir atölyen var. Kendi işletmenden ortaklık payı alamazsın." />
+    <string id="cx_own_workshop_sold" text="Artık {NAME} içinde bir atölyen var. Oradaki {QTY} ortaklık payın güncel fiyattan {TOTAL} dinara satıldı ({PNL})." />
+    <string id="cx_own_workshop_mark" text="{NAME} (atölyen)" />
   </strings>
 </base>

@@ -18,5 +18,8 @@ namespace CalradicExchange.Core.Trading
 
         /// <summary>A guild has a fixed number of partnership shares (guilds.sharesPerGuild).</summary>
         GuildSharesExceeded,
+
+        /// <summary>The trader owns a workshop of that guild: no partnership shares in one's own business (ADR-034).</summary>
+        OwnWorkshop,
     }
 }

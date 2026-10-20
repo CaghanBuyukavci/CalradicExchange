@@ -358,3 +358,10 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Karar:** `trading.commissionRate` = 0,02, her işlemde sabit. `minCommission` (2 dinar) duruyor. `commissionRateMax`, `commissionRateMin` ve `tradeSkillCap` ayarları kaldırıldı. `OrderEngine.CommissionRate` artık parametresiz.
 - **Değişmeyen:** Trade yeteneği pozisyon limitini artırmaya devam ediyor (`limits.perTradeSkill`). Kullanıcı sadece komisyonu sordu.
 - **Etkisi:** Trade 10 olan oyuncu için komisyon %2,43'ten %2'ye indi. ADR-022'nin "haberle işlem komisyonu yener" hesabı daha da rahatladı.
+
+## ADR-034 — Kendi atölyesinin loncasından pay alınamaz (2026-10-20)
+
+- **Kullanıcı isteği:** Oyuncu kendi dükkanından ortaklık payı alamaz. Ortaklık payı olan bir dükkanı satın alırsa payları o anki geçerli fiyattan satılır.
+- **Eşleme:** Lonca = bir şehirdeki aynı türden atölyelerin tamamı (ADR-027). Oyuncunun o şehirde o türden bir atölyesi varsa o loncanın payını alamaz (`TradeError.OwnWorkshop`). Satış serbest. Lonca tablosunda satırın adına "(atölyen)" eklenir ve Al düğmesi gizlenir.
+- **Zorunlu satış:** Oyuncu atölye satın aldığında (`WorkshopOwnerChangedEvent`) ya da atölyesinin türünü değiştirdiğinde (`WorkshopTypeChangedEvent`), elindeki o loncanın payları hemen satılır. Günlük tick'te de aynı kontrol yapılır, kaçan bir durum kalmasın diye.
+- **Fiyat:** Piyasa fiyatı; alış-satış farkı, kayma, komisyon ve kâr vergisi yok. Lonca kapanışındaki zorunlu satışla aynı kural (`Portfolio.ForceSell`). İşlem geçmişinde zorunlu satış olarak görünür. Satış ani ve oyuncunun seçimi değil, bu yüzden ceza kesilmiyor.

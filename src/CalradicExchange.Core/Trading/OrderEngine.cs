@@ -102,6 +102,7 @@ namespace CalradicExchange.Core.Trading
 
             if (side == OrderSide.Buy)
             {
+                if (def.Class == InstrumentClass.Guild && trader.OwnGuilds.Contains(instrumentId)) return Fail(q, TradeError.OwnWorkshop);
                 if (q.Total > trader.Gold) return Fail(q, TradeError.InsufficientGold);
                 decimal held = portfolio.MarketValue(PriceOf);
                 if ((double)held + orderValue > TotalLimit(trader)) return Fail(q, TradeError.TotalLimitExceeded);

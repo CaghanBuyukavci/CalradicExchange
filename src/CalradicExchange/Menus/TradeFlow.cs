@@ -173,12 +173,14 @@ namespace CalradicExchange.Menus
             double weekProfit = WeekProfitPerShare(b, def.Id);
             string none = Strings.NoPrice.ToString();
             string id = def.Id;
-            return new TradeRowVM(Names.Instrument(def),
+            bool own = b.CurrentTrader().OwnGuilds.Contains(id);
+            string name = own ? Strings.OwnWorkshopMark.SetTextVariable("NAME", Names.Instrument(def)).ToString() : Names.Instrument(def);
+            return new TradeRowVM(name,
                 priced ? Fmt.Price(ps.Price) : none,
                 priced ? Fmt.Pct(week) : none, TableColors.ForChange(week),
                 Fmt.SignedDenars((decimal)weekProfit), TableColors.ForAmount((decimal)weekProfit),
                 qty > 0 ? qty.ToString() : none,
-                open && local, open && qty > 0, alternate, Strings.BtnBuy.ToString(), Strings.BtnSell.ToString(),
+                open && local && !own, open && qty > 0, alternate, Strings.BtnBuy.ToString(), Strings.BtnSell.ToString(),
                 () => Guard("buy pick", () => AskQuantity(id, OrderSide.Buy, back)),
                 () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell, back)));
         }

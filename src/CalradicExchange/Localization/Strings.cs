@@ -67,6 +67,8 @@ namespace CalradicExchange.Localization
         public static TextObject KingdomFallen => new TextObject("{=cx_kingdom_fallen}{KINGDOM} has fallen. Your {QTY} shares of its index are worthless: {LOSS} denars lost.");
         public static TextObject GuildMarketDescription => new TextObject("{=cx_guild_market_desc}Partnership shares in the workshops of this town. Every 7 days each share brings its part of the guild's profit, or of its loss. Shares of other towns can be sold anywhere.");
         public static TextObject GuildSectionLocal => new TextObject("{=cx_guild_section_local}Guilds of {TOWN}");
+        public static TextObject OwnWorkshopSold => new TextObject("{=cx_own_workshop_sold}You now own a workshop of {NAME}. Your {QTY} partnership shares were sold at the current price for {TOTAL} denars ({PNL}).");
+        public static TextObject OwnWorkshopMark => new TextObject("{=cx_own_workshop_mark}{NAME} (your workshop)");
         public static TextObject GuildSectionOther => new TextObject("{=cx_guild_section_other}Your shares in other towns");
         public static TextObject GuildNoneHere => new TextObject("{=cx_guild_none_here}No guild of this town is listed yet.");
         public static TextObject GuildName => new TextObject("{=cx_guild_name}{TOWN} {GUILD}");
@@ -256,6 +258,7 @@ namespace CalradicExchange.Localization
                 case TradeError.InstrumentLimitExceeded: return new TextObject("{=cx_err_instrument_limit}The market is too thin to take that much of one instrument.");
                 case TradeError.NotInGuildTown: return new TextObject("{=cx_err_guild_town}Partnership shares of a guild are only sold in its own town.");
                 case TradeError.GuildSharesExceeded: return new TextObject("{=cx_err_guild_shares}The guild does not have that many shares left for you.");
+                case TradeError.OwnWorkshop: return new TextObject("{=cx_err_own_workshop}You own a workshop of this guild. You cannot buy partnership shares in your own business.");
                 default: return new TextObject("{=cx_err_generic}The trade could not be made.");
             }
         }
