@@ -69,6 +69,11 @@ namespace CalradicExchange.Behaviors
         public override void RegisterEvents()
         {
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
+            CampaignEvents.OnAfterSessionLaunchedEvent.AddNonSerializedListener(this, starter =>
+            {
+                try { ExchangeMenus.AddVisitOption(starter); }
+                catch (Exception ex) { ExchangeLog.Error("Town option failed", ex); }
+            });
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, OnDailyTick);
             EventBridge.Register(this, OnWorldEvent);
             CampaignEvents.WorkshopOwnerChangedEvent.AddNonSerializedListener(this, (workshop, oldOwner) =>

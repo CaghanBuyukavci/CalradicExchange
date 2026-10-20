@@ -139,6 +139,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - 2026-10-20 (ADR-035): Performans penceresi düzenlendi: grafik ortalı ve sekmelerin altında, eksende gün noktaları, portföy toplamları altta kayan tablo.
 - [ ] 2.8 ~~Piyasa sekmesi~~ Tam ekran ekran yapılmıyor (ADR-026); piyasa tabloları (Emtia, Sepet, Lonca, Krallık) bu işi görüyor
   - 2026-10-20 (ADR-035): Dört piyasa tek "Piyasalar" penceresinde sekme oldu: Hisseler, Sepetler, Ortaklıklar, Endeksler. Borsa seçeneği şehir menüsünde Ticaret'in hemen üstünde.
+  - 2026-10-20: Menü sırası düzeltildi: seçenek artık `OnAfterSessionLaunchedEvent`'te ekleniyor (ilk testte en üstte görünüyordu).
 - [ ] 2.9 Araç detay penceresi: tablolarda hisse adına tıklanınca fiyat grafiği ve temel değer bileşenleri
 - [x] 2.10 Emir paneli: adet girişi, maliyet önizlemesi, onay
   - Slider'lı miktar penceresi + onay penceresi; satırdaki AL/SAT butonlarından açılıyor (ADR-025).

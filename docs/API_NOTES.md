@@ -21,6 +21,7 @@ General notes for v1.4.8:
 | `CampaignBehaviorBase` | Events + save | `public abstract void RegisterEvents()`, `public abstract void SyncData(IDataStore dataStore)` | VERIFIED | |
 | `IDataStore.SyncData` | Persist a string | `bool SyncData<T>(string key, ref T data)` | VERIFIED | `IDataStore.IsSaving/IsLoading` also exist |
 | `CampaignEvents.OnSessionLaunchedEvent` | Add menus once campaign is ready | `IMbEvent<CampaignGameStarter>` | VERIFIED | Vanilla adds menus here too |
+| `CampaignEvents.OnAfterSessionLaunchedEvent` | Add the town option after every vanilla town option exists | `IMbEvent<CampaignGameStarter>` | VERIFIED | Fires after OnSessionLaunchedEvent (WorkshopsCampaignBehavior uses it). `GameMenu.AddOption(index)` appends when index > count, which put the exchange first while vanilla options came later (ADR-035) |
 | `CampaignEvents.OnGameLoadFinishedEvent` | Post-load hook | `IMbEvent` | VERIFIED | |
 | JSON serializer | Persistence | Game ships `Newtonsoft.Json.dll` assembly 13.0.0.0 (file 13.0.1.25517) | VERIFIED | Used by TaleWorlds.Library. See ADR-012 |
 

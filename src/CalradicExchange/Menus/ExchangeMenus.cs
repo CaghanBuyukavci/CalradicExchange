@@ -29,12 +29,20 @@ namespace CalradicExchange.Menus
 
         private const string MenuTextVariable = "CX_EXCHANGE_TEXT";
 
-        public static void AddTo(CampaignGameStarter starter)
+        /// <summary>
+        /// The town option. Added on OnAfterSessionLaunchedEvent: some vanilla town options are added on
+        /// OnSessionLaunchedEvent after ours, and an index beyond the list end puts the option first.
+        /// </summary>
+        public static void AddVisitOption(CampaignGameStarter starter)
         {
             int visitIndex = VisitIndex(starter);
             starter.AddGameMenuOption(TownMenuId, VisitOptionId, Strings.MenuVisitExchange,
                 OnVisitCondition, args => Guard("visit", () => GameMenu.SwitchToMenu(ExchangeMenuId)), isLeave: false, index: visitIndex);
+            ExchangeLog.Info($"Town option added at {visitIndex}.");
+        }
 
+        public static void AddTo(CampaignGameStarter starter)
+        {
             starter.AddGameMenu(ExchangeMenuId, "{=!}{" + MenuTextVariable + "}", OnExchangeInit, GameMenu.MenuOverlayType.SettlementWithBoth);
             starter.AddGameMenuOption(ExchangeMenuId, "cx_markets", Strings.OptMarkets,
                 args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("markets", TradeFlow.ShowMarkets));
@@ -48,7 +56,7 @@ namespace CalradicExchange.Menus
                 args => { args.optionLeaveType = GameMenuOption.LeaveType.Leave; return true; },
                 args => Guard("leave", () => GameMenu.SwitchToMenu(TownMenuId)), isLeave: true);
 
-            ExchangeLog.Info($"Exchange menus added (town option at {visitIndex}).");
+            ExchangeLog.Info("Exchange menus added.");
         }
 
         /// <summary>
