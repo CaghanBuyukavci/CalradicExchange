@@ -17,6 +17,8 @@ namespace CalradicExchange.Core.Tests
         {
             var settings = TestData.NoNoiseSettings();
             settings.Trading.CommissionRate = 0.025; // the cost breakdowns below were worked out at 2.5 %
+            settings.Npc.SupplyDepthMultiple = 1e6; // deep supply: impact multiplier ~1, as in the breakdowns below
+            settings.Npc.InitialHoldingFraction = 0;
             _market = new MarketEngine(TestData.Catalog(), settings, new MarketState(), new XorShift128Plus(1));
             _market.Tick(TestData.World(1)); // grain share = 100
             _orders = new OrderEngine(_market);

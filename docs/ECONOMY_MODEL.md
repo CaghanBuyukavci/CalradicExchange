@@ -225,6 +225,30 @@ kâr_vergisi = %10 × max(0, satış_geliri − komisyon − satılan_payların_
 - Komisyon ve kâr vergisi: yukarıdaki formül (ADR-014). Lonca, krallık ve tahvil değerleri Faz 2/3'te yeniden ayarlanacak.
 - **Kalıcı fiyat etkisi:** Oyuncunun net alım satımı piyasa fiyatını da kaydırır: `P ← P × (1 ± 0,5 × etki)`. Bu etki κ ile doğal olarak temel değere geri döner. Böylece "al, fiyatı yükselt, sat" döngüsü zarar ettirir.
 
+### 5.1 Sınırlı arz ve şehrin yatırımcıları (ADR-037)
+
+Her aracın sınırlı sayıda payı var. Pay azaldıkça aynı emir fiyatı daha çok oynatır. Oyuncuya ayrıca bir tutma sınırı konmuyor; oyuncunun sınırı §6'daki limitlerden geliyor (ileride borsacı seviyesi).
+
+```
+çıkarılan_pay = derinlik × 6 / liste_fiyatı          (lonca: 100 pay)
+yatırımcı_payı_başlangıçta = çıkarılan × 0,3           (lonca: 0)
+serbest_pay = çıkarılan − yatırımcı_payı − oyuncu_payı
+çarpan = clamp( serbest_oran_başlangıçta / serbest_oran_emir_ortasında , 0,5 , 4 )
+etki = λ × (emir_değeri / derinlik) × çarpan
+```
+
+- "Emir ortası": alımda emrin yarısı kadar pay çekilmiş, satışta yarısı kadar pay geri gelmiş serbest oran.
+- **Yatırımcılar (NPC):** Portföyleri yok; araç başına yalnızca toplam payları (`npcShares`) kaydediliyor. Emtia, sepet ve krallık endekslerinde her gün bir net emir veriyorlar. Lonca ortaklıklarını sadece oyuncu alıp satıyor.
+
+```
+günlük_net_emir = derinlik × ( 0,15 × N(0,1)  +  0 × 5_günlük_değişim  +  0,5 × (başlangıç_payı − pay) / çıkarılan )
+```
+
+- Trend takibi katsayısı (`flowMomentum`) 0. Simülatörde 0,5 değeri, kendi köyünü yağmalayıp fiyatı iten manipülatörün kazancını hedefin üstüne çıkardı.
+- Alım serbest payla, satış yatırımcıların elindeki payla sınırlı. Fiyat etkisi oyuncunun emriyle aynı formül (kalıcı etki × 0,5, κ ile geri döner).
+- **Balina:** Her gün %10 olasılıkla, açık araçlardan rastgele birinde bir balina derinliğin 1–3 katı büyüklükte işlem yapıyor. %60 alım; yatırımcılar zaten başlangıç payının 1,5 katından fazlasını tutuyorsa %60 satış. Haberlere ve mesaja düşüyor ("Bir Pravend tüccarı 800 adet tahıl hissesi topladı (+%13,1)").
+- Bir balinanın topladığı paylar sonraki günlerde geri dönüş terimiyle satılıyor (günde fazlanın yaklaşık %8'i); fiyat bu sırada aşağı baskı görüyor.
+
 ## 6. Limitler ve teminat
 
 ```

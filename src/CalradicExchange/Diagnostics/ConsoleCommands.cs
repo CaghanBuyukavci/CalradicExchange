@@ -11,6 +11,7 @@ using CalradicExchange.Core.Pricing;
 using CalradicExchange.Core.Trading;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Library;
 
 namespace CalradicExchange.Diagnostics
@@ -43,13 +44,13 @@ namespace CalradicExchange.Diagnostics
             return RunReady("dump_prices", args, b =>
             {
                 var sb = new StringBuilder($"Exchange day {b.State.Market.LastTickDay}\n");
-                sb.AppendLine("id                       P          F          S        1d       7d");
+                sb.AppendLine("id                       P          F          S        1d       7d   investors/supply");
                 foreach (InstrumentDefinition def in b.Market.Instruments)
                 {
                     PriceState ps = b.Market.Get(def.Id);
                     if (ps == null || !ps.HasPrice) { sb.AppendLine($"{def.Id,-22} (no price)"); continue; }
-                    sb.AppendLine(string.Format(Inv, "{0,-22} {1,10:0.00} {2,10:0.00} {3,8:+0.000;-0.000} {4,8:+0.0%;-0.0%} {5,8:+0.0%;-0.0%}{6}",
-                        def.Id, ps.Price, ps.Fundamental, ps.Shock, ps.ChangeOver(1), ps.ChangeOver(7), ps.Closed ? " CLOSED" : ""));
+                    sb.AppendLine(string.Format(Inv, "{0,-22} {1,10:0.00} {2,10:0.00} {3,8:+0.000;-0.000} {4,8:+0.0%;-0.0%} {5,8:+0.0%;-0.0%}   {6}/{7}{8}",
+                        def.Id, ps.Price, ps.Fundamental, ps.Shock, ps.ChangeOver(1), ps.ChangeOver(7), ps.NpcShares, ps.TotalShares, ps.Closed ? " CLOSED" : ""));
                 }
                 return sb.ToString();
             });
@@ -143,6 +144,25 @@ namespace CalradicExchange.Diagnostics
                 }
                 IReadOnlyList<string> affected = b.ApplyEvent(ev);
                 return $"Fired {ev}. Affected: {(affected.Count == 0 ? "none" : string.Join(", ", affected))}. Felt on the next tick (exchange.tick to run one now).";
+            });
+        }
+
+        /// <summary>Makes a whale trade now (ADR-037): exchange.whale cx_grain buy 2.</summary>
+        [CommandLineFunctionality.CommandLineArgumentFunction("whale", Group)]
+        public static string Whale(List<string> args)
+        {
+            return RunReady("whale", args, b =>
+            {
+                const string usage = "Usage: exchange.whale <instrumentId> <buy|sell> [depths, default 2]";
+                if (args.Count < 2 || (args[1] != "buy" && args[1] != "sell")) return usage;
+                double depths = args.Count > 2 && double.TryParse(args[2], NumberStyles.Float, Inv, out double d) ? d : 2;
+                string town = Settlement.CurrentSettlement?.IsTown == true ? Settlement.CurrentSettlement.StringId : null;
+                PriceState ps = b.Market.Get(args[0]);
+                decimal before = ps?.Price ?? 0;
+                MarketEvent ev = b.Market.WhaleTrade(args[0], args[1] == "buy", depths, town, b.State.Market.LastTickDay);
+                if (ev == null) return $"No whale trade on '{args[0]}' (unknown, closed, a guild, or nothing left to trade).";
+                ExchangeLog.Info($"Console whale {ev}");
+                return $"{ev}. Price {before:0.00} -> {ps.Price:0.00}, investors hold {ps.NpcShares} / {ps.TotalShares}.";
             });
         }
 

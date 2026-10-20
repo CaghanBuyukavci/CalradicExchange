@@ -66,7 +66,9 @@ namespace CalradicExchange.Core.Trading
             ClassParameters cp = Settings.For(def.Class);
             double p = (double)ps.Price;
             double orderValue = quantity * p;
-            double impact = cp.Lambda * orderValue / cp.Depth;
+            // Limited supply (ADR-037): the thinner the free float, the larger the slippage.
+            int held = portfolio.QuantityOf(instrumentId);
+            double impact = cp.Lambda * orderValue / cp.Depth * _market.ImpactMultiplier(instrumentId, side == OrderSide.Buy ? quantity : -quantity, held);
             double halfSpread = cp.Spread / 2.0;
 
             double exec;
@@ -104,8 +106,8 @@ namespace CalradicExchange.Core.Trading
             {
                 if (def.Class == InstrumentClass.Guild && trader.OwnGuilds.Contains(instrumentId)) return Fail(q, TradeError.OwnWorkshop);
                 if (q.Total > trader.Gold) return Fail(q, TradeError.InsufficientGold);
-                decimal held = portfolio.MarketValue(PriceOf);
-                if ((double)held + orderValue > TotalLimit(trader)) return Fail(q, TradeError.TotalLimitExceeded);
+                decimal invested = portfolio.MarketValue(PriceOf);
+                if ((double)invested + orderValue > TotalLimit(trader)) return Fail(q, TradeError.TotalLimitExceeded);
                 double heldHere = portfolio.QuantityOf(instrumentId) * p;
                 if (heldHere + orderValue > InstrumentLimit(def.Class)) return Fail(q, TradeError.InstrumentLimitExceeded);
                 if (def.Class == InstrumentClass.Guild)

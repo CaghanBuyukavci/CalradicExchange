@@ -151,6 +151,10 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 2.12 Menü tabanlı arayüzü yedek olarak tut (Gauntlet hata verirse ona düş)
   - Her tablo penceresi açılamazsa vanilla inquiry'ye düşüyor.
 
+### 2B+. Piyasa derinliği
+- [x] 2.15 Sınırlı arz, şehrin yatırımcıları (NPC al/sat) ve balina işlemleri (ADR-037)
+  - Şema 13. Oyuncuya tutma sınırı yok; hacim sütunu yok. Oyun içi test bekleniyor.
+
 ### 2C. Ayarlar ve yerelleştirme
 - [ ] 2.13 MCM entegrasyonu (isteğe bağlı bağımlılık); MCM yoksa `settings.json`
 - [ ] 2.14 Tam Türkçe ve İngilizce dil dosyaları

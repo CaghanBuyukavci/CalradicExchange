@@ -246,6 +246,11 @@
     <string id="cx_news_cat_battle" text="Muharebe" />
     <string id="cx_news_cat_war_end" text="Savaş sonu" />
     <string id="cx_news_cat_clan" text="Klan" />
+    <string id="cx_news_cat_whale" text="Balina" />
+    <string id="cx_ev_whale_buy" text="Bir {TOWN} tüccarı {QTY} adet {NAME} hissesi topladı ({CHANGE})." />
+    <string id="cx_ev_whale_sell" text="Bir {TOWN} tüccarı {QTY} adet {NAME} hissesini elden çıkardı ({CHANGE})." />
+    <string id="cx_ev_whale_buy_any" text="Büyük bir yatırımcı {QTY} adet {NAME} hissesi topladı ({CHANGE})." />
+    <string id="cx_ev_whale_sell_any" text="Büyük bir yatırımcı {QTY} adet {NAME} hissesini elden çıkardı ({CHANGE})." />
     <string id="cx_ev_castle_captured" text="{SETTLEMENT}, {K1} krallığından {K2} krallığına geçti." />
     <string id="cx_ev_war_ended" text="{K1}, {K2} ile savaşı kazandı. {K2} günde {AMOUNT} dinar haraç ödeyecek." />
     <string id="cx_ev_ruler_died" text="{K1} hükümdarı {HERO}{CAUSE} öldü." />

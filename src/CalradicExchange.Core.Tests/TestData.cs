@@ -39,6 +39,7 @@ namespace CalradicExchange.Core.Tests
             foreach (ClassParameters p in s.Classes.Values) p.Sigma = 0;
             s.ShockBaselineHalfLifeDays = 0;
             s.EconomyWeight = 0;
+            s.Npc.Enabled = false;
             return s;
         }
 

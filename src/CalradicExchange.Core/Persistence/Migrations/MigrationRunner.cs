@@ -56,6 +56,10 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // Schema 12 (ADR-032) adds kingdoms[].baseFiefScore / baseHearth / baseStrength / baseClans, set from
                         // the next reading (KingdomInstruments.SetMissingBases), and new news event fields. Nothing to do here.
                         break;
+                    case 12:
+                        // Schema 13 (ADR-037) adds prices[].totalShares / npcShares and news[].event.instrumentId. Supply is
+                        // issued on the next tick from the current price (MarketEngine.EnsureSupply). Nothing to do here.
+                        break;
                 }
             }
 

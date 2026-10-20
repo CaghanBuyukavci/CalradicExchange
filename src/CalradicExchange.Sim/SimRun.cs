@@ -24,6 +24,7 @@ namespace CalradicExchange.Sim
             var world = new SyntheticWorld(seed * 7919 + 1, catalog.RequiredCategoryIds);
             var market = new MarketEngine(catalog, settings, new MarketState(), new XorShift128Plus(seed));
             if (strategy != null) run.Context = new SimContext(market, trader ?? TraderSetup.Mid, seed * 31 + 7);
+            if (run.Context != null) market.PlayerShares = run.Context.Portfolio.QuantityOf;
             foreach (InstrumentDefinition def in catalog.Instruments) run.Series[def.Id] = new List<PricePoint>();
 
             for (int day = 0; day <= days; day++)

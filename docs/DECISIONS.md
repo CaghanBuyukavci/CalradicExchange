@@ -383,3 +383,18 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Etiket:** Sadece üzüm `agriculture` aldı: tarım sepetindeki diğer ürünlerle aynı mevsim ve kıtlık şoklarını yesin. Hayvansal ürünler ve işlenmiş mallar etiketsiz. Mevsimsel etkiyi genişletmek ayrı bir ayar işi.
 - **Mevcut kayıtlar:** Şema değişmedi. Yeni hisseler kayıtlı oyunda ilk günlük tikte, dünya fiyatı görüldüğünde dünya fiyatından açılıyor (`MarketEngine.Tick`, `StartPrice`). Geçmişleri o günden başlıyor.
 - **Sepetler:** Bu adımda değişmedi; yeni sepetler ayrı iş.
+
+## ADR-037 — Sınırlı arz, şehrin yatırımcıları ve balinalar (2026-10-20)
+
+**Bağlam:** Kullanıcı her hissenin ve sepetin sınırlı sayıda olmasını, NPC'lerin rastgele al/sat yapmasını ve büyük işlemlerin fiyatı oynatmasını (balina etkisi) istedi. NPC'ler için portföy tutulmayacak.
+
+**Karar** (formüller ECONOMY_MODEL §5.1):
+- **Arz:** Her araç ilk fiyatlandığı gün `derinlik × 6 / fiyat` pay çıkarıyor. Lonca ortaklıklarının arzı mevcut 100 pay. Yatırımcılar başlangıçta arzın %30'unu tutuyor; lonca ortaklıklarında 0.
+- **Fiyat etkisi:** Kayma, serbest payın başlangıç seviyesine oranıyla çarpılıyor (0,5–4 arası). Oyuncu ve yatırımcılar aynı formülü kullanıyor.
+- **Oyuncuya tutma sınırı yok** (kullanıcı kararı). Oyuncunun sınırı mevcut toplam ve araç başı limitler; ileride borsacı seviyesi.
+- **Yatırımcılar:** Her gün emtia, sepet ve krallık endekslerinde bir net emir: gürültü ve tutulan payın başlangıç seviyesine geri dönmesi. Trend takibi ayarda var ama 0: simülatörde manipülatör botun erken oyun kazancını hedefin (günde 50 dinar) üstüne çıkardı. Lonca ortaklıklarında yatırımcı akışı yok.
+- **Kayıt:** Araç başına `totalShares` ve `npcShares` kaydediliyor (kullanıcı kararı: NPC'lerin net payı kaydedilsin). Şema 13. Eski kayıtlarda arz, bir sonraki günlük tikte o günkü fiyattan çıkarılıyor; yatırımcılar %30 ile başlıyor.
+- **Balina:** Günde %10 olasılık, derinliğin 1–3 katı. Haberlerde "Balina" kategorisi (mavi) ve ekranda yeşil/kırmızı mesaj. Tablolara hacim sütunu şimdilik eklenmedi (kullanıcı kararı).
+- **Test için konsol:** `exchange.whale <id> <buy|sell> [derinlik]`. `exchange.dump_prices` artık yatırımcı payı / arz sütununu da gösteriyor.
+
+**Gerekçe:** Tek sayı kaydetmek portföy tutmadan "balina topladı, sonra boşaltıyor" davranışını veriyor. Fiyat etkisini oyuncunun emriyle aynı formülden geçirmek, oyuncuya "büyük emir fiyatı oynatır, sığ piyasada daha çok" kuralını tutarlı biçimde öğretiyor. Simülatörün 8 hedefi geçiyor. Emtia yıllık oynaklığı medyanı %29,9'dan %31,7'ye çıktı. Erken oyunda en iyi bot günde 48,1 dinar kazanıyor.

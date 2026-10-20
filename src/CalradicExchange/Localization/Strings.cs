@@ -168,6 +168,7 @@ namespace CalradicExchange.Localization
                 case MarketEventType.BattleEnded: return new TextObject("{=cx_news_cat_battle}Battle");
                 case MarketEventType.WarEnded: return new TextObject("{=cx_news_cat_war_end}War's end");
                 case MarketEventType.ClanChangedKingdom: return new TextObject("{=cx_news_cat_clan}Clan");
+                case MarketEventType.WhaleTrade: return new TextObject("{=cx_news_cat_whale}Whale");
                 default: return new TextObject(type.ToString());
             }
         }
@@ -209,6 +210,11 @@ namespace CalradicExchange.Localization
                 default: return TextObject.GetEmpty();
             }
         }
+
+        public static TextObject WhaleBought => new TextObject("{=cx_ev_whale_buy}A merchant of {TOWN} bought {QTY} {NAME} shares ({CHANGE}).");
+        public static TextObject WhaleSold => new TextObject("{=cx_ev_whale_sell}A merchant of {TOWN} sold {QTY} {NAME} shares ({CHANGE}).");
+        public static TextObject WhaleBoughtNoTown => new TextObject("{=cx_ev_whale_buy_any}A large investor bought {QTY} {NAME} shares ({CHANGE}).");
+        public static TextObject WhaleSoldNoTown => new TextObject("{=cx_ev_whale_sell_any}A large investor sold {QTY} {NAME} shares ({CHANGE}).");
 
         public static TextObject BattleWon => new TextObject("{=cx_ev_battle}{K1} defeated {K2} ({CASUALTIES} casualties).");
         public static TextObject BattleWonNear => new TextObject("{=cx_ev_battle_near}{K1} defeated {K2} near {SETTLEMENT} ({CASUALTIES} casualties).");

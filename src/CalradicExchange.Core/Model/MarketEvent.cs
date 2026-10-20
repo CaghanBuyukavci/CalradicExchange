@@ -20,6 +20,8 @@ namespace CalradicExchange.Core.Model
     /// WarEnded: KingdomId = winner, OtherKingdomId = loser (the tribute payer), Amount = daily tribute.
     /// ClanChangedKingdom: ClanId, KingdomId = old kingdom, OtherKingdomId = new kingdom (either may be null),
     /// Detail = ChangeKingdomActionDetail, Magnitude = 1 (rebellion more).
+    /// WhaleTrade: InstrumentId, TownId = the whale's home town, Detail = "buy" or "sell", Amount = shares,
+    /// Magnitude = price change of the trade (signed fraction).
     /// </summary>
     public sealed class MarketEvent
     {
@@ -52,6 +54,9 @@ namespace CalradicExchange.Core.Model
         /// <summary>Size of the event, 0 and up; rules with scaleByMagnitude multiply their impulse by it. Schema 12.</summary>
         public double? Magnitude { get; set; }
 
+        /// <summary>WhaleTrade: the instrument traded. Schema 13.</summary>
+        public string InstrumentId { get; set; }
+
         /// <summary>BattleEnded: troops lost on both sides. Schema 12.</summary>
         public int Casualties { get; set; }
 
@@ -72,7 +77,7 @@ namespace CalradicExchange.Core.Model
             return $"{Type} day={Day} settlement={SettlementId} item={ItemId} town={TownId} kingdom={KingdomId} other={OtherKingdomId} season={Season}" + (HeroId != null ? $" hero={HeroId} captor={OtherHeroId} rank={HeroRank}" : "")
                 + (ClanId != null ? $" clan={ClanId}" : "") + (Detail != null ? $" detail={Detail}" : "")
                 + (Magnitude != null ? $" magnitude={Magnitude:0.00}" : "") + (Casualties > 0 ? $" casualties={Casualties}" : "")
-                + (Amount > 0 ? $" amount={Amount}" : "") + (Quiet ? " quiet" : "");
+                + (Amount > 0 ? $" amount={Amount}" : "") + (InstrumentId != null ? $" instrument={InstrumentId}" : "") + (Quiet ? " quiet" : "");
         }
     }
 }

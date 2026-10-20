@@ -41,6 +41,12 @@ namespace CalradicExchange.Core.Pricing
         /// <summary>Log return of the last tick.</summary>
         public double LastReturn { get; set; }
 
+        /// <summary>Shares issued (limited supply, ADR-037). 0 until set on the first tick with a price. Schema 13.</summary>
+        public int TotalShares { get; set; }
+
+        /// <summary>Net holding of the town's investors (NPCs, no portfolios), 0..TotalShares. Schema 13.</summary>
+        public int NpcShares { get; set; }
+
         public List<ShockComponent> Shocks { get; set; } = new List<ShockComponent>();
         public List<VolBoost> VolBoosts { get; set; } = new List<VolBoost>();
         public List<PricePoint> History { get; set; } = new List<PricePoint>();

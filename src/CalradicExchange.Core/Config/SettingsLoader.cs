@@ -65,6 +65,20 @@ namespace CalradicExchange.Core.Config
             }
 
             if (s.Guilds != null) Range(e, "guilds.profitWindowDays", s.Guilds.ProfitWindowDays, 1, 336);
+            if (s.Npc != null)
+            {
+                RangeOpenLow(e, "npc.supplyDepthMultiple", s.Npc.SupplyDepthMultiple, 0, 1000);
+                Range(e, "npc.initialHoldingFraction", s.Npc.InitialHoldingFraction, 0, 0.9);
+                RangeOpenLow(e, "npc.impactMultiplierMin", s.Npc.ImpactMultiplierMin, 0, 1);
+                Range(e, "npc.impactMultiplierMax", s.Npc.ImpactMultiplierMax, 1, 100);
+                Range(e, "npc.flowNoise", s.Npc.FlowNoise, 0, 5);
+                Range(e, "npc.flowMomentum", s.Npc.FlowMomentum, -10, 10);
+                Range(e, "npc.holdingReversion", s.Npc.HoldingReversion, 0, 10);
+                Range(e, "npc.whaleDailyChance", s.Npc.WhaleDailyChance, 0, 1);
+                Range(e, "npc.whaleMinDepths", s.Npc.WhaleMinDepths, 0, 100);
+                Range(e, "npc.whaleMaxDepths", s.Npc.WhaleMaxDepths, s.Npc.WhaleMinDepths, 100);
+                Range(e, "npc.whaleBuyChance", s.Npc.WhaleBuyChance, 0, 1);
+            }
             if (s.Kingdoms != null) Range(e, "kingdoms.minListingDays", s.Kingdoms.MinListingDays, 0, 336);
             if (s.Trading == null) e.Add("trading is missing.");
             else

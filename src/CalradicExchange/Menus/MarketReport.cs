@@ -239,6 +239,14 @@ namespace CalradicExchange.Menus
                 case MarketEventType.BattleEnded:
                     t = string.IsNullOrEmpty(ev.SettlementId) ? Strings.BattleWon : Strings.BattleWonNear;
                     break;
+                case MarketEventType.WhaleTrade:
+                    bool bought = ev.Detail == "buy";
+                    t = string.IsNullOrEmpty(ev.TownId) ? (bought ? Strings.WhaleBoughtNoTown : Strings.WhaleSoldNoTown) : (bought ? Strings.WhaleBought : Strings.WhaleSold);
+                    t.SetTextVariable("QTY", ev.Amount);
+                    t.SetTextVariable("NAME", Names.ShortInstrument(ExchangeCampaignBehavior.Current?.Market?.Find(ev.InstrumentId)));
+                    t.SetTextVariable("CHANGE", Fmt.Pct(ev.Magnitude ?? 0));
+                    t.SetTextVariable("TOWN", Names.Settlement(ev.TownId));
+                    return t.ToString();
                 case MarketEventType.ClanChangedKingdom:
                     if (ev.Detail == "CreateKingdom") t = Strings.ClanRebelledFounded;
                     else if (ev.Detail == "LeaveWithRebellion") t = Strings.ClanRebelled;

@@ -47,6 +47,12 @@ namespace CalradicExchange.Core.Pricing
         }
 
         public MarketState State { get; }
+
+        /// <summary>
+        /// The player's holding of an instrument, for the free float (ADR-037). Set by the game layer and the
+        /// simulator; null counts as no holding. Not saved.
+        /// </summary>
+        public Func<string, int> PlayerShares { get; set; }
         public InstrumentCatalog Catalog => _catalog;
         public MarketSettings Settings => _settings;
 
@@ -171,6 +177,7 @@ namespace CalradicExchange.Core.Pricing
                     decimal? f = ComputeFundamental(def, world);
                     if (f != null && f > 0) StartPrice(ps, f.Value, world.Day);
                 }
+                EnsureSupply();
                 State.Initialized = true;
                 State.StartDay = world.Day;
                 State.FundamentalMethod = FundamentalMethodId;
@@ -225,6 +232,9 @@ namespace CalradicExchange.Core.Pricing
                 if (r > summary.MaxMove) { summary.MaxMove = r; summary.MaxMoveId = def.Id; }
             }
             if (summary.InstrumentCount == 0) summary.MinMove = summary.MaxMove = 0;
+
+            EnsureSupply();
+            RunInvestors(world, summary);
 
             State.LastTickDay = world.Day;
             SaveRng();
@@ -290,7 +300,127 @@ namespace CalradicExchange.Core.Pricing
             ps.Anchor = p;
             ps.EconomySignal = 0;
             ps.InitialPrice = p;
+            ps.TotalShares = 0; // issued again at the new price (EnsureSupply)
+            ps.NpcShares = 0;
             AddHistory(ps, day);
+        }
+
+        /// <summary>
+        /// Impact multiplier of an order taking <paramref name="taken"/> shares out of free float (negative for a
+        /// sell), with the player holding <paramref name="playerShares"/> before the order (ADR-037).
+        /// </summary>
+        public double ImpactMultiplier(string instrumentId, int taken, int playerShares)
+        {
+            InstrumentDefinition def = Find(instrumentId);
+            PriceState ps = Get(instrumentId);
+            if (def == null || ps == null || _settings.Npc == null) return 1;
+            return Liquidity.ImpactMultiplier(ps.TotalShares, ps.NpcShares, playerShares, taken,
+                Liquidity.ReferenceFreeFraction(def.Class, _settings.Npc), _settings.Npc);
+        }
+
+        /// <summary>Issues shares for every priced instrument that has none yet (new listing, or a save from before schema 13).</summary>
+        private void EnsureSupply()
+        {
+            NpcSettings npc = _settings.Npc;
+            if (npc == null) return;
+            foreach (InstrumentDefinition def in Instruments)
+            {
+                PriceState ps = _byId[def.Id];
+                if (!ps.HasPrice || ps.TotalShares > 0 || ps.Price <= 0) continue;
+                if (def.Class == InstrumentClass.Guild)
+                {
+                    ps.TotalShares = _settings.Guilds?.SharesPerGuild ?? 100;
+                    ps.NpcShares = 0;
+                    continue;
+                }
+                ps.TotalShares = Liquidity.SupplyFor(_settings.For(def.Class), npc, ps.Price);
+                ps.NpcShares = Liquidity.TradedByInvestors(def.Class) ? (int)Math.Round(ps.TotalShares * npc.InitialHoldingFraction) : 0;
+            }
+        }
+
+        /// <summary>
+        /// The town's investors (ADR-037): every tradable instrument gets one net order a day (noise, trend following,
+        /// and a pull of their holding back to its listing level), and now and then one whale trades a big block,
+        /// which makes the news. Draws the same random numbers whatever the prices, for determinism.
+        /// </summary>
+        private void RunInvestors(WorldSnapshot world, TickSummary summary)
+        {
+            NpcSettings npc = _settings.Npc;
+            if (npc == null || !npc.Enabled) return;
+
+            var open = new List<InstrumentDefinition>();
+            foreach (InstrumentDefinition def in Instruments)
+            {
+                if (!Liquidity.TradedByInvestors(def.Class)) continue;
+                PriceState ps = _byId[def.Id];
+                double eps = _rng.NextGaussian();
+                if (ps.Closed || !ps.HasPrice || ps.TotalShares <= 0) continue;
+                open.Add(def);
+
+                double gap = (npc.InitialHoldingFraction * ps.TotalShares - ps.NpcShares) / ps.TotalShares;
+                double fraction = npc.FlowNoise * eps + npc.FlowMomentum * ps.ChangeOver(5) + npc.HoldingReversion * gap;
+                InvestorTrade(def, ps, fraction * _settings.For(def.Class).Depth, world.Day);
+            }
+
+            double roll = _rng.NextDouble();
+            if (roll >= npc.WhaleDailyChance || open.Count == 0) return;
+            double pick = _rng.NextDouble(), side = _rng.NextDouble(), size = _rng.NextDouble(), home = _rng.NextDouble();
+            InstrumentDefinition target = open[Math.Min(open.Count - 1, (int)(pick * open.Count))];
+            PriceState tps = _byId[target.Id];
+            bool heavy = tps.NpcShares > npc.InitialHoldingFraction * 1.5 * tps.TotalShares;
+            bool buy = side < (heavy ? 1 - npc.WhaleBuyChance : npc.WhaleBuyChance);
+            double depths = npc.WhaleMinDepths + (npc.WhaleMaxDepths - npc.WhaleMinDepths) * size;
+            string town = world.Towns.Count > 0 ? world.Towns[Math.Min(world.Towns.Count - 1, (int)(home * world.Towns.Count))].Id : null;
+            MarketEvent whale = WhaleTrade(target.Id, buy, depths, town, world.Day);
+            if (whale != null) summary.GeneratedEvents.Add(whale);
+        }
+
+        /// <summary>
+        /// A whale buys or sells <paramref name="depths"/> x the class depth of <paramref name="instrumentId"/> and
+        /// the news is recorded. Also used by the console (exchange.whale). Null when nothing could be traded.
+        /// </summary>
+        public MarketEvent WhaleTrade(string instrumentId, bool buy, double depths, string townId, int day)
+        {
+            InstrumentDefinition def = Find(instrumentId);
+            PriceState ps = Get(instrumentId);
+            if (def == null || ps == null || ps.Closed || !ps.HasPrice || ps.TotalShares <= 0 || !Liquidity.TradedByInvestors(def.Class)) return null;
+            decimal before = ps.Price;
+            int shares = InvestorTrade(def, ps, (buy ? 1 : -1) * depths * _settings.For(def.Class).Depth, day);
+            if (shares == 0 || before <= 0) return null;
+            var ev = new MarketEvent
+            {
+                Type = MarketEventType.WhaleTrade,
+                Day = day,
+                InstrumentId = def.Id,
+                TownId = townId,
+                Detail = shares > 0 ? "buy" : "sell",
+                Amount = Math.Abs(shares),
+                Magnitude = Math.Round((double)(ps.Price / before) - 1, 4),
+            };
+            AddNews(ev, new List<string> { def.Id });
+            return ev;
+        }
+
+        /// <summary>
+        /// Investors trade <paramref name="value"/> denars (negative: sell) at the market: buys stop at the free float,
+        /// sells at their holding. Moves the price like a player order of the same size. Returns signed shares.
+        /// </summary>
+        private int InvestorTrade(InstrumentDefinition def, PriceState ps, double value, int day)
+        {
+            int shares = (int)Math.Round(value / (double)ps.Price);
+            int player = PlayerShares?.Invoke(def.Id) ?? 0;
+            if (shares > 0) shares = Math.Min(shares, Math.Max(0, ps.TotalShares - ps.NpcShares - player));
+            else shares = Math.Max(shares, -ps.NpcShares);
+            if (shares == 0) return 0;
+
+            ClassParameters cp = _settings.For(def.Class);
+            double multiplier = Liquidity.ImpactMultiplier(ps.TotalShares, ps.NpcShares, player, shares,
+                Liquidity.ReferenceFreeFraction(def.Class, _settings.Npc), _settings.Npc);
+            double impact = cp.Lambda * Math.Abs(shares) * (double)ps.Price / cp.Depth * multiplier;
+            ps.NpcShares += shares;
+            ApplyTradeImpact(def.Id, shares > 0, impact);
+            if (ps.History.Count > 0 && ps.History[ps.History.Count - 1].Day == day) ps.History[ps.History.Count - 1].P = ps.Price;
+            return shares;
         }
 
         /// <summary>World values of every open instrument that has data today.</summary>

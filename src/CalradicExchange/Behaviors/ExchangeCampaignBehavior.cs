@@ -215,6 +215,7 @@ namespace CalradicExchange.Behaviors
             _state.LastTickDay = _state.Market.LastTickDay;
             ExchangeLog.Info($"Daily tick {summary} (towns {world.Towns.Count}, kingdoms {world.KingdomCount}, wars {world.ActiveWarPairs}, season {world.Season})");
             foreach (MarketEvent ev in summary.GeneratedEvents) ExchangeLog.Info($"Generated event {ev}");
+            if (summary.Processed && !summary.Initialized) NotifyWhales(summary);
             if (summary.Processed)
             {
                 ExchangeLog.Info("Guilds: " + GuildReport.Summary(_state.Market.Guilds));
@@ -316,6 +317,7 @@ namespace CalradicExchange.Behaviors
             // ADR-004: reseed from entropy on every load so reloading does not replay tomorrow's noise.
             var rng = new XorShift128Plus((ulong)DateTime.UtcNow.Ticks ^ ((ulong)Environment.TickCount << 32));
             _market = new MarketEngine(_catalog, _settings, _state.Market, rng);
+            _market.PlayerShares = id => _state?.Portfolio?.QuantityOf(id) ?? 0; // free float (ADR-037)
             _orders = new OrderEngine(_market);
             _guildPayouts = new GuildPayouts(this);
             _reader = new WorldReader(_catalog);
@@ -410,6 +412,15 @@ namespace CalradicExchange.Behaviors
                 parts.Add($"{def.KingdomId} P {ps?.Price:0.0} F {ps?.Fundamental:0.0} ({state})");
             }
             return parts.Count == 0 ? "none listed" : string.Join("; ", parts);
+        }
+
+        /// <summary>A whale's trade is news (ADR-037); it is also shown as a message, like a big move.</summary>
+        private static void NotifyWhales(TickSummary summary)
+        {
+            foreach (MarketEvent ev in summary.GeneratedEvents.Where(e => e.Type == MarketEventType.WhaleTrade))
+            {
+                InformationManager.DisplayMessage(new InformationMessage(MarketReport.Describe(ev), ev.Detail == "buy" ? Colors.Green : Colors.Red));
+            }
         }
 
         private void NotifyBigMoves()
