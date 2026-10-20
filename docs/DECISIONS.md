@@ -365,3 +365,9 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Eşleme:** Lonca = bir şehirdeki aynı türden atölyelerin tamamı (ADR-027). Oyuncunun o şehirde o türden bir atölyesi varsa o loncanın payını alamaz (`TradeError.OwnWorkshop`). Satış serbest. Lonca tablosunda satırın adına "(atölyen)" eklenir ve Al düğmesi gizlenir.
 - **Zorunlu satış:** Oyuncu atölye satın aldığında (`WorkshopOwnerChangedEvent`) ya da atölyesinin türünü değiştirdiğinde (`WorkshopTypeChangedEvent`), elindeki o loncanın payları hemen satılır. Günlük tick'te de aynı kontrol yapılır, kaçan bir durum kalmasın diye.
 - **Fiyat:** Piyasa fiyatı; alış-satış farkı, kayma, komisyon ve kâr vergisi yok. Lonca kapanışındaki zorunlu satışla aynı kural (`Portfolio.ForceSell`). İşlem geçmişinde zorunlu satış olarak görünür. Satış ani ve oyuncunun seçimi değil, bu yüzden ceza kesilmiyor.
+
+## ADR-035 — Arayüz turu 2: tek Piyasalar penceresi, tablo düzeni, performans penceresi (2026-10-20)
+
+- **Şehir menüsü:** "Borsaya git" vanilla "Ticaret" seçeneğinin hemen üstünde. Sıra numarası sabit değil, oturum açılırken `trade` seçeneğinin yerine bakılarak bulunuyor (`GameMenu.MenuOptions`). Bulunamazsa 5. sıra.
+- **Piyasalar:** Borsa menüsündeki dört piyasa seçeneği tek "Piyasalar" seçeneği oldu. Pencerede dört sekme var: Hisseler (emtia), Sepetler, Ortaklıklar (lonca), Endeksler (krallık). Başlık, açıklama ve sütun başlıkları sekmeye göre değişiyor. Arama kutusu sadece Hisseler sekmesinde. Seçili sekme oyun boyunca hatırlanıyor; işlemden ya da Portföy'den dönünce aynı sekme açılıyor.
+- **Adlar:** "Krallık Piyasası" → "Endeks Piyasası". Krallık tablolarının ilk sütunu "Krallık Endeksleri". Portföy sekmeleri de piyasa sekmeleriyle aynı adları aldı: Ortaklıklar, Endeksler.

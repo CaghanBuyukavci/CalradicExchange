@@ -25,15 +25,31 @@ namespace CalradicExchange.Menus
     /// </summary>
     public static class TradeFlow
     {
-        /// <summary>Commodity, basket (InstrumentClass.Sector) or kingdom market. <paramref name="search"/> refills the commodity search box.</summary>
+        /// <summary>Market tabs of the Markets window, left to right.</summary>
+        private static readonly InstrumentClass[] MarketTabs = { InstrumentClass.Commodity, InstrumentClass.Sector, InstrumentClass.Guild, InstrumentClass.Kingdom };
+
+        /// <summary>The selected market tab, kept while the game runs so the menu and a finished trade come back to it.</summary>
+        private static InstrumentClass _marketTab = InstrumentClass.Commodity;
+
+        /// <summary>Opens the Markets window on the last selected tab.</summary>
+        public static void ShowMarkets() => ShowMarket(_marketTab);
+
+        /// <summary>
+        /// Markets window on the tab of <paramref name="cls"/>: commodity shares, baskets (InstrumentClass.Sector),
+        /// guild partnerships or kingdom indices. <paramref name="search"/> refills the commodity search box.
+        /// </summary>
         public static void ShowMarket(InstrumentClass cls, string search = "")
         {
             ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
             if (b == null || !b.IsReady) return;
+            if (Array.IndexOf(MarketTabs, cls) >= 0) _marketTab = cls;
             ButtonSkins.EnsureApplied();
-            if (TablePopup.Show("CxTradeTable", close => MarketTable(b, cls, search, close))) return;
-            ShowMarketFallback(b, cls);
+            if (TablePopup.Show("CxTradeTable", close => MarketTable(b, search, close))) return;
+            if (_marketTab != InstrumentClass.Guild) ShowMarketFallback(b, _marketTab);
+            else ExchangeLog.Warn("Guild market table could not be shown.");
         }
+
+        public static void ShowGuildMarket() => ShowMarket(InstrumentClass.Guild);
 
         /// <summary>"Gold: ... / Limit left: ..." for the bottom-left corner of the market tables.</summary>
         public static string GoldAndLimit(ExchangeCampaignBehavior b)
@@ -46,27 +62,60 @@ namespace CalradicExchange.Menus
             return t.ToString();
         }
 
-        private static ExchangeTableVM MarketTable(ExchangeCampaignBehavior b, InstrumentClass cls, string search, Action close)
+        private static ExchangeTableVM MarketTable(ExchangeCampaignBehavior b, string search, Action close)
         {
-            string description = null;
-            if (cls == InstrumentClass.Commodity) description = Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare).ToString();
-            else if (cls == InstrumentClass.Kingdom) description = Strings.KingdomMarketDescription.ToString();
+            var vm = new ExchangeTableVM("", null, null, Strings.Close.ToString(), close);
+            vm.StatusText = GoldAndLimit(b);
+            vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(() => ShowMarket(_marketTab, vm.SearchText)));
+
+            // Rows of the selected tab before filtering; the search box filters the commodity tab.
+            var rows = new List<KeyValuePair<string, TradeRowVM>>();
+            foreach (InstrumentClass tab in MarketTabs)
+            {
+                InstrumentClass cls = tab;
+                vm.Tabs.Add(new TabVM(MarketTabLabel(cls).ToString(), cls == _marketTab, () =>
+                {
+                    _marketTab = cls;
+                    FillMarket(b, vm, rows);
+                }));
+            }
+            vm.WithSearch(Strings.SearchPlaceholder.ToString(), search, text =>
+            {
+                if (_marketTab == InstrumentClass.Commodity) FillRows(vm, rows, text);
+            });
+            FillMarket(b, vm, rows);
+            return vm;
+        }
+
+        /// <summary>Refills title, description, headers and rows for the selected tab.</summary>
+        private static void FillMarket(ExchangeCampaignBehavior b, ExchangeTableVM vm, List<KeyValuePair<string, TradeRowVM>> rows)
+        {
+            InstrumentClass cls = _marketTab;
+            for (int i = 0; i < vm.Tabs.Count; i++) vm.Tabs[i].IsSelected = MarketTabs[i] == cls;
+            vm.Title = MarketTitle(cls);
+            vm.ShowSearch(cls == InstrumentClass.Commodity);
+            vm.EmptyText = "";
+            rows.Clear();
+            vm.TradeRows.Clear();
+            Action back = () => ShowMarket(cls, vm.SearchText);
+            if (cls == InstrumentClass.Guild)
+            {
+                FillGuilds(b, vm, back);
+                return;
+            }
+
+            if (cls == InstrumentClass.Commodity) vm.Description = Strings.HeaderCommodities.SetTextVariable("UNITS", b.Catalog.UnitsPerShare).ToString();
+            else if (cls == InstrumentClass.Kingdom) vm.Description = Strings.KingdomMarketDescription.ToString();
+            else vm.Description = "";
 
             TextObject nameHeader = cls == InstrumentClass.Kingdom ? Strings.ColKingdom : cls == InstrumentClass.Sector ? Strings.ColBasket : Strings.ColInstrument;
-            var vm = new ExchangeTableVM(MarketTitle(cls),
-                new[]
-                {
-                    nameHeader.ToString(), Strings.ColPrice.ToString(),
-                    Strings.ColToday.ToString(), Strings.ColWeek.ToString(), Strings.ColHeld.ToString(),
-                },
-                null, Strings.Close.ToString(), close, description);
-            vm.StatusText = GoldAndLimit(b);
+            vm.SetHeaders(new[]
+            {
+                nameHeader.ToString(), Strings.ColPrice.ToString(),
+                Strings.ColToday.ToString(), Strings.ColWeek.ToString(), Strings.ColHeld.ToString(),
+            });
 
             string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString(), none = Strings.NoPrice.ToString();
-            Action back = () => ShowMarket(cls, vm.SearchText);
-            vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(back));
-
-            var rows = new List<KeyValuePair<string, TradeRowVM>>();
             foreach (InstrumentDefinition def in b.Market.Instruments.Where(i => i.Class == cls))
             {
                 PriceState ps = b.Market.Get(def.Id);
@@ -86,11 +135,7 @@ namespace CalradicExchange.Menus
                     () => Guard("buy pick", () => AskQuantity(id, OrderSide.Buy, back)),
                     () => Guard("sell pick", () => AskQuantity(id, OrderSide.Sell, back)))));
             }
-
-            Action<string> fill = text => FillRows(vm, rows, text);
-            if (cls == InstrumentClass.Commodity) vm.WithSearch(Strings.SearchPlaceholder.ToString(), search, fill);
-            else fill("");
-            return vm;
+            FillRows(vm, rows, cls == InstrumentClass.Commodity ? vm.SearchText : "");
         }
 
         /// <summary>Shows the rows whose name contains <paramref name="search"/> (case-insensitive), shading every other one.</summary>
@@ -110,39 +155,26 @@ namespace CalradicExchange.Menus
         }
 
         /// <summary>
-        /// Guild market (ADR-026): partnership shares of this town's guilds (Buy and Sell), then the player's shares in
+        /// Guild tab (ADR-026): partnership shares of this town's guilds (Buy and Sell), then the player's shares in
         /// other towns (Sell only).
         /// </summary>
-        public static void ShowGuildMarket()
-        {
-            ExchangeCampaignBehavior b = ExchangeCampaignBehavior.Current;
-            if (b == null || !b.IsReady) return;
-            ButtonSkins.EnsureApplied();
-            if (TablePopup.Show("CxTradeTable", close => GuildTable(b, close))) return;
-            ExchangeLog.Warn("Guild market table could not be shown.");
-        }
-
-        private static ExchangeTableVM GuildTable(ExchangeCampaignBehavior b, Action close)
+        private static void FillGuilds(ExchangeCampaignBehavior b, ExchangeTableVM vm, Action back)
         {
             TraderProfile trader = b.CurrentTrader();
-            var vm = new ExchangeTableVM(Strings.GuildMarketTitle.ToString(),
-                new[]
-                {
-                    Strings.ColGuild.ToString(), Strings.ColPrice.ToString(), Strings.ColWeek.ToString(),
-                    Strings.ColWeekProfitPerShare.ToString(), Strings.ColHeld.ToString(),
-                },
-                null, Strings.Close.ToString(), close, Strings.GuildMarketDescription.ToString());
-            vm.StatusText = GoldAndLimit(b);
+            vm.Description = Strings.GuildMarketDescription.ToString();
+            vm.SetHeaders(new[]
+            {
+                Strings.ColGuild.ToString(), Strings.ColPrice.ToString(), Strings.ColWeek.ToString(),
+                Strings.ColWeekProfitPerShare.ToString(), Strings.ColHeld.ToString(),
+            });
 
-            Action back = ShowGuildMarket;
-            vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(back));
             vm.TradeRows.Add(new TradeRowVM(Strings.GuildSectionLocal.SetTextVariable("TOWN", Names.Settlement(trader.TownId)).ToString()));
             List<InstrumentDefinition> local = b.Market.Guilds.Where(g => g.TownId == trader.TownId && !(b.Market.Get(g.Id)?.Closed ?? true)).ToList();
             if (local.Count == 0) vm.TradeRows.Add(new TradeRowVM(Strings.GuildNoneHere.ToString()));
             bool alternate = false;
             foreach (InstrumentDefinition def in local)
             {
-                vm.TradeRows.Add(GuildRow(b, def, true, alternate, back));
+                vm.TradeRows.Add(GuildRow(b, trader, def, true, alternate, back));
                 alternate = !alternate;
             }
 
@@ -156,14 +188,13 @@ namespace CalradicExchange.Menus
                 alternate = false;
                 foreach (InstrumentDefinition def in elsewhere)
                 {
-                    vm.TradeRows.Add(GuildRow(b, def, false, alternate, back));
+                    vm.TradeRows.Add(GuildRow(b, trader, def, false, alternate, back));
                     alternate = !alternate;
                 }
             }
-            return vm;
         }
 
-        private static TradeRowVM GuildRow(ExchangeCampaignBehavior b, InstrumentDefinition def, bool local, bool alternate, Action back)
+        private static TradeRowVM GuildRow(ExchangeCampaignBehavior b, TraderProfile trader, InstrumentDefinition def, bool local, bool alternate, Action back)
         {
             PriceState ps = b.Market.Get(def.Id);
             bool priced = ps != null && ps.HasPrice;
@@ -173,7 +204,7 @@ namespace CalradicExchange.Menus
             double weekProfit = WeekProfitPerShare(b, def.Id);
             string none = Strings.NoPrice.ToString();
             string id = def.Id;
-            bool own = b.CurrentTrader().OwnGuilds.Contains(id);
+            bool own = trader.OwnGuilds.Contains(id);
             string name = own ? Strings.OwnWorkshopMark.SetTextVariable("NAME", Names.Instrument(def)).ToString() : Names.Instrument(def);
             return new TradeRowVM(name,
                 priced ? Fmt.Price(ps.Price) : none,
@@ -199,8 +230,20 @@ namespace CalradicExchange.Menus
             switch (cls)
             {
                 case InstrumentClass.Commodity: return Strings.CommodityMarketTitle.ToString();
+                case InstrumentClass.Guild: return Strings.GuildMarketTitle.ToString();
                 case InstrumentClass.Kingdom: return Strings.KingdomMarketTitle.ToString();
                 default: return Strings.BasketMarketTitle.ToString();
+            }
+        }
+
+        private static TextObject MarketTabLabel(InstrumentClass cls)
+        {
+            switch (cls)
+            {
+                case InstrumentClass.Sector: return Strings.MarketTabBaskets;
+                case InstrumentClass.Guild: return Strings.MarketTabGuilds;
+                case InstrumentClass.Kingdom: return Strings.MarketTabIndices;
+                default: return Strings.MarketTabShares;
             }
         }
 

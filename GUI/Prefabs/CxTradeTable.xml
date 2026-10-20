@@ -1,10 +1,10 @@
 <Prefab>
-  <!-- Calradic Exchange: commodity / basket / kingdom market (search box top right when HasSearch). Columns: name | price | today | 7 days | held | Buy | Sell (guild market: name | price | 7 days | week profit/share | held). Header rows show SectionText. Data source: ExchangeTableVM with TradeRows. -->
+  <!-- Calradic Exchange: Markets window. Tabs (TabVM): shares | baskets | partnerships | indices; search box top right when HasSearch (shares tab). Columns: name | price | today | 7 days | held | Buy | Sell (guild market: name | price | 7 days | week profit/share | held). Header rows show SectionText. Data source: ExchangeTableVM with TradeRows. -->
   <Window>
     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000ff" AlphaFactor="0.7">
       <Children>
 
-        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="980" SuggestedHeight="720" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="980" SuggestedHeight="780" HorizontalAlignment="Center" VerticalAlignment="Center">
           <Children>
             <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="StdAssets\Popup\canvas" />
 
@@ -22,6 +22,18 @@
                   </Children>
                 </Widget>
                 <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="23" Sprite="StdAssets\Popup\divider" />
+                <ListPanel DataSource="{Tabs}" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="42" HorizontalAlignment="Center" MarginBottom="10" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <ItemTemplate>
+                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="210" SuggestedHeight="42" MarginLeft="6" MarginRight="6" Command.Click="ExecuteSelect">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.18" IsVisible="@IsSelected" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#FFFFFFFF" AlphaFactor="0.05" IsVisible="@IsNotSelected" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="3" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" IsVisible="@IsSelected" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="@TextColor" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@Text" />
+                      </Children>
+                    </ButtonWidget>
+                  </ItemTemplate>
+                </ListPanel>
                 <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginBottom="10" Brush="Popup.Description.Text" Brush.FontSize="19" Text="@Description" IsVisible="@HasDescription" />
 
                 <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="34" MarginLeft="40" MarginRight="40" StackLayout.LayoutMethod="HorizontalLeftToRight">

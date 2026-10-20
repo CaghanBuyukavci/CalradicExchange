@@ -21,25 +21,23 @@ namespace CalradicExchange.Menus
         public const string ExchangeMenuId = "cx_exchange";
         public const string VisitOptionId = "cx_visit_exchange";
 
-        /// <summary>Position among the town options; vanilla puts "Go to alley" at 4.</summary>
+        /// <summary>Vanilla "Trade" option of the town menu; the exchange goes right above it.</summary>
+        private const string TradeOptionId = "trade";
+
+        /// <summary>Position among the town options when "Trade" is not found.</summary>
         private const int VisitOptionIndex = 5;
 
         private const string MenuTextVariable = "CX_EXCHANGE_TEXT";
 
         public static void AddTo(CampaignGameStarter starter)
         {
+            int visitIndex = VisitIndex(starter);
             starter.AddGameMenuOption(TownMenuId, VisitOptionId, Strings.MenuVisitExchange,
-                OnVisitCondition, args => Guard("visit", () => GameMenu.SwitchToMenu(ExchangeMenuId)), isLeave: false, index: VisitOptionIndex);
+                OnVisitCondition, args => Guard("visit", () => GameMenu.SwitchToMenu(ExchangeMenuId)), isLeave: false, index: visitIndex);
 
             starter.AddGameMenu(ExchangeMenuId, "{=!}{" + MenuTextVariable + "}", OnExchangeInit, GameMenu.MenuOverlayType.SettlementWithBoth);
-            starter.AddGameMenuOption(ExchangeMenuId, "cx_commodity_market", Strings.OptCommodityMarket,
-                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("commodity market", () => TradeFlow.ShowMarket(InstrumentClass.Commodity)));
-            starter.AddGameMenuOption(ExchangeMenuId, "cx_basket_market", Strings.OptBasketMarket,
-                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("basket market", () => TradeFlow.ShowMarket(InstrumentClass.Sector)));
-            starter.AddGameMenuOption(ExchangeMenuId, "cx_guild_market", Strings.OptGuildMarket,
-                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("guild market", TradeFlow.ShowGuildMarket));
-            starter.AddGameMenuOption(ExchangeMenuId, "cx_kingdom_market", Strings.OptKingdomMarket,
-                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("kingdom market", () => TradeFlow.ShowMarket(InstrumentClass.Kingdom)));
+            starter.AddGameMenuOption(ExchangeMenuId, "cx_markets", Strings.OptMarkets,
+                args => Option(args, GameMenuOption.LeaveType.Trade), args => Guard("markets", TradeFlow.ShowMarkets));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_portfolio", Strings.OptPortfolio,
                 args => Option(args, GameMenuOption.LeaveType.Manage), args => Guard("portfolio", MarketReport.ShowPortfolio));
             starter.AddGameMenuOption(ExchangeMenuId, "cx_news", Strings.OptNews,
@@ -50,7 +48,23 @@ namespace CalradicExchange.Menus
                 args => { args.optionLeaveType = GameMenuOption.LeaveType.Leave; return true; },
                 args => Guard("leave", () => GameMenu.SwitchToMenu(TownMenuId)), isLeave: true);
 
-            ExchangeLog.Info("Exchange menus added.");
+            ExchangeLog.Info($"Exchange menus added (town option at {visitIndex}).");
+        }
+
+        /// <summary>
+        /// Index of vanilla "Trade" in the town menu, so the exchange is listed right above it. The vanilla behaviors
+        /// add their town options before our session launch; other mods may add theirs later.
+        /// </summary>
+        private static int VisitIndex(CampaignGameStarter starter)
+        {
+            int i = 0;
+            foreach (GameMenuOption option in starter.GetPresumedGameMenu(TownMenuId).MenuOptions)
+            {
+                if (option.IdString == TradeOptionId) return i;
+                i++;
+            }
+            ExchangeLog.Warn($"Town menu option '{TradeOptionId}' not found; the exchange goes to {VisitOptionIndex}.");
+            return VisitOptionIndex;
         }
 
         /// <summary>Re-enters the exchange menu so its text shows fresh numbers.</summary>

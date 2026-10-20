@@ -113,15 +113,12 @@
     <string id="cx_col_side" text="İşlem" />
     <string id="cx_col_total" text="Tutar" />
     <string id="cx_col_costs" text="Masraf" />
-    <string id="cx_opt_commodity_market" text="Emtia Piyasası" />
-    <string id="cx_opt_basket_market" text="Sepet Piyasası" />
     <string id="cx_commodity_market_title" text="Emtia Piyasası" />
     <string id="cx_basket_market_title" text="Sepet Piyasası" />
     <string id="cx_trade_desc" text="Altın: {GOLD} dinar&#10;Kalan limit: {LEFT} dinar" />
     <string id="cx_btn_buy" text="AL" />
     <string id="cx_btn_sell" text="SAT" />
     <string id="cx_col_held" text="Elde" />
-    <string id="cx_opt_guild_market" text="Lonca Piyasası" />
     <string id="cx_guild_market_title" text="Lonca Piyasası" />
     <string id="cx_guild_market_desc" text="Bu şehrin atölyelerinde ortaklık payları. Her 7 günde bir her pay, loncanın kârından ya da zararından payına düşeni getirir. Başka şehirlerdeki paylarını her yerde satabilirsin." />
     <string id="cx_guild_section_local" text="{TOWN} loncaları" />
@@ -160,15 +157,14 @@
     <string id="cx_portfolio_tab_empty" text="Bu türden elinde bir şey yok." />
     <string id="cx_tab_shares" text="Hisseler ({COUNT})" />
     <string id="cx_tab_baskets" text="Sepetler ({COUNT})" />
-    <string id="cx_tab_guilds" text="Loncalar ({COUNT})" />
+    <string id="cx_tab_guilds" text="Ortaklıklar ({COUNT})" />
     <string id="cx_col_basket" text="Sepet" />
-    <string id="cx_opt_kingdom_market" text="Krallık Piyasası" />
-    <string id="cx_kingdom_market_title" text="Krallık Piyasası" />
-    <string id="cx_kingdom_market_desc" text="Calradia krallıklarının endeksleri. Krallığın refahı ve fiefleri arttıkça yükselir, savaşları ve kuşatmaları arttıkça düşer. Krallık yıkılırsa endeksi sıfırlanır." />
+    <string id="cx_kingdom_market_title" text="Endeks Piyasası" />
+    <string id="cx_kingdom_market_desc" text="Calradia krallıklarının endeksleri. Krallığın refahı, şehirleri, kaleleri, köyleri, ordusu, klanları ve zaferleriyle yükselir; savaşlar, kuşatmalar, yağmalar, yenilgiler ve hükümdar ölümleriyle düşer. Krallık yıkılırsa endeksi sıfırlanır." />
     <string id="cx_kingdom_index_name" text="{KINGDOM} endeksi" />
     <string id="cx_kingdom_fallen" text="{KINGDOM} yıkıldı. {QTY} endeks payın değersiz kaldı: {LOSS} dinar zarar." />
-    <string id="cx_tab_kingdoms" text="Krallıklar ({COUNT})" />
-    <string id="cx_col_kingdom" text="Krallık" />
+    <string id="cx_tab_kingdoms" text="Endeksler ({COUNT})" />
+    <string id="cx_col_kingdom" text="Krallık Endeksleri" />
     <string id="cx_news_cat_captive" text="Tutsak" />
     <string id="cx_ev_hero_captured" text="{HERO} ({K1}), {CAPTOR} ({K2}) tarafından tutsak alındı." />
     <string id="cx_ev_hero_captured_faction" text="{HERO} ({K1}), {K2} tarafından tutsak alındı." />
@@ -231,5 +227,10 @@
     <string id="cx_err_own_workshop" text="Bu loncada senin de bir atölyen var. Kendi işletmenden ortaklık payı alamazsın." />
     <string id="cx_own_workshop_sold" text="Artık {NAME} içinde bir atölyen var. Oradaki {QTY} ortaklık payın güncel fiyattan {TOTAL} dinara satıldı ({PNL})." />
     <string id="cx_own_workshop_mark" text="{NAME} (atölyen)" />
+    <string id="cx_opt_markets" text="Piyasalar" />
+    <string id="cx_mtab_shares" text="Hisseler" />
+    <string id="cx_mtab_baskets" text="Sepetler" />
+    <string id="cx_mtab_guilds" text="Ortaklıklar" />
+    <string id="cx_mtab_indices" text="Endeksler" />
   </strings>
 </base>

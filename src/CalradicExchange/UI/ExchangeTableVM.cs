@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using TaleWorlds.Library;
 
 namespace CalradicExchange.UI
@@ -11,47 +12,55 @@ namespace CalradicExchange.UI
     public sealed class ExchangeTableVM : ViewModel
     {
         private readonly Action _onClose;
-        private string _h1;
+        private string _title = "", _description = "";
+        private string _h1 = "", _h2 = "", _h3 = "", _h4 = "", _h5 = "", _h6 = "", _h7 = "", _h8 = "";
         private string _emptyText = "";
         private string _searchText = "";
         private string _statusText = "";
         private string _secondaryText = "";
         private Action _onSecondary;
         private Action<string> _onSearch;
+        private bool _searchVisible;
 
         public ExchangeTableVM(string title, string[] headers, string footer, string closeText, Action onClose, string description = null)
         {
-            Title = title;
-            H1 = At(headers, 0); H2 = At(headers, 1); H3 = At(headers, 2); H4 = At(headers, 3);
-            H5 = At(headers, 4); H6 = At(headers, 5); H7 = At(headers, 6); H8 = At(headers, 7);
+            _title = title ?? "";
+            SetHeaders(headers);
             Footer = footer ?? "";
-            Description = description ?? "";
+            _description = description ?? "";
             CloseText = closeText;
             _onClose = onClose;
         }
 
-        [DataSourceProperty] public string Title { get; }
-        [DataSourceProperty] public string Description { get; }
-        [DataSourceProperty] public bool HasDescription => Description.Length > 0;
+        [DataSourceProperty] public string Title { get => _title; set => Set(ref _title, value); }
+
         [DataSourceProperty]
-        public string H1
+        public string Description
         {
-            get => _h1;
+            get => _description;
             set
             {
-                if (_h1 == value) return;
-                _h1 = value;
-                OnPropertyChanged();
+                if (Set(ref _description, value)) OnPropertyChanged(nameof(HasDescription));
             }
         }
 
-        [DataSourceProperty] public string H2 { get; }
-        [DataSourceProperty] public string H3 { get; }
-        [DataSourceProperty] public string H4 { get; }
-        [DataSourceProperty] public string H5 { get; }
-        [DataSourceProperty] public string H6 { get; }
-        [DataSourceProperty] public string H7 { get; }
-        [DataSourceProperty] public string H8 { get; }
+        [DataSourceProperty] public bool HasDescription => _description.Length > 0;
+        [DataSourceProperty] public string H1 { get => _h1; set => Set(ref _h1, value); }
+        [DataSourceProperty] public string H2 { get => _h2; set => Set(ref _h2, value); }
+        [DataSourceProperty] public string H3 { get => _h3; set => Set(ref _h3, value); }
+        [DataSourceProperty] public string H4 { get => _h4; set => Set(ref _h4, value); }
+        [DataSourceProperty] public string H5 { get => _h5; set => Set(ref _h5, value); }
+        [DataSourceProperty] public string H6 { get => _h6; set => Set(ref _h6, value); }
+        [DataSourceProperty] public string H7 { get => _h7; set => Set(ref _h7, value); }
+        [DataSourceProperty] public string H8 { get => _h8; set => Set(ref _h8, value); }
+
+        /// <summary>Replaces all column headers (a tab switch); missing ones become empty.</summary>
+        public void SetHeaders(string[] headers)
+        {
+            H1 = At(headers, 0); H2 = At(headers, 1); H3 = At(headers, 2); H4 = At(headers, 3);
+            H5 = At(headers, 4); H6 = At(headers, 5); H7 = At(headers, 6); H8 = At(headers, 7);
+        }
+
         [DataSourceProperty] public string Footer { get; }
         [DataSourceProperty] public bool HasFooter => Footer.Length > 0;
         [DataSourceProperty] public string CloseText { get; }
@@ -110,7 +119,15 @@ namespace CalradicExchange.UI
             _onSecondary?.Invoke();
         }
 
-        [DataSourceProperty] public bool HasSearch => _onSearch != null;
+        [DataSourceProperty] public bool HasSearch => _onSearch != null && _searchVisible;
+
+        /// <summary>Shows or hides the search box set up by <see cref="WithSearch"/> (only some tabs filter).</summary>
+        public void ShowSearch(bool visible)
+        {
+            if (_searchVisible == visible) return;
+            _searchVisible = visible;
+            OnPropertyChanged(nameof(HasSearch));
+        }
         [DataSourceProperty] public string SearchPlaceholder { get; private set; } = "";
 
         /// <summary>Bound to the search box; every change calls the filter.</summary>
@@ -133,6 +150,7 @@ namespace CalradicExchange.UI
         {
             SearchPlaceholder = placeholder ?? "";
             _onSearch = onSearch;
+            _searchVisible = true;
             _searchText = initial ?? "";
             onSearch?.Invoke(_searchText);
             return this;
@@ -144,6 +162,15 @@ namespace CalradicExchange.UI
             _onClose?.Invoke();
         }
 
-        private static string At(string[] a, int i) => a != null && i < a.Length ? a[i] : "";
+        private static string At(string[] a, int i) => a != null && i < a.Length ? a[i] ?? "" : "";
+
+        private bool Set(ref string field, string value, [CallerMemberName] string name = null)
+        {
+            value = value ?? "";
+            if (field == value) return false;
+            field = value;
+            OnPropertyChangedWithValue(value, name);
+            return true;
+        }
     }
 }
