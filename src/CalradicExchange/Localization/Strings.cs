@@ -227,6 +227,16 @@ namespace CalradicExchange.Localization
         public static TextObject PerformanceChange => new TextObject("{=cx_perf_change}Last {DAYS} days: {CHANGE} denars");
         public static TextObject PerformanceChangePartial => new TextObject("{=cx_perf_change_partial}Last {DAYS} days: {CHANGE} denars (recorded for {COVERED} days)");
         public static TextObject PerformanceTotals => new TextObject("{=cx_perf_totals}Total profit/loss: {PNL} denars. Portfolio value: {VALUE} denars.");
+        public static TextObject SumValue => new TextObject("{=cx_sum_value}Portfolio value");
+        public static TextObject SumOpen => new TextObject("{=cx_sum_open}Open P/L");
+        public static TextObject SumRealized => new TextObject("{=cx_sum_realized}Realized P/L");
+        public static TextObject SumGuildIncome => new TextObject("{=cx_sum_guild_income}Profit received from guilds");
+        public static TextObject SumGuildPending => new TextObject("{=cx_sum_guild_pending}Guild profit accruing");
+        public static TextObject SumGuildDebt => new TextObject("{=cx_sum_guild_debt}Guild debt");
+        public static TextObject SumFees => new TextObject("{=cx_sum_fees}Commission paid");
+        public static TextObject SumTaxes => new TextObject("{=cx_sum_taxes}Tax paid");
+        public static TextObject SumTrades => new TextObject("{=cx_sum_trades}Trades");
+        public static TextObject SumTotal => new TextObject("{=cx_sum_total}Total P/L");
         public static TextObject PerformanceNotEnough => new TextObject("{=cx_perf_not_enough}One point is recorded every day. The chart appears after the first recorded day.");
         public static TextObject BtnPortfolio => new TextObject("{=cx_btn_portfolio}Portfolio");
         public static TextObject SearchNoMatch => new TextObject("{=cx_search_no_match}Nothing matches the search.");

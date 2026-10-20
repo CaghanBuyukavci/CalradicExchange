@@ -17,6 +17,15 @@ namespace CalradicExchange.Core.Tests
         }
 
         [Fact]
+        public void Ticks_MarkEveryDay_FromLeftEdgeToRightEdge()
+        {
+            Assert.Equal(new float[] { 0, 175, 350, 525, 700 }, LineChart.Ticks(10, 14, 700));
+            Assert.Equal(new float[] { 0 }, LineChart.Ticks(5, 5, 700));
+            Assert.Empty(LineChart.Ticks(5, 4, 700));
+            Assert.Equal(31, LineChart.Ticks(100, 130, 700).Count);
+        }
+
+        [Fact]
         public void TotalPnl_AddsOpenRealizedAndGuildProfit_AndIgnoresBuying()
         {
             Portfolio pf = Holding(1000, 10);

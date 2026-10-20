@@ -136,6 +136,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - 2026-10-19: "Hisse al/sat" yerine Emtia Piyasası ve Sepet Piyasası tabloları; her satırda AL/SAT, işlemden sonra tabloya dönüş (ADR-025).
 - [x] 2.7 Grafik çözümü denemesi: ince widget'larla çubuk grafik veya dinamik doku. Sonuç `DECISIONS.md`'ye
   - 2026-10-20: 4 piksellik ince widget dilimleriyle çizgi grafik (dönme ve doku yok), ilk kullanım Portföy Performansı penceresi (ADR-031). 2.9'daki fiyat grafiği aynı `LineChart` yerleşimini kullanacak.
+  - 2026-10-20 (ADR-035): Performans penceresi düzenlendi: grafik ortalı ve sekmelerin altında, eksende gün noktaları, portföy toplamları altta kayan tablo.
 - [ ] 2.8 ~~Piyasa sekmesi~~ Tam ekran ekran yapılmıyor (ADR-026); piyasa tabloları (Emtia, Sepet, Lonca, Krallık) bu işi görüyor
   - 2026-10-20 (ADR-035): Dört piyasa tek "Piyasalar" penceresinde sekme oldu: Hisseler, Sepetler, Ortaklıklar, Endeksler. Borsa seçeneği şehir menüsünde Ticaret'in hemen üstünde.
 - [ ] 2.9 Araç detay penceresi: tablolarda hisse adına tıklanınca fiyat grafiği ve temel değer bileşenleri

@@ -19,8 +19,8 @@ namespace CalradicExchange.Menus
     {
         private static readonly int[] Periods = { 7, 14, 30 };
 
-        /// <summary>Chart size in the prefab (CxPerformance.xml). Slices are SliceWidth pixels wide.</summary>
-        public const float ChartWidth = 820, ChartHeight = 360, SliceWidth = 4, LineThickness = 3;
+        /// <summary>Chart size in the prefab (CxPerformance.xml). Slices are SliceWidth pixels wide; day marks are DotSize squares.</summary>
+        public const float ChartWidth = 700, ChartHeight = 260, SliceWidth = 4, LineThickness = 3, DotSize = 6;
 
         /// <summary>The selected period, kept while the game runs.</summary>
         private static int _period = 7;
@@ -66,7 +66,9 @@ namespace CalradicExchange.Menus
             totals.SetTextVariable("PNL", Fmt.SignedDenars(now.Pnl));
             totals.SetTextVariable("VALUE", Fmt.Denars(now.Value));
 
+            FillSummary(b, vm, now);
             vm.Columns.Clear();
+            vm.DayTicks.Clear();
             if (points.Count < 2)
             {
                 vm.Set("", TableColors.Neutral, totals.ToString(), Strings.PerformanceNotEnough.ToString(), ChartHeight, ChartHeight, "", "", "", "", "");
@@ -85,11 +87,48 @@ namespace CalradicExchange.Menus
             {
                 vm.Columns.Add(new ChartColumnVM(c.LineTop, c.LineHeight, c.FillTop, c.FillHeight, c.Positive ? Gain : Loss));
             }
+
+            // One dot per day; each list slot ends at its dot's right edge, kept inside the chart.
+            float previous = 0;
+            foreach (float x in LineChart.Ticks(points[0].Day, today, ChartWidth))
+            {
+                float right = Math.Min(ChartWidth, Math.Max(DotSize, x + DotSize / 2));
+                vm.DayTicks.Add(new ChartTickVM(right - previous));
+                previous = right;
+            }
             vm.Set(head.ToString(), TableColors.ForAmount(change), totals.ToString(), "", layout.ZeroY, ChartHeight,
                 layout.Max > 0 ? Fmt.SignedDenars((decimal)layout.Max) : "",
                 "0",
                 layout.Min < 0 ? Fmt.SignedDenars((decimal)layout.Min) : "",
                 Strings.NewsDaysAgo.SetTextVariable("DAYS", covered).ToString(), Strings.NewsToday.ToString());
         }
+
+        /// <summary>The portfolio totals that used to be under the portfolio and history tables (ADR-035).</summary>
+        private static void FillSummary(ExchangeCampaignBehavior b, PerformanceVM vm, PerformancePoint now)
+        {
+            Portfolio pf = b.Portfolio;
+            decimal open = pf.UnrealizedPnl(id => MarketReport.PriceOf(b, id));
+            decimal pending = pf.GuildAccruals.Values.Sum();
+            vm.Summary.Clear();
+            Add(vm, Strings.SumValue, Denars(Fmt.Denars(now.Value)), null);
+            Add(vm, Strings.SumOpen, Denars(Fmt.SignedDenars(open)), TableColors.ForAmount(open));
+            Add(vm, Strings.SumRealized, Denars(Fmt.SignedDenars(pf.RealizedPnl)), TableColors.ForAmount(pf.RealizedPnl));
+            Add(vm, Strings.SumGuildIncome, Denars(Fmt.SignedDenars(pf.GuildIncomeTotal)), TableColors.ForAmount(pf.GuildIncomeTotal));
+            Add(vm, Strings.SumGuildPending, Denars(Fmt.SignedDenars(pending)), TableColors.ForAmount(pending));
+            Add(vm, Strings.SumGuildDebt, Denars(Fmt.Denars(pf.TotalGuildDebt)), pf.TotalGuildDebt > 0 ? TableColors.Down : (Color?)null);
+            Add(vm, Strings.SumFees, Denars(Fmt.Denars(pf.TotalCommissionPaid)), null);
+            Add(vm, Strings.SumTaxes, Denars(Fmt.Denars(pf.TotalProfitTaxPaid)), null);
+            Add(vm, Strings.SumTrades, pf.TradeCount.ToString(), null);
+            Add(vm, Strings.SumTotal, Denars(Fmt.SignedDenars(now.Pnl)), TableColors.ForAmount(now.Pnl), true);
+        }
+
+        private static void Add(PerformanceVM vm, TextObject label, string value, Color? color, bool total = false)
+        {
+            var row = new GridRowVM(new[] { label.ToString(), value }, total);
+            if (color != null) row.WithColor(2, color.Value);
+            vm.Summary.Add(row);
+        }
+
+        private static string Denars(string amount) => Strings.DenarsAmount.SetTextVariable("AMOUNT", amount).ToString();
     }
 }

@@ -64,6 +64,23 @@ namespace CalradicExchange.Core.Charts
             return layout;
         }
 
+        /// <summary>
+        /// Pixel position (0..<paramref name="width"/>) of every whole x from <paramref name="x0"/> to
+        /// <paramref name="x1"/>, on the same scale as <see cref="Layout"/>: x0 at the left edge, x1 at the right edge.
+        /// Used for one axis mark per day.
+        /// </summary>
+        public static List<float> Ticks(double x0, double x1, float width)
+        {
+            var ticks = new List<float>();
+            if (width <= 0 || x1 < x0) return ticks;
+            double span = x1 - x0;
+            for (double x = Math.Ceiling(x0); x <= x1 + 1e-9; x++)
+            {
+                ticks.Add(span <= 0 ? 0 : (float)((x - x0) / span * width));
+            }
+            return ticks;
+        }
+
         /// <summary>Straight-line value between the two points around <paramref name="x"/>; the end values outside.</summary>
         public static double ValueAt(IReadOnlyList<double> xs, IReadOnlyList<double> ys, double x)
         {

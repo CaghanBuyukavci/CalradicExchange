@@ -232,5 +232,15 @@
     <string id="cx_mtab_baskets" text="Sepetler" />
     <string id="cx_mtab_guilds" text="Ortaklıklar" />
     <string id="cx_mtab_indices" text="Endeksler" />
+    <string id="cx_sum_value" text="Portföy değeri" />
+    <string id="cx_sum_open" text="Açık K/Z" />
+    <string id="cx_sum_realized" text="Gerçekleşmiş K/Z" />
+    <string id="cx_sum_guild_income" text="Loncalardan gelen kâr" />
+    <string id="cx_sum_guild_pending" text="Biriken lonca kârı" />
+    <string id="cx_sum_guild_debt" text="Lonca borcu" />
+    <string id="cx_sum_fees" text="Ödenen komisyon" />
+    <string id="cx_sum_taxes" text="Ödenen vergi" />
+    <string id="cx_sum_trades" text="İşlem sayısı" />
+    <string id="cx_sum_total" text="Toplam K/Z" />
   </strings>
 </base>

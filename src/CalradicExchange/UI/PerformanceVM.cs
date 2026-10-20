@@ -28,6 +28,12 @@ namespace CalradicExchange.UI
         [DataSourceProperty] public MBBindingList<TabVM> Tabs { get; } = new MBBindingList<TabVM>();
         [DataSourceProperty] public MBBindingList<ChartColumnVM> Columns { get; } = new MBBindingList<ChartColumnVM>();
 
+        /// <summary>One mark per day on the x axis.</summary>
+        [DataSourceProperty] public MBBindingList<ChartTickVM> DayTicks { get; } = new MBBindingList<ChartTickVM>();
+
+        /// <summary>Portfolio totals below the chart: label | value (C1, C2); the total row is shaded (IsAlternate).</summary>
+        [DataSourceProperty] public MBBindingList<GridRowVM> Summary { get; } = new MBBindingList<GridRowVM>();
+
         /// <summary>"Last 7 days: +1,234 denars", in green or red.</summary>
         [DataSourceProperty] public string Headline { get => _headline; private set => SetText(ref _headline, value, nameof(Headline)); }
         [DataSourceProperty] public bool HasHeadline => _headline.Length > 0;
