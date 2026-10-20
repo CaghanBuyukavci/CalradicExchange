@@ -97,6 +97,8 @@ namespace CalradicExchange.Menus
             vm.EmptyText = "";
             rows.Clear();
             vm.TradeRows.Clear();
+            vm.OtherRows.Clear();
+            vm.OtherTitle = "";
             Action back = () => ShowMarket(cls, vm.SearchText);
             if (cls == InstrumentClass.Guild)
             {
@@ -155,8 +157,8 @@ namespace CalradicExchange.Menus
         }
 
         /// <summary>
-        /// Guild tab (ADR-026): partnership shares of this town's guilds (Buy and Sell), then the player's shares in
-        /// other towns (Sell only).
+        /// Guild tab (ADR-026): partnership shares of this town's guilds (Buy and Sell); the player's shares in other
+        /// towns (Sell only) go to the second section, which has its own header and scroll.
         /// </summary>
         private static void FillGuilds(ExchangeCampaignBehavior b, ExchangeTableVM vm, Action back)
         {
@@ -182,16 +184,13 @@ namespace CalradicExchange.Menus
                 .Select(p => b.Market.Find(p.InstrumentId))
                 .Where(d => d != null && d.Class == InstrumentClass.Guild && d.TownId != trader.TownId)
                 .ToList();
-            if (elsewhere.Count > 0)
+            alternate = false;
+            foreach (InstrumentDefinition def in elsewhere)
             {
-                vm.TradeRows.Add(new TradeRowVM(Strings.GuildSectionOther.ToString()));
-                alternate = false;
-                foreach (InstrumentDefinition def in elsewhere)
-                {
-                    vm.TradeRows.Add(GuildRow(b, trader, def, false, alternate, back));
-                    alternate = !alternate;
-                }
+                vm.OtherRows.Add(GuildRow(b, trader, def, false, alternate, back));
+                alternate = !alternate;
             }
+            vm.OtherTitle = elsewhere.Count > 0 ? Strings.GuildSectionOther.ToString() : "";
         }
 
         private static TradeRowVM GuildRow(ExchangeCampaignBehavior b, TraderProfile trader, InstrumentDefinition def, bool local, bool alternate, Action back)

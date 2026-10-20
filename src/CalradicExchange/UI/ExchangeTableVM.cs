@@ -12,7 +12,7 @@ namespace CalradicExchange.UI
     public sealed class ExchangeTableVM : ViewModel
     {
         private readonly Action _onClose;
-        private string _title = "", _description = "";
+        private string _title = "", _description = "", _otherTitle = "";
         private string _h1 = "", _h2 = "", _h3 = "", _h4 = "", _h5 = "", _h6 = "", _h7 = "", _h8 = "";
         private string _emptyText = "";
         private string _searchText = "";
@@ -85,6 +85,21 @@ namespace CalradicExchange.UI
         [DataSourceProperty] public MBBindingList<PortfolioRowVM> PortfolioRows { get; } = new MBBindingList<PortfolioRowVM>();
         [DataSourceProperty] public MBBindingList<GridRowVM> Rows { get; } = new MBBindingList<GridRowVM>();
         [DataSourceProperty] public MBBindingList<TradeRowVM> TradeRows { get; } = new MBBindingList<TradeRowVM>();
+
+        /// <summary>Second section below the rows (guild tab: shares in other towns), shown while <see cref="OtherTitle"/> is set.</summary>
+        [DataSourceProperty] public MBBindingList<TradeRowVM> OtherRows { get; } = new MBBindingList<TradeRowVM>();
+
+        [DataSourceProperty]
+        public string OtherTitle
+        {
+            get => _otherTitle;
+            set
+            {
+                if (Set(ref _otherTitle, value)) OnPropertyChanged(nameof(HasOtherRows));
+            }
+        }
+
+        [DataSourceProperty] public bool HasOtherRows => _otherTitle.Length > 0;
 
         /// <summary>Bottom-left line, e.g. gold and limit left.</summary>
         [DataSourceProperty]

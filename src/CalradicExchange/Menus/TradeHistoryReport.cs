@@ -39,9 +39,8 @@ namespace CalradicExchange.Menus
 
         private static ExchangeTableVM Table(ExchangeCampaignBehavior b, Action close)
         {
+            // Totals are in the performance window (ADR-035).
             Portfolio pf = b.Portfolio;
-            string footer = Footer(pf);
-            if (pf.History.Count == 0) footer = Strings.HistoryEmpty + "\n" + footer;
 
             var vm = new ExchangeTableVM(Strings.HistoryTitle.ToString(),
                 new[]
@@ -49,8 +48,9 @@ namespace CalradicExchange.Menus
                     Strings.ColDate.ToString(), Strings.ColSide.ToString(), Strings.ColInstrument.ToString(), Strings.ColQuantity.ToString(),
                     Strings.ColPrice.ToString(), Strings.ColTotal.ToString(), Strings.ColCosts.ToString(), Strings.ColProfit.ToString(),
                 },
-                footer, Strings.Close.ToString(), close);
+                null, Strings.Close.ToString(), close);
             vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(Show));
+            if (pf.History.Count == 0) vm.EmptyText = Strings.HistoryEmpty.ToString();
 
             bool alternate = false;
             foreach (TradeRecord t in Enumerable.Reverse(pf.History).Take(MaxRows))

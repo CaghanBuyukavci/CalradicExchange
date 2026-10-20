@@ -79,30 +79,15 @@ namespace CalradicExchange.Menus
 
         private static ExchangeTableVM PortfolioTable(ExchangeCampaignBehavior b, Action close, Action back)
         {
+            // Totals (value, profit, fees, guild income) are in the performance window (ADR-035).
             Portfolio pf = b.Portfolio;
-            TextObject totals = Strings.PortfolioTotals;
-            totals.SetTextVariable("VALUE", Fmt.Denars(pf.MarketValue(id => PriceOf(b, id))));
-            totals.SetTextVariable("OPEN", Fmt.SignedDenars(pf.UnrealizedPnl(id => PriceOf(b, id))));
-            totals.SetTextVariable("REALIZED", Fmt.SignedDenars(pf.RealizedPnl));
-            totals.SetTextVariable("FEES", Fmt.Denars(pf.TotalCommissionPaid));
-            totals.SetTextVariable("TAXES", Fmt.Denars(pf.TotalProfitTaxPaid));
-            string footer = pf.Positions.Count == 0 ? Strings.PortfolioEmpty + "\n" + totals : totals.ToString();
-            if (pf.GuildIncomeTotal != 0 || pf.GuildAccruals.Count > 0 || pf.GuildDebts.Count > 0)
-            {
-                TextObject guilds = Strings.PortfolioGuildTotals;
-                guilds.SetTextVariable("INCOME", Fmt.SignedDenars(pf.GuildIncomeTotal));
-                guilds.SetTextVariable("PENDING", Fmt.SignedDenars(pf.GuildAccruals.Values.Sum()));
-                guilds.SetTextVariable("DEBT", Fmt.Denars(pf.TotalGuildDebt));
-                footer += "\n" + guilds;
-            }
-
             var vm = new ExchangeTableVM(Strings.PortfolioTitle.ToString(),
                 new[]
                 {
                     Strings.ColInstrument.ToString(), Strings.ColQuantity.ToString(), Strings.ColBoughtAt.ToString(),
                     Strings.ColNow.ToString(), Strings.ColProfit.ToString(), Strings.ColProfitPct.ToString(),
                 },
-                footer, Strings.Close.ToString(), close);
+                null, Strings.Close.ToString(), close);
             vm.WithSecondary(Strings.BtnPerformance.ToString(), () => PerformanceReport.Show(() => ShowPortfolio(back)));
 
             foreach (InstrumentClass tab in PortfolioTabs)

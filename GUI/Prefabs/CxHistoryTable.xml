@@ -18,13 +18,13 @@
                 <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="34" MarginLeft="40" MarginRight="40" StackLayout.LayoutMethod="HorizontalLeftToRight">
                   <Children>
                     <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="170" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Text="@H1" />
-                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Text="@H2" />
-                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="230" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Text="@H3" />
-                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Right" Text="@H4" />
-                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Right" Text="@H5" />
-                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="110" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Right" Text="@H6" />
-                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Right" Text="@H7" />
-                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="130" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Right" Text="@H8" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="110" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Center" Text="@H2" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="240" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@H3" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Center" Text="@H4" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Center" Text="@H5" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Center" Text="@H6" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Center" Text="@H7" />
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Center" Text="@H8" />
                   </Children>
                 </ListPanel>
                 <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" MarginLeft="40" MarginRight="40" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.5" />
@@ -43,13 +43,13 @@
                                     <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="10" StackLayout.LayoutMethod="HorizontalLeftToRight">
                                       <Children>
                                                 <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="170" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.FontColor="@Color1" Text="@C1" />
-                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.FontColor="@Color2" Text="@C2" />
-                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="230" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.FontColor="@Color3" Text="@C3" />
-                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Right" Brush.FontColor="@Color4" Text="@C4" />
-                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Right" Brush.FontColor="@Color5" Text="@C5" />
-                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="110" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Right" Brush.FontColor="@Color6" Text="@C6" />
-                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Right" Brush.FontColor="@Color7" Text="@C7" />
-                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="130" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Right" Brush.FontColor="@Color8" Text="@C8" />
+                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="110" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.FontColor="@Color2" Brush.TextHorizontalAlignment="Center" Text="@C2" />
+                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="240" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.FontColor="@Color3" Brush.TextHorizontalAlignment="Left" Text="@C3" />
+                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Brush.FontColor="@Color4" Text="@C4" />
+                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Brush.FontColor="@Color5" Text="@C5" />
+                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Brush.FontColor="@Color6" Text="@C6" />
+                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Brush.FontColor="@Color7" Text="@C7" />
+                                                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="104" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Brush.FontColor="@Color8" Text="@C8" />
                                       </Children>
                                     </ListPanel>
                                   </Children>
@@ -61,6 +61,8 @@
                       </Children>
                     </ScrollablePanel>
 
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginTop="20" VerticalAlignment="Top" Brush="Popup.Description.Text" Brush.FontSize="19" Brush.TextHorizontalAlignment="Center" Text="@EmptyText" IsVisible="@IsEmpty" />
+
                     <ScrollbarWidget Id="VerticalScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="8" HorizontalAlignment="Right" VerticalAlignment="Top" AlignmentAxis="Vertical" Handle="VerticalScrollbarHandle" MaxValue="100" MinValue="0">
                       <Children>
                         <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4" HorizontalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#5A4033FF" AlphaFactor="0.5" />
@@ -70,9 +72,7 @@
                   </Children>
                 </Widget>
 
-                <!-- Totals -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" MarginLeft="40" MarginRight="40" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.5" />
-                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="8" MarginBottom="90" Brush="Popup.Description.Text" Brush.FontSize="19" Text="@Footer" IsVisible="@HasFooter" />
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="90" />
 
               </Children>
             </ListPanel>

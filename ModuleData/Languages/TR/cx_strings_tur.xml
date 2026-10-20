@@ -75,7 +75,7 @@
     <string id="cx_opt_portfolio" text="Portföyün" />
     <string id="cx_portfolio_empty" text="Elinde hiç hisse yok." />
     <string id="cx_portfolio_line" text="{NAME}: {QTY} adet, alış {AVG}, şimdi {PRICE}, {PNL}" />
-    <string id="cx_portfolio_title" text="Portföyün" />
+    <string id="cx_portfolio_title" text="Portföyüm" />
     <string id="cx_portfolio_totals" text="Değer {VALUE} dinar, açık kâr/zarar {OPEN}.&#10;Gerçekleşmiş kâr/zarar {REALIZED}. Ödenen komisyon {FEES}, vergi {TAXES} dinar." />
     <string id="cx_qty_buy" text="Bir {NAME} masraflar hariç {PRICE} dinar.&#10;Kaç hisse alacaksın? (en fazla {MAX})" />
     <string id="cx_qty_invalid" text="1 ile {MAX} arasında bir tam sayı gir." />
@@ -98,8 +98,8 @@
     <string id="cx_col_quantity" text="Adet" />
     <string id="cx_col_bought_at" text="Alış" />
     <string id="cx_col_now" text="Şimdi" />
-    <string id="cx_col_profit" text="Kâr/zarar" />
-    <string id="cx_col_profit_pct" text="Kâr/zarar %" />
+    <string id="cx_col_profit" text="K/Z" />
+    <string id="cx_col_profit_pct" text="K/Z %" />
     <string id="cx_no_price_short" text="-" />
     <string id="cx_qty_estimate_buy" text="Ödenecek: {TOTAL} dinar (komisyon {FEE})" />
     <string id="cx_qty_estimate_sell" text="Eline geçecek: {TOTAL} dinar (komisyon {FEE}, vergi {TAX})" />

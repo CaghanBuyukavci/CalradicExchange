@@ -41,8 +41,8 @@ namespace CalradicExchange.Localization
         public static TextObject ColQuantity => new TextObject("{=cx_col_quantity}Qty");
         public static TextObject ColBoughtAt => new TextObject("{=cx_col_bought_at}Bought at");
         public static TextObject ColNow => new TextObject("{=cx_col_now}Now");
-        public static TextObject ColProfit => new TextObject("{=cx_col_profit}Profit");
-        public static TextObject ColProfitPct => new TextObject("{=cx_col_profit_pct}Profit %");
+        public static TextObject ColProfit => new TextObject("{=cx_col_profit}P/L");
+        public static TextObject ColProfitPct => new TextObject("{=cx_col_profit_pct}P/L %");
         public static TextObject ColHeld => new TextObject("{=cx_col_held}Held");
         public static TextObject ColGuild => new TextObject("{=cx_col_guild}Guild");
         public static TextObject ColWeekProfitPerShare => new TextObject("{=cx_col_week_profit}Week profit/share");
@@ -107,7 +107,7 @@ namespace CalradicExchange.Localization
         public static TextObject BigMove => new TextObject("{=cx_msg_big_move}Exchange: {NAME} {CHANGE} ({PRICE}).");
 
         // Portfolio
-        public static TextObject PortfolioTitle => new TextObject("{=cx_portfolio_title}Your portfolio");
+        public static TextObject PortfolioTitle => new TextObject("{=cx_portfolio_title}My portfolio");
         public static TextObject PortfolioEmpty => new TextObject("{=cx_portfolio_empty}You hold no shares.");
         public static TextObject PortfolioTabEmpty => new TextObject("{=cx_portfolio_tab_empty}You hold nothing of this kind.");
         public static TextObject TabShares => new TextObject("{=cx_tab_shares}Shares ({COUNT})");
