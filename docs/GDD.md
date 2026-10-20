@@ -203,7 +203,7 @@ Bunlar oynanışın parçası. Ama riskleri var:
 
 Önlemler:
 
-1. **Alış-satış farkı ve komisyon.** Doğal para çıkışı. Trade yeteneği komisyonu en fazla yarıya indirir.
+1. **Alış-satış farkı ve komisyon.** Doğal para çıkışı. Komisyon sabit %2. İleride modun kendi Simsar (Broker) seviyesi ve yetenek ağacı indirebilecek (ADR-033).
 2. **Piyasa derinliği ve kayma.** Büyük emirler fiyatı aleyhine oynatır. Oyuncu büyük pozisyonları parça parça ve zamana yayarak açmak zorunda kalır.
 3. **Pozisyon limitleri.** Toplam yatırım limiti klan seviyesine bağlıdır.
 4. **Uzun vadeli getiri beklentisi sıfıra yakın.** Fiyatlar temel değere döndüğü için pasif "al ve unut" stratejisi yüksek getiri sağlamaz. Para, dünyayı okuyan ve doğru zamanda işlem yapan oyuncuya gider.
@@ -213,7 +213,7 @@ Bunlar oynanışın parçası. Ama riskleri var:
 ## 10. İlerleme ve yetenek bağlantıları
 
 - Borsa kârları vanilla ticaretteki gibi Trade yeteneğine XP verir (kârla orantılı, düşük oranda).
-- Trade yeteneği: komisyon indirimi, daha yüksek pozisyon limiti, Faz 4'te haber ipuçları.
+- Trade yeteneği: daha yüksek pozisyon limiti, Faz 4'te haber ipuçları. Komisyon indirimi Trade'den değil, ileride eklenecek Simsar seviyesinden ve onun perklerinden gelecek (ADR-033).
 - Klan seviyesi: pozisyon limiti, tahvil ihracına katılım (Faz 3), sigorta havuzu açma (Faz 3).
 - Mevcut perk'leri değiştirmek yerine bu bonuslar modun kendi kurallarıyla hesaplanır. Bu, Harmony gerektirmez ve vanilla dengeyi bozmaz.
 

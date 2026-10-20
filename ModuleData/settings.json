@@ -52,11 +52,9 @@
     }
   },
   "trading": {
-    "_comment": "Commission rate falls linearly with Trade skill from commissionRateMax (skill 0) to commissionRateMin (tradeSkillCap). profitTaxRate is taken from realized profit on sells (ADR-014).",
-    "commissionRateMax": 0.025,
-    "commissionRateMin": 0.005,
+    "_comment": "Flat commission on every trade, not tied to the Trade skill (ADR-033). profitTaxRate is taken from realized profit on sells (ADR-014).",
+    "commissionRate": 0.02,
     "minCommission": 2,
-    "tradeSkillCap": 300,
     "profitTaxRate": 0.1,
     "permanentImpactFactor": 0.5,
     "tradeHistoryLimit": 500

@@ -15,7 +15,9 @@ namespace CalradicExchange.Core.Tests
 
         public OrderEngineTests()
         {
-            _market = new MarketEngine(TestData.Catalog(), TestData.NoNoiseSettings(), new MarketState(), new XorShift128Plus(1));
+            var settings = TestData.NoNoiseSettings();
+            settings.Trading.CommissionRate = 0.025; // the cost breakdowns below were worked out at 2.5 %
+            _market = new MarketEngine(TestData.Catalog(), settings, new MarketState(), new XorShift128Plus(1));
             _market.Tick(TestData.World(1)); // grain share = 100
             _orders = new OrderEngine(_market);
         }
@@ -35,24 +37,20 @@ namespace CalradicExchange.Core.Tests
             Assert.Equal(1034, q.Total);
         }
 
-        [Theory]
-        [InlineData(0, 0.025)]
-        [InlineData(60, 0.021)]
-        [InlineData(150, 0.015)]
-        [InlineData(300, 0.005)]
-        [InlineData(1000, 0.005)]
-        [InlineData(-10, 0.025)]
-        public void CommissionRate_FallsWithTradeSkill(int skill, double expected)
+        [Fact]
+        public void CommissionRate_IsFlat_WhateverTheTradeSkill()
         {
-            Assert.Equal(expected, _orders.CommissionRate(skill), 9);
+            Assert.Equal(0.025, _orders.CommissionRate, 9);
+            var skilled = new TraderProfile(1_000_000, 6, 300);
+            Assert.Equal(_orders.Quote("cx_grain", OrderSide.Buy, 10, _rich, _portfolio).Commission,
+                _orders.Quote("cx_grain", OrderSide.Buy, 10, skilled, _portfolio).Commission);
         }
 
         [Fact]
         public void Commission_HasMinimum()
         {
-            Assert.Equal(2, _orders.Commission(50, 0));
-            Assert.Equal(50, _orders.Commission(2000, 0));
-            Assert.Equal(10, _orders.Commission(2000, 300));
+            Assert.Equal(2, _orders.Commission(50));
+            Assert.Equal(50, _orders.Commission(2000));
         }
 
         [Fact]

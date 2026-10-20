@@ -210,8 +210,7 @@ haber_hızı = 40 harita birimi / gün       (harita ölçeğine göre Faz 4'te 
 işlem_fiyatı_alış = P × (1 + fark/2) × (1 + etki)
 işlem_fiyatı_satış = P × (1 − fark/2) × (1 − etki)
 etki = λ × (emir_değeri / derinlik)
-komisyon = max(2, oran(trade) × emir_değeri)
-oran(trade) = %2,5 − (%2,5 − %0,5) × min(trade, 300) / 300      (Trade 0: %2,5, Trade 60: %2,1, Trade 150: %1,5, Trade 300+: %0,5; ADR-022)
+komisyon = max(2, %2 × emir_değeri)      (herkese sabit, Trade yeteneğine bağlı değil; ADR-033)
 kâr_vergisi = %10 × max(0, satış_geliri − komisyon − satılan_payların_maliyeti)   (sadece satışta, zararda yok)
 ```
 

@@ -351,3 +351,10 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Klan değişikliği:** Paralı asker sözleşmeleri ve yıkılışla gelen ayrılmalar sayılmaz. İsyan (`LeaveWithRebellion`, `CreateKingdom`) ×1,6.
 - **Şema 12:** `kingdoms[].baseFiefScore / baseHearth / baseStrength / baseClans` eklendi ve ilk okumada doldurulur. Eski kayıtlarda fief puanı tabanı eski fief sayısı tabanından ölçeklenir, böylece o güne kadar kaybedilen fiefler sayılmaya devam eder. Yeni parçalar (köy, güç, klan) eski kayıtlarda bugünden itibaren ölçülür.
 - **Henüz kullanılmayan:** StanceLink'teki savaş istatistikleri (kayıp, başarılı kuşatma ve yağma sayıları). Haraçsız barışta kazananı bunlardan çıkarmak sonraki ayar turuna kalabilir.
+
+## ADR-033 — Sabit komisyon, Trade yeteneği etkisi kaldırıldı (2026-10-20)
+
+- **Kullanıcı isteği:** Komisyon en fazla %2 olsun ve Tüccar (Trade) yeteneğiyle değişmesin. İleride modun kendi Simsar (Broker) seviyesi, perkleri ve yetenek ağacı olacak; indirimler oradan gelecek.
+- **Karar:** `trading.commissionRate` = 0,02, her işlemde sabit. `minCommission` (2 dinar) duruyor. `commissionRateMax`, `commissionRateMin` ve `tradeSkillCap` ayarları kaldırıldı. `OrderEngine.CommissionRate` artık parametresiz.
+- **Değişmeyen:** Trade yeteneği pozisyon limitini artırmaya devam ediyor (`limits.perTradeSkill`). Kullanıcı sadece komisyonu sordu.
+- **Etkisi:** Trade 10 olan oyuncu için komisyon %2,43'ten %2'ye indi. ADR-022'nin "haberle işlem komisyonu yener" hesabı daha da rahatladı.

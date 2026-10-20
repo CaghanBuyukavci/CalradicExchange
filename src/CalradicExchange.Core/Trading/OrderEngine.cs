@@ -35,17 +35,12 @@ namespace CalradicExchange.Core.Trading
             return (int)(Settings.For(cls).Depth * Settings.Limits.PerInstrumentDepthMultiple);
         }
 
-        /// <summary>Commission rate for a Trade skill: linear from the max rate (skill 0) to the min rate (skill cap).</summary>
-        public double CommissionRate(int tradeSkill)
-        {
-            TradingSettings t = Settings.Trading;
-            double skill = Math.Min(Math.Max(0, tradeSkill), t.TradeSkillCap) / (double)t.TradeSkillCap;
-            return t.CommissionRateMax - (t.CommissionRateMax - t.CommissionRateMin) * skill;
-        }
+        /// <summary>Flat commission rate (ADR-033). A broker level of our own may lower it later; the Trade skill does not.</summary>
+        public double CommissionRate => Settings.Trading.CommissionRate;
 
-        public int Commission(int gross, int tradeSkill)
+        public int Commission(int gross)
         {
-            double fee = Math.Max(Settings.Trading.MinCommission, CommissionRate(tradeSkill) * gross);
+            double fee = Math.Max(Settings.Trading.MinCommission, CommissionRate * gross);
             return (int)Math.Ceiling(fee - 1e-9);
         }
 
@@ -91,7 +86,7 @@ namespace CalradicExchange.Core.Trading
             q.ExecutionPrice = PriceMath.Round(exec);
             q.Impact = impact;
             q.Gross = gross;
-            q.Commission = Commission(gross, trader.TradeSkill);
+            q.Commission = Commission(gross);
             if (side == OrderSide.Buy)
             {
                 q.Total = gross + q.Commission;

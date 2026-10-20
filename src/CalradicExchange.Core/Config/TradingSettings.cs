@@ -5,16 +5,10 @@ namespace CalradicExchange.Core.Config
     /// <summary>Order cost parameters (ECONOMY_MODEL 5, ADR-014).</summary>
     public sealed class TradingSettings
     {
-        /// <summary>Commission rate at Trade skill 0.</summary>
-        [JsonProperty("commissionRateMax")] public double CommissionRateMax { get; set; }
-
-        /// <summary>Commission rate at <see cref="TradeSkillCap"/> and above.</summary>
-        [JsonProperty("commissionRateMin")] public double CommissionRateMin { get; set; }
+        /// <summary>Commission rate on the gross of every trade, the same for every trader (ADR-033).</summary>
+        [JsonProperty("commissionRate")] public double CommissionRate { get; set; }
 
         [JsonProperty("minCommission")] public int MinCommission { get; set; }
-
-        /// <summary>Trade skill at which the commission reaches its minimum rate.</summary>
-        [JsonProperty("tradeSkillCap")] public int TradeSkillCap { get; set; }
 
         /// <summary>Share of realized profit taken on each profitable sell. Losses are not taxed.</summary>
         [JsonProperty("profitTaxRate")] public double ProfitTaxRate { get; set; }

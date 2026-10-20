@@ -63,7 +63,7 @@ namespace CalradicExchange.Diagnostics
                 Portfolio pf = b.Portfolio;
                 TraderProfile t = b.CurrentTrader();
                 var sb = new StringBuilder();
-                sb.AppendLine($"gold {t.Gold}, clan tier {t.ClanTier}, trade {t.TradeSkill}, limit {b.Orders.TotalLimit(t)}, fee {b.Orders.CommissionRate(t.TradeSkill):P2}");
+                sb.AppendLine($"gold {t.Gold}, clan tier {t.ClanTier}, trade {t.TradeSkill}, limit {b.Orders.TotalLimit(t)}, fee {b.Orders.CommissionRate:P2}");
                 foreach (Position p in pf.Positions)
                 {
                     decimal price = b.Market.Get(p.InstrumentId)?.Price ?? 0;

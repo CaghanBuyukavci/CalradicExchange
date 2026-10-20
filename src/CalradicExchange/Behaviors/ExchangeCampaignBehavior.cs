@@ -222,7 +222,7 @@ namespace CalradicExchange.Behaviors
                 if (IsReady && Hero.MainHero != null)
                 {
                     TraderProfile t = CurrentTrader();
-                    ExchangeLog.Info($"Trader now: trade skill {t.TradeSkill} -> commission {Orders.CommissionRate(t.TradeSkill):P2}, clan tier {t.ClanTier}, limit {Orders.TotalLimit(t)}.");
+                    ExchangeLog.Info($"Trader now: trade skill {t.TradeSkill} -> commission {Orders.CommissionRate:P2}, clan tier {t.ClanTier}, limit {Orders.TotalLimit(t)}.");
                 }
             }
             catch (Exception ex)

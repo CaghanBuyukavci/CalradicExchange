@@ -186,7 +186,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [ ] 4.5 Trade yeteneğine bağlı söylenti ipuçları
 - [ ] 4.6 Arbitraj testi: iki uzak şehir arasında fiyat farkı oluşuyor mu, ne kadar sürüyor?
 - [ ] 4.7 Manipülasyon tespiti: şüphe puanı, kademeli sonuçlar, ayarlar (GDD §8)
-- [ ] 4.8 Borsa kârından Trade XP; komisyon ve limit bonusları (GDD §10)
+- [ ] 4.8 Borsa kârından Trade XP; limit bonusları (GDD §10). Komisyon indirimi ayrı Simsar seviyesi ve perk ağacına kaldı (ADR-033).
 - [ ] 4.9 Performans: 50+ şehir × tüm araçlar × olay kuyruğu için günlük tick süresi ölçümü. Hedef < 5 ms
 
 **Kabul kriterleri**

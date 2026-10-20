@@ -33,7 +33,7 @@ namespace CalradicExchange.Menus
             t.SetTextVariable("PNL", Fmt.SignedDenars(open));
             t.SetTextVariable("USED", Fmt.Denars(value));
             t.SetTextVariable("LIMIT", Fmt.Denars(b.Orders.TotalLimit(trader)));
-            t.SetTextVariable("FEE", Fmt.Pct(b.Orders.CommissionRate(trader.TradeSkill)).TrimStart('+'));
+            t.SetTextVariable("FEE", Fmt.Pct(b.Orders.CommissionRate).TrimStart('+'));
             t.SetTextVariable("TAX", Fmt.Pct(b.Market.Settings.Trading.ProfitTaxRate).TrimStart('+'));
             decimal debt = b.Portfolio.TotalGuildDebt;
             return debt > 0 ? t + "\n" + Strings.MenuGuildDebt.SetTextVariable("DEBT", Fmt.Denars(debt)) : t.ToString();

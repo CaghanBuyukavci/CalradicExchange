@@ -69,10 +69,8 @@ namespace CalradicExchange.Core.Config
             if (s.Trading == null) e.Add("trading is missing.");
             else
             {
-                Range(e, "trading.commissionRateMax", s.Trading.CommissionRateMax, 0, 0.5);
-                Range(e, "trading.commissionRateMin", s.Trading.CommissionRateMin, 0, s.Trading.CommissionRateMax);
+                Range(e, "trading.commissionRate", s.Trading.CommissionRate, 0, 0.5);
                 Range(e, "trading.minCommission", s.Trading.MinCommission, 0, 100000);
-                RangeOpenLow(e, "trading.tradeSkillCap", s.Trading.TradeSkillCap, 0, 10000);
                 Range(e, "trading.profitTaxRate", s.Trading.ProfitTaxRate, 0, 1);
                 Range(e, "trading.permanentImpactFactor", s.Trading.PermanentImpactFactor, 0, 1);
                 Range(e, "trading.tradeHistoryLimit", s.Trading.TradeHistoryLimit, 0, 10000);
