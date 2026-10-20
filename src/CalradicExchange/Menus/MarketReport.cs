@@ -185,7 +185,7 @@ namespace CalradicExchange.Menus
             var sb = new StringBuilder();
             if (news.Count == 0) sb.AppendLine(Strings.NewsEmpty.ToString());
             int today = b.NextDay;
-            foreach (NewsItem item in Enumerable.Reverse(news).Take(15))
+            foreach (NewsItem item in Enumerable.Reverse(news).Where(n => IsListed(n)).Take(15))
             {
                 int ago = System.Math.Max(0, today - item.Day);
                 TextObject when = ago == 0 ? Strings.NewsToday : Strings.NewsDaysAgo.SetTextVariable("DAYS", ago);
@@ -197,6 +197,9 @@ namespace CalradicExchange.Menus
             Show(Strings.NewsTitle.ToString(), sb.ToString());
         }
 
+        /// <summary>Captures are no longer news (ADR-041); older saves still hold some.</summary>
+        private static bool IsListed(NewsItem item) => item?.Event != null && item.Event.Type != MarketEventType.HeroCaptured;
+
         /// <summary>All kept news, newest first; kind and text in the color of the event's category.</summary>
         private static ExchangeTableVM NewsTable(ExchangeCampaignBehavior b, Action close)
         {
@@ -207,7 +210,7 @@ namespace CalradicExchange.Menus
 
             int today = b.NextDay;
             bool alternate = false;
-            foreach (NewsItem item in Enumerable.Reverse(b.Market.State.News))
+            foreach (NewsItem item in Enumerable.Reverse(b.Market.State.News).Where(n => IsListed(n)))
             {
                 int ago = Math.Max(0, today - item.Day);
                 TextObject when = ago == 0 ? Strings.NewsToday : Strings.NewsDaysAgo.SetTextVariable("DAYS", ago);

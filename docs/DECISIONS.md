@@ -462,3 +462,9 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 | Yağma kovalayan bot (erken oyun) | −%0,5 | +%6,1 |
 
 Bütün hedefler geçiyor; sadece işlenmiş mallarda yıllık oynaklık %23–25'te kalıyor (hedef ≥ %25).
+
+## ADR-041 — Tutsak alma haberlerden çıktı (2026-10-21)
+
+**Bağlam:** Kullanıcı: tutsak alma haberleri listede çok yer kaplıyor.
+
+**Karar:** Lord tutsak alma olayı (`HeroCaptured`) haber listesine girmiyor (`Quiet`). Kural tablosundaki etkisi (hükümdar tutsak → krallık endeksi) sürüyor. Eski kayıtlardaki tutsak haberleri listede gösterilmiyor.

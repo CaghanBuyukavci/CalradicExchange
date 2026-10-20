@@ -236,6 +236,7 @@ namespace CalradicExchange.Adapters
                 KingdomId = prisoner.MapFaction.StringId,
                 OtherHeroId = capturer?.LeaderHero?.StringId,
                 OtherKingdomId = capturer?.MapFaction?.StringId,
+                Quiet = true, // still moves prices by its rules, but too frequent for the news list (ADR-041)
             };
         }
 
