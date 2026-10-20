@@ -19,7 +19,8 @@ namespace CalradicExchange.Sim
             ["grain"] = 10, ["fish"] = 12, ["olives"] = 30, ["date_fruit"] = 50, ["grape"] = 20, ["oil"] = 290,
             ["salt"] = 40, ["iron"] = 50, ["tools"] = 250, ["flax"] = 15, ["linen"] = 245, ["wool"] = 22,
             ["felt"] = 230, ["velvet"] = 575, ["cotton"] = 80, ["silver"] = 100, ["jewelry"] = 675, ["wine"] = 90,
-            ["clay"] = 18, ["hardwood"] = 25,
+            ["clay"] = 18, ["hardwood"] = 25, ["meat"] = 30, ["cheese"] = 40, ["butter"] = 25, ["beer"] = 50, ["sheep"] = 80,
+            ["hog"] = 60, ["pottery"] = 210, ["planks"] = 180, ["hides"] = 50, ["leather"] = 230, ["fur"] = 400,
         };
 
         private static readonly HashSet<string> Foods = new HashSet<string> { "grain", "fish", "olives", "date_fruit", "grape" };
@@ -28,7 +29,8 @@ namespace CalradicExchange.Sim
         private static readonly Dictionary<string, string> Inputs = new Dictionary<string, string>
         {
             ["oil"] = "olives", ["wine"] = "grape", ["linen"] = "flax", ["felt"] = "wool", ["velvet"] = "cotton",
-            ["tools"] = "iron", ["jewelry"] = "silver",
+            ["tools"] = "iron", ["jewelry"] = "silver", ["beer"] = "grain", ["pottery"] = "clay", ["planks"] = "hardwood",
+            ["leather"] = "hides",
         };
 
         /// <summary>Village products and their relative frequency.</summary>
@@ -36,6 +38,7 @@ namespace CalradicExchange.Sim
         {
             ("grain", 8), ("olives", 2), ("date_fruit", 2), ("grape", 3), ("fish", 3), ("flax", 2), ("wool", 3),
             ("cotton", 1), ("iron", 2), ("salt", 1), ("silver", 1), ("clay", 2), ("hardwood", 2),
+            ("sheep", 1), ("hog", 1), ("hides", 1), ("fur", 1), ("cheese", 1), ("butter", 1), ("meat", 1),
         };
 
         private static readonly Dictionary<Season, double> FoodSeason = new Dictionary<Season, double>

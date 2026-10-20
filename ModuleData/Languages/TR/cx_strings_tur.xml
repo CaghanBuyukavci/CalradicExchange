@@ -58,6 +58,25 @@
     <string id="cx_inst_velvet" text="Kadife hissesi" />
     <string id="cx_inst_wine" text="Şarap hissesi" />
     <string id="cx_inst_wool" text="Yün hissesi" />
+    <string id="cx_inst_fish" text="Balık hissesi" />
+    <string id="cx_inst_meat" text="Et hissesi" />
+    <string id="cx_inst_cheese" text="Peynir hissesi" />
+    <string id="cx_inst_butter" text="Tereyağı hissesi" />
+    <string id="cx_inst_grape" text="Üzüm hissesi" />
+    <string id="cx_inst_beer" text="Bira hissesi" />
+    <string id="cx_inst_sheep" text="Koyun hissesi" />
+    <string id="cx_inst_hog" text="Domuz hissesi" />
+    <string id="cx_inst_clay" text="Kil hissesi" />
+    <string id="cx_inst_pottery" text="Çömlek hissesi" />
+    <string id="cx_inst_hardwood" text="Sert kereste hissesi" />
+    <string id="cx_inst_planks" text="Tahta hissesi" />
+    <string id="cx_inst_silver" text="Gümüş cevheri hissesi" />
+    <string id="cx_inst_jewelry" text="Mücevher hissesi" />
+    <string id="cx_inst_cotton" text="Ham ipek hissesi" />
+    <string id="cx_inst_felt" text="Keçe hissesi" />
+    <string id="cx_inst_hides" text="Post hissesi" />
+    <string id="cx_inst_leather" text="Deri hissesi" />
+    <string id="cx_inst_fur" text="Kürk hissesi" />
     <string id="cx_menu_exchange_closed" text="Borsa bugün kapalı. ({REASON})" />
     <string id="cx_menu_exchange_text" text="Hanın arka odasında sarraflar masalarının başında oturmuş, hisseler ve sepetler için fiyat bağırıyor.&#10; &#10;Portföyün: {VALUE} dinar ({PNL}).&#10;Kullanılan yatırım limiti: {USED} / {LIMIT} dinar.&#10;Komisyon: {FEE}. Kâr vergisi: {TAX}." />
     <string id="cx_menu_visit_exchange" text="Borsaya git" />
@@ -185,6 +204,25 @@
     <string id="cx_inst_velvet_short" text="Kadife" />
     <string id="cx_inst_wine_short" text="Şarap" />
     <string id="cx_inst_wool_short" text="Yün" />
+    <string id="cx_inst_fish_short" text="Balık" />
+    <string id="cx_inst_meat_short" text="Et" />
+    <string id="cx_inst_cheese_short" text="Peynir" />
+    <string id="cx_inst_butter_short" text="Tereyağı" />
+    <string id="cx_inst_grape_short" text="Üzüm" />
+    <string id="cx_inst_beer_short" text="Bira" />
+    <string id="cx_inst_sheep_short" text="Koyun" />
+    <string id="cx_inst_hog_short" text="Domuz" />
+    <string id="cx_inst_clay_short" text="Kil" />
+    <string id="cx_inst_pottery_short" text="Çömlek" />
+    <string id="cx_inst_hardwood_short" text="Sert kereste" />
+    <string id="cx_inst_planks_short" text="Tahta" />
+    <string id="cx_inst_silver_short" text="Gümüş cevheri" />
+    <string id="cx_inst_jewelry_short" text="Mücevher" />
+    <string id="cx_inst_cotton_short" text="Ham ipek" />
+    <string id="cx_inst_felt_short" text="Keçe" />
+    <string id="cx_inst_hides_short" text="Post" />
+    <string id="cx_inst_leather_short" text="Deri" />
+    <string id="cx_inst_fur_short" text="Kürk" />
     <string id="cx_cf_heading_buy" text="{QTY} x {NAME} al" />
     <string id="cx_cf_heading_sell" text="{QTY} x {NAME} sat" />
     <string id="cx_cf_market" text="Piyasa fiyatı" />

@@ -13,7 +13,7 @@ namespace CalradicExchange.Core.Tests
             InstrumentCatalog c = TestData.Catalog();
 
             Assert.Equal(10, c.UnitsPerShare);
-            Assert.Equal(12, c.Instruments.Count(i => i.Class == InstrumentClass.Commodity));
+            Assert.Equal(31, c.Instruments.Count(i => i.Class == InstrumentClass.Commodity));
             Assert.Equal(5, c.Instruments.Count(i => i.Class == InstrumentClass.Sector));
             Assert.Contains("felt", c.RequiredItemIds);
             Assert.Contains("fish", c.RequiredItemIds);

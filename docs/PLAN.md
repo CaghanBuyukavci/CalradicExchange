@@ -128,6 +128,7 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
   - ADR-030: her şehirde alınır, açığa satış yok, yıkılınca sıfır, oyuncunun krallığı da listelenir. Şema 10. Oyun içi test bekleniyor.
   - 2026-10-20 (ADR-032): Endekse köyler, kaleler, askeri güç ve klan sayısı eklendi; olaylara kale fethi, hükümdar ve klan lideri ölümü ve esareti, muharebeler, savaşın kazananı/kaybedeni (haraç), barış ve klan iltihak/ayrılmaları eklendi.
 - [ ] 2.5 Simülatöre yeni araçları ekle, hedefleri yeniden kontrol et (özellikle temettülü al-tut getirisi)
+  - 2026-10-20 (ADR-036): Emtia hisseleri 12'den 31'e çıktı. Simülatörün sentetik dünyasına yeni ürünlerin oyun fiyatları eklendi; 8 hedefin hepsi geçiyor.
 
 ### 2B. Gauntlet ekranı
 - [ ] 2.6 Teknik deneme (spike): Gauntlet'te basit bir liste ekranı ve ViewModel. Örnek olarak vanilla ekranlardan birinin prefab'ını incele

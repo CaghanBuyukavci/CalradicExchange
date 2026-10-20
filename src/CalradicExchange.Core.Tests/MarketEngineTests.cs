@@ -22,7 +22,7 @@ namespace CalradicExchange.Core.Tests
             TickSummary s = e.Tick(TestData.World(1));
 
             Assert.True(s.Initialized);
-            Assert.Equal(17, s.InstrumentCount);
+            Assert.Equal(36, s.InstrumentCount);
             Assert.Equal(100m, e.Get("cx_grain").Price);
             Assert.Equal(100m, e.Get("cx_sector_agriculture").Price);
             Assert.Equal(100m, e.Get("cx_grain").InitialPrice);
@@ -87,7 +87,7 @@ namespace CalradicExchange.Core.Tests
         {
             MarketEngine e = NewEngine();
             e.Tick(TestData.World(1));
-            Assert.Empty(e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "clay" }));
+            Assert.Empty(e.ApplyEvent(new MarketEvent { Type = MarketEventType.VillageLooted, Day = 1, ItemId = "spice" }));
         }
 
         [Fact]

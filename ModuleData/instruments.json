@@ -15,7 +15,26 @@
     { "id": "cx_linen",      "itemId": "linen",      "nameId": "cx_inst_linen",      "name": "Linen Share" },
     { "id": "cx_wool",       "itemId": "wool",       "nameId": "cx_inst_wool",       "name": "Wool Share" },
     { "id": "cx_velvet",     "itemId": "velvet",     "nameId": "cx_inst_velvet",     "name": "Velvet Share" },
-    { "id": "cx_wine",       "itemId": "wine",       "nameId": "cx_inst_wine",       "name": "Wine Share" }
+    { "id": "cx_wine",       "itemId": "wine",       "nameId": "cx_inst_wine",       "name": "Wine Share" },
+    { "id": "cx_fish", "itemId": "fish", "nameId": "cx_inst_fish", "name": "Fish Share" },
+    { "id": "cx_meat", "itemId": "meat", "nameId": "cx_inst_meat", "name": "Meat Share" },
+    { "id": "cx_cheese", "itemId": "cheese", "nameId": "cx_inst_cheese", "name": "Cheese Share" },
+    { "id": "cx_butter", "itemId": "butter", "nameId": "cx_inst_butter", "name": "Butter Share" },
+    { "id": "cx_grape", "itemId": "grape", "nameId": "cx_inst_grape", "name": "Grape Share", "tags": ["agriculture"] },
+    { "id": "cx_beer", "itemId": "beer", "nameId": "cx_inst_beer", "name": "Beer Share" },
+    { "id": "cx_sheep", "itemId": "sheep", "nameId": "cx_inst_sheep", "name": "Sheep Share" },
+    { "id": "cx_hog", "itemId": "hog", "nameId": "cx_inst_hog", "name": "Hog Share" },
+    { "id": "cx_clay", "itemId": "clay", "nameId": "cx_inst_clay", "name": "Clay Share" },
+    { "id": "cx_pottery", "itemId": "pottery", "nameId": "cx_inst_pottery", "name": "Pottery Share" },
+    { "id": "cx_hardwood", "itemId": "hardwood", "nameId": "cx_inst_hardwood", "name": "Hardwood Share" },
+    { "id": "cx_planks", "itemId": "planks", "nameId": "cx_inst_planks", "name": "Planks Share" },
+    { "id": "cx_silver", "itemId": "silver", "nameId": "cx_inst_silver", "name": "Silver Ore Share" },
+    { "id": "cx_jewelry", "itemId": "jewelry", "nameId": "cx_inst_jewelry", "name": "Jewelry Share" },
+    { "id": "cx_cotton", "itemId": "cotton", "nameId": "cx_inst_cotton", "name": "Raw Silk Share" },
+    { "id": "cx_felt", "itemId": "felt", "nameId": "cx_inst_felt", "name": "Felt Share" },
+    { "id": "cx_hides", "itemId": "hides", "nameId": "cx_inst_hides", "name": "Hides Share" },
+    { "id": "cx_leather", "itemId": "leather", "nameId": "cx_inst_leather", "name": "Leather Share" },
+    { "id": "cx_fur", "itemId": "fur", "nameId": "cx_inst_fur", "name": "Fur Share" }
   ],
   "sectors": [
     {

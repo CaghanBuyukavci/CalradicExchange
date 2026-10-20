@@ -377,3 +377,9 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Performans penceresi:** Yukarıdan aşağıya: dönem sekmeleri (7/14/30 gün), grafik, başlık ve toplam satırı, portföy toplamları tablosu. Grafik pencerede ortalı: 700 × 260 px çizim alanının iki yanında 110 px boşluk var, y etiketleri soldaki boşlukta. Yatay eksende her gün için bir nokta var (`LineChart.Ticks`, grafikle aynı ölçek). Toplamlar tablosu (portföy değeri, açık ve gerçekleşmiş K/Z, loncalardan gelen ve biriken kâr, lonca borcu, komisyon, vergi, işlem sayısı, toplam K/Z) etiket | değer listesi. Kaydırma yok, 10 satırın hepsi görünüyor (30 px satır, 520 px genişlik). Başlık 22 punto. Pencere 1040 × 900.
 - **Takas Geçmişim:** Sol altta "Bu oturumda yapılan toplam işlem: X". Sayaç behavior örneğinde tutuluyor, kaydedilmiyor; oyun yüklenince sıfırdan başlıyor. Sadece oyuncunun kendi alım/satımları sayılıyor; zorunlu satışlar (atölye, krallık yıkımı) sayılmıyor.
 
+## ADR-036 — Emtia hisseleri 12'den 31'e (2026-10-20)
+
+- **Eklenen 19 hisse:** balık, et, peynir, tereyağı, üzüm, bira, koyun, domuz, kil, çömlek, sert kereste, tahta, gümüş cevheri, mücevher, ham ipek, keçe, post, deri, kürk. Kaynak, kullanıcının oyundaki ticaret ekranı görüntüleri (Hisseler_1..3). Item ID'leri v1.4.8 oyun verisinde doğrulandı (API_NOTES §8). Koyun ve domuz `horses_and_others.xml`'de, kategori ID'leri `sheep` ve `hog`, `isTradeGood: true`.
+- **Etiket:** Sadece üzüm `agriculture` aldı: tarım sepetindeki diğer ürünlerle aynı mevsim ve kıtlık şoklarını yesin. Hayvansal ürünler ve işlenmiş mallar etiketsiz. Mevsimsel etkiyi genişletmek ayrı bir ayar işi.
+- **Mevcut kayıtlar:** Şema değişmedi. Yeni hisseler kayıtlı oyunda ilk günlük tikte, dünya fiyatı görüldüğünde dünya fiyatından açılıyor (`MarketEngine.Tick`, `StartPrice`). Geçmişleri o günden başlıyor.
+- **Sepetler:** Bu adımda değişmedi; yeni sepetler ayrı iş.

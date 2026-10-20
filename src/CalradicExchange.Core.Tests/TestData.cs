@@ -15,6 +15,8 @@ namespace CalradicExchange.Core.Tests
             ["grain"] = 10, ["fish"] = 12, ["olives"] = 30, ["date_fruit"] = 50, ["grape"] = 20, ["oil"] = 290,
             ["salt"] = 40, ["iron"] = 50, ["tools"] = 250, ["flax"] = 15, ["linen"] = 245, ["wool"] = 22,
             ["felt"] = 230, ["velvet"] = 575, ["cotton"] = 80, ["silver"] = 100, ["jewelry"] = 675, ["wine"] = 90,
+            ["meat"] = 30, ["cheese"] = 40, ["butter"] = 25, ["beer"] = 50, ["sheep"] = 80, ["hog"] = 60, ["clay"] = 18,
+            ["pottery"] = 210, ["hardwood"] = 25, ["planks"] = 180, ["hides"] = 50, ["leather"] = 230, ["fur"] = 400,
         };
 
         private static string DataDir => Path.Combine(AppContext.BaseDirectory, "ModuleData");
