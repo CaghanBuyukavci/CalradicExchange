@@ -58,6 +58,9 @@ namespace CalradicExchange.Behaviors
         public Portfolio Portfolio => _state?.Portfolio;
 
         /// <summary>True when data files loaded and the market has been initialized.</summary>
+        /// <summary>Trades the player made since the campaign was loaded; not saved (shown in the trade history).</summary>
+        public int SessionTradeCount { get; set; }
+
         public bool IsReady => _market != null && _state?.Market?.Initialized == true;
 
         /// <summary>Set when the exchange cannot run (e.g. bad data files). Shown in the menu.</summary>

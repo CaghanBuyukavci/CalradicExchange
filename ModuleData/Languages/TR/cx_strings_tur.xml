@@ -106,6 +106,7 @@
     <string id="cx_opt_history" text="Takas Geçmişim" />
     <string id="cx_history_title" text="Takas Geçmişim" />
     <string id="cx_history_empty" text="Henüz hiç işlem yapmadın." />
+    <string id="cx_history_session_trades" text="Bu oturumda yapılan toplam işlem: {COUNT}" />
     <string id="cx_history_totals" text="{COUNT} işlem. Gerçekleşmiş kâr/zarar {REALIZED}. Ödenen komisyon {FEES}, vergi {TAXES} dinar." />
     <string id="cx_side_buy" text="Alış" />
     <string id="cx_side_sell" text="Satış" />

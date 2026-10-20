@@ -51,6 +51,7 @@ namespace CalradicExchange.Menus
                 null, Strings.Close.ToString(), close);
             vm.WithSecondary(Strings.BtnPortfolio.ToString(), () => MarketReport.ShowPortfolio(Show));
             if (pf.History.Count == 0) vm.EmptyText = Strings.HistoryEmpty.ToString();
+            vm.StatusText = Strings.HistorySessionTrades.SetTextVariable("COUNT", b.SessionTradeCount).ToString();
 
             bool alternate = false;
             foreach (TradeRecord t in Enumerable.Reverse(pf.History).Take(MaxRows))

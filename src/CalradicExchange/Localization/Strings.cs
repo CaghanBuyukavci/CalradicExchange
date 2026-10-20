@@ -121,6 +121,7 @@ namespace CalradicExchange.Localization
 
         // Trade history
         public static TextObject HistoryTitle => new TextObject("{=cx_history_title}Your trade history");
+        public static TextObject HistorySessionTrades => new TextObject("{=cx_history_session_trades}Trades this session: {COUNT}");
         public static TextObject HistoryEmpty => new TextObject("{=cx_history_empty}You have not traded yet.");
         public static TextObject HistoryTotals => new TextObject("{=cx_history_totals}{COUNT} trades. Realized profit {REALIZED}. Fees paid {FEES}, taxes paid {TAXES} denars.");
         public static TextObject SideBuy => new TextObject("{=cx_side_buy}Buy");

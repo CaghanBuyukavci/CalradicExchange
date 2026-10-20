@@ -78,7 +78,7 @@
             </ListPanel>
 
             <!-- Bottom bar: status line (left), Close + optional second button (center) -->
-            <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="260" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginLeft="40" MarginBottom="22" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@StatusText" IsVisible="@HasStatus" />
+            <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="340" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginLeft="40" MarginBottom="32" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@StatusText" IsVisible="@HasStatus" />
             <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="12" StackLayout.LayoutMethod="HorizontalLeftToRight">
               <Children>
                 <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" Brush="Popup.Done.Button.NineGrid" Command.Click="ExecuteClose">

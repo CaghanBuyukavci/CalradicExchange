@@ -433,6 +433,7 @@ namespace CalradicExchange.Menus
             }
 
             // Core already updated the portfolio; now move the gold. Null counterpart = the house.
+            b.SessionTradeCount++;
             if (r.GoldDelta < 0) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, -r.GoldDelta, true);
             else if (r.GoldDelta > 0) GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, r.GoldDelta, true);
 
