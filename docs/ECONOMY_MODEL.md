@@ -250,6 +250,22 @@ G = 1 olasılık 0,4 ile (her araç, her gün ayrı zar), yoksa 0
 - **Balina:** Her gün %10 olasılıkla, açık araçlardan rastgele birinde bir balina derinliğin 1–3 katı büyüklükte işlem yapıyor. %60 alım; yatırımcılar zaten başlangıç payının 1,5 katından fazlasını tutuyorsa %60 satış. Haberlere ve mesaja düşüyor ("Bir Pravend tüccarı 800 adet tahıl hissesi topladı (+%13,1)").
 - Bir balinanın topladığı paylar sonraki günlerde geri dönüş terimiyle satılıyor, ama her gün değil: her gün %40 olasılıkla, o gün fazlanın yaklaşık %17'si (ortalama günde %7). Fiyat düşüşü belli bir takvime bağlı değil.
 
+### 5.2 Kar Al / Zarar Durdur emirleri (ADR-039)
+
+Eldeki emtia, sepet ve krallık endeksi hisseleri için satış emri. Lonca ortaklıklarına emir verilmez.
+
+```
+hedef_kar_fiyatı   = ortalama_maliyet × (1 + kar_% / 100)      (kar_% = 0 → kapalı)
+hedef_zarar_fiyatı = ortalama_maliyet × (1 − zarar_% / 100)    (zarar_% = 0 → kapalı)
+emir_ücreti        = max(10, emir_değeri × (0,002 + 0,0002 × gün))   emir_değeri = adet × bugünkü fiyat
+```
+
+- Ücret emir verilirken alınır, geri ödenmez; masraf olarak gerçekleşen kâra yazılır.
+- Emirdeki paylar kilitlenir: portföy tablosunda görünmez, satılamaz, başka emre konamaz. Değer, limit ve serbest pay hesaplarında oyuncunun elinde sayılmaya devam eder.
+- Her günlük fiyat güncellemesinden sonra bekleyen emirler kontrol edilir, oyuncu nerede olursa olsun: fiyat ≥ hedef kar ya da fiyat ≤ hedef zarar ise paylar o günün piyasa fiyatından satılır. Satışta normal fark ve kayma uygulanır, komisyon alınmaz, kâr varsa kâr vergisi alınır. Fiyat bir günde hedefin ötesine atlarsa (ör. zarar durdur 80, fiyat 72) satış 72'den olur.
+- Süresi biten emir iptal olur; paylar portföye döner. Oyuncu emri istediği zaman iptal edebilir. Piyasa kapanırsa (yıkılan krallık) ya da paylar zorunlu satışla elden çıkarsa emir iptal olur.
+- Sınırlar: kar %1–100, zarar %1–50, süre 1–60 gün, liste ve kayıt son 20 emir (bekleyenler hiç silinmez). Hepsi `settings.json` → `orders`.
+
 ## 6. Limitler ve teminat
 
 ```

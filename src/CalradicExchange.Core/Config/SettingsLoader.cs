@@ -80,6 +80,16 @@ namespace CalradicExchange.Core.Config
                 Range(e, "npc.whaleMaxDepths", s.Npc.WhaleMaxDepths, s.Npc.WhaleMinDepths, 100);
                 Range(e, "npc.whaleBuyChance", s.Npc.WhaleBuyChance, 0, 1);
             }
+            if (s.Orders != null)
+            {
+                Range(e, "orders.feeRate", s.Orders.FeeRate, 0, 0.5);
+                Range(e, "orders.feePerDay", s.Orders.FeePerDay, 0, 0.1);
+                Range(e, "orders.minFee", s.Orders.MinFee, 0, 100000);
+                Range(e, "orders.maxDays", s.Orders.MaxDays, 1, 336);
+                Range(e, "orders.maxTakeProfitPercent", s.Orders.MaxTakeProfitPercent, 1, 1000);
+                Range(e, "orders.maxStopLossPercent", s.Orders.MaxStopLossPercent, 1, 99);
+                Range(e, "orders.ordersKept", s.Orders.OrdersKept, 1, 1000);
+            }
             if (s.Kingdoms != null) Range(e, "kingdoms.minListingDays", s.Kingdoms.MinListingDays, 0, 336);
             if (s.Trading == null) e.Add("trading is missing.");
             else

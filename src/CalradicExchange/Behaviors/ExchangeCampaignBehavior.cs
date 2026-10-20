@@ -230,6 +230,7 @@ namespace CalradicExchange.Behaviors
                     ExchangeLog.Error("Guild payouts failed", ex);
                 }
             }
+            if (summary.Processed && !summary.Initialized) RunStandingOrders();
             if (summary.Processed) WriteOffFallenKingdoms(summary.Day);
             if (summary.Processed) SellOwnWorkshopShares("daily check");
             if (summary.Processed) RecordPerformance(summary.Day);
@@ -379,6 +380,21 @@ namespace CalradicExchange.Behaviors
         }
 
         /// <summary>One line per listed kingdom index for the daily log: price, fundamental, fiefs, prosperity, wars, sieges.</summary>
+        /// <summary>Take-profit / stop-loss orders are checked against the new prices (ADR-039), wherever the player is.</summary>
+        private void RunStandingOrders()
+        {
+            try
+            {
+                if (_state.Portfolio.Orders.Count == 0) return;
+                List<StandingOrder> ended = _orders.ProcessStandingOrders(_state.Portfolio, OrdersReport.Today);
+                OrdersReport.Settle(this, ended);
+            }
+            catch (Exception ex)
+            {
+                ExchangeLog.Error("Standing orders failed", ex);
+            }
+        }
+
         /// <summary>Daily point of the portfolio performance chart (ADR-031), after payouts and write-offs.</summary>
         private void RecordPerformance(int day)
         {

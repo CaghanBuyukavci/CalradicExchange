@@ -89,11 +89,12 @@ namespace CalradicExchange.Menus
                 },
                 null, Strings.Close.ToString(), close);
             vm.WithSecondary(Strings.BtnPerformance.ToString(), () => PerformanceReport.Show(() => ShowPortfolio(back)));
+            vm.WithTertiary(Strings.BtnMyOrders.ToString(), () => OrdersReport.Show(() => ShowPortfolio(back)));
 
             foreach (InstrumentClass tab in PortfolioTabs)
             {
                 InstrumentClass cls = tab;
-                int count = pf.Positions.Count(p => TabOf(b, p.InstrumentId) == cls);
+                int count = pf.Positions.Count(p => TabOf(b, p.InstrumentId) == cls && pf.FreeQuantity(p.InstrumentId) > 0);
                 vm.Tabs.Add(new TabVM(TabLabel(cls).SetTextVariable("COUNT", count).ToString(), cls == _portfolioTab, () =>
                 {
                     _portfolioTab = cls;
@@ -146,25 +147,29 @@ namespace CalradicExchange.Menus
             vm.H1 = NameHeader(_portfolioTab);
             vm.PortfolioRows.Clear();
 
-            string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString();
+            string buyText = Strings.BtnBuy.ToString(), sellText = Strings.BtnSell.ToString(), orderText = Strings.BtnOrder.ToString();
             string here = b.CurrentTrader().TownId;
             Action back = () => ShowPortfolio(outerBack);
             bool alternate = false;
-            foreach (Position pos in pf.Positions.Where(p => TabOf(b, p.InstrumentId) == _portfolioTab))
+            // Shares locked in pending orders are out of the portfolio until the order ends (ADR-039).
+            foreach (Position pos in pf.Positions.Where(p => TabOf(b, p.InstrumentId) == _portfolioTab && pf.FreeQuantity(p.InstrumentId) > 0))
             {
+                int free = pf.FreeQuantity(pos.InstrumentId);
                 decimal price = PriceOf(b, pos.InstrumentId);
-                decimal pnl = pos.Quantity * price - pos.CostBasis;
-                double pct = pos.CostBasis > 0 ? (double)(pnl / pos.CostBasis) : 0;
+                decimal cost = pos.AverageCost * free;
+                decimal pnl = free * price - cost;
+                double pct = cost > 0 ? (double)(pnl / cost) : 0;
                 PriceState ps = b.Market.Get(pos.InstrumentId);
                 bool open = ps != null && ps.HasPrice && !ps.Closed;
                 string id = pos.InstrumentId;
                 InstrumentDefinition def = b.Market.Find(id);
                 bool canBuy = open && (def?.Class != InstrumentClass.Guild || def.TownId == here);
-                vm.PortfolioRows.Add(new PortfolioRowVM(Names.ShortInstrument(def), pos.Quantity.ToString(),
+                vm.PortfolioRows.Add(new PortfolioRowVM(Names.ShortInstrument(def), free.ToString(),
                     Fmt.Price(pos.AverageCost), Fmt.Price(price), Fmt.SignedDenars(pnl), Fmt.Pct(pct), TableColors.ForAmount(pnl), alternate,
                     canBuy, open, buyText, sellText,
                     () => TradeFlow.StartTrade(id, OrderSide.Buy, back),
-                    () => TradeFlow.StartTrade(id, OrderSide.Sell, back)));
+                    () => TradeFlow.StartTrade(id, OrderSide.Sell, back))
+                    .WithOrder(open && def?.Class != InstrumentClass.Guild, orderText, () => OrdersReport.StartOrder(id, back)));
                 alternate = !alternate;
             }
             vm.EmptyText = vm.PortfolioRows.Count == 0 ? Strings.PortfolioTabEmpty.ToString() : "";

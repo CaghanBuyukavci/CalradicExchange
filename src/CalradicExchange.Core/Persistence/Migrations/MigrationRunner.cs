@@ -60,6 +60,10 @@ namespace CalradicExchange.Core.Persistence.Migrations
                         // Schema 13 (ADR-037) adds prices[].totalShares / npcShares and news[].event.instrumentId. Supply is
                         // issued on the next tick from the current price (MarketEngine.EnsureSupply). Nothing to do here.
                         break;
+                    case 13:
+                        // Schema 14 (ADR-039) adds portfolio.orders / nextOrderId (take-profit / stop-loss orders) and
+                        // history[].order. All default when missing: no orders.
+                        break;
                 }
             }
 

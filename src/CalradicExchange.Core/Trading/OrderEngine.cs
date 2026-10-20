@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using CalradicExchange.Core.Config;
 using CalradicExchange.Core.Model;
 using CalradicExchange.Core.Pricing;
@@ -54,6 +56,15 @@ namespace CalradicExchange.Core.Trading
 
         public TradeQuote Quote(string instrumentId, OrderSide side, int quantity, TraderProfile trader, Portfolio portfolio)
         {
+            return Quote(instrumentId, side, quantity, trader, portfolio, false);
+        }
+
+        /// <summary>
+        /// <paramref name="standingOrder"/>: the sale of a take-profit / stop-loss order (ADR-039). No commission, and
+        /// the order's own locked shares may be sold.
+        /// </summary>
+        private TradeQuote Quote(string instrumentId, OrderSide side, int quantity, TraderProfile trader, Portfolio portfolio, bool standingOrder)
+        {
             var q = new TradeQuote { InstrumentId = instrumentId, Side = side, Quantity = quantity };
             InstrumentDefinition def = _market.Find(instrumentId);
             PriceState ps = _market.Get(instrumentId);
@@ -88,7 +99,7 @@ namespace CalradicExchange.Core.Trading
             q.ExecutionPrice = PriceMath.Round(exec);
             q.Impact = impact;
             q.Gross = gross;
-            q.Commission = Commission(gross);
+            q.Commission = standingOrder ? 0 : Commission(gross);
             if (side == OrderSide.Buy)
             {
                 q.Total = gross + q.Commission;
@@ -116,7 +127,7 @@ namespace CalradicExchange.Core.Trading
                     if (portfolio.QuantityOf(instrumentId) + quantity > GuildShares) return Fail(q, TradeError.GuildSharesExceeded);
                 }
             }
-            else if (quantity > portfolio.QuantityOf(instrumentId))
+            else if (quantity > (standingOrder ? portfolio.QuantityOf(instrumentId) : portfolio.FreeQuantity(instrumentId)))
             {
                 return Fail(q, TradeError.InsufficientShares);
             }
@@ -160,6 +171,146 @@ namespace CalradicExchange.Core.Trading
             return result;
         }
 
+        /// <summary>Fee of a take-profit / stop-loss order: max(minFee, value x (feeRate + feePerDay x days)).</summary>
+        public int StandingOrderFee(decimal value, int days)
+        {
+            StandingOrderSettings o = OrderSettings;
+            double fee = Math.Max(o.MinFee, (double)value * (o.FeeRate + o.FeePerDay * Math.Max(0, days)));
+            return (int)Math.Ceiling(fee - 1e-9);
+        }
+
+        private StandingOrderSettings OrderSettings => Settings.Orders ?? new StandingOrderSettings();
+
+        /// <summary>
+        /// What a take-profit / stop-loss order on <paramref name="quantity"/> held shares would cost (ADR-039).
+        /// Targets are percents of the average cost; 0 turns one off.
+        /// </summary>
+        public StandingOrderQuote QuoteStandingOrder(string instrumentId, int quantity, int takeProfitPercent, int stopLossPercent, int days,
+            TraderProfile trader, Portfolio portfolio)
+        {
+            StandingOrderSettings o = OrderSettings;
+            var q = new StandingOrderQuote { InstrumentId = instrumentId, Quantity = quantity, Days = days };
+            InstrumentDefinition def = _market.Find(instrumentId);
+            PriceState ps = _market.Get(instrumentId);
+            Position pos = portfolio.Find(instrumentId);
+
+            if (def == null || ps == null) return Fail(q, TradeError.UnknownInstrument);
+            if (def.Class == InstrumentClass.Guild) return Fail(q, TradeError.OrdersNotForGuilds);
+            if (ps.Closed) return Fail(q, TradeError.InstrumentClosed);
+            if (!ps.HasPrice || ps.Price <= 0) return Fail(q, TradeError.NoPrice);
+
+            q.MarketPrice = ps.Price;
+            q.ReferenceCost = pos != null ? Math.Round(pos.AverageCost, 4) : 0;
+            if (takeProfitPercent > 0) q.TakeProfitPrice = Math.Round(q.ReferenceCost * (1 + takeProfitPercent / 100m), 4);
+            if (stopLossPercent > 0) q.StopLossPrice = Math.Round(q.ReferenceCost * (1 - stopLossPercent / 100m), 4);
+            q.Fee = StandingOrderFee(Math.Max(0, quantity) * ps.Price, days);
+
+            if (quantity <= 0) return Fail(q, TradeError.InvalidQuantity);
+            if (quantity > portfolio.FreeQuantity(instrumentId)) return Fail(q, TradeError.InsufficientShares);
+            if (days < 1 || days > o.MaxDays || takeProfitPercent < 0 || takeProfitPercent > o.MaxTakeProfitPercent
+                || stopLossPercent < 0 || stopLossPercent > o.MaxStopLossPercent) return Fail(q, TradeError.InvalidOrder);
+            if (takeProfitPercent == 0 && stopLossPercent == 0) return Fail(q, TradeError.NoOrderTarget);
+            if (q.Fee > trader.Gold) return Fail(q, TradeError.InsufficientGold);
+            return q;
+        }
+
+        /// <summary>
+        /// Places the order if the quote is valid: locks the shares and books the fee as a cost. The caller takes the
+        /// fee in gold. Returns the order, or null with the reason in <paramref name="quote"/>.
+        /// </summary>
+        public StandingOrder PlaceStandingOrder(string instrumentId, int quantity, int takeProfitPercent, int stopLossPercent, int days,
+            TraderProfile trader, Portfolio portfolio, int day, out StandingOrderQuote quote)
+        {
+            quote = QuoteStandingOrder(instrumentId, quantity, takeProfitPercent, stopLossPercent, days, trader, portfolio);
+            if (!quote.IsValid) return null;
+            var order = new StandingOrder
+            {
+                Id = portfolio.NextOrderId++,
+                InstrumentId = instrumentId,
+                Quantity = quantity,
+                ReferenceCost = quote.ReferenceCost,
+                TakeProfitPercent = takeProfitPercent,
+                StopLossPercent = stopLossPercent,
+                TakeProfitPrice = quote.TakeProfitPrice,
+                StopLossPrice = quote.StopLossPrice,
+                PlacedDay = day,
+                ExpiryDay = day + days,
+                Fee = quote.Fee,
+            };
+            portfolio.Orders.Add(order);
+            portfolio.TotalCommissionPaid += quote.Fee;
+            portfolio.RealizedPnl -= quote.Fee;
+            portfolio.TrimOrders(OrderSettings.OrdersKept);
+            return order;
+        }
+
+        /// <summary>
+        /// Checks the pending orders after the day's prices (ADR-039). A target reached sells at the market without
+        /// commission (profit tax only); an order past its last day expires; one on a closed instrument is canceled.
+        /// Returns the orders that ended today; the gold of the filled ones is their Proceeds, paid by the caller.
+        /// </summary>
+        public List<StandingOrder> ProcessStandingOrders(Portfolio portfolio, int day)
+        {
+            var ended = new List<StandingOrder>();
+            foreach (StandingOrder o in portfolio.Orders.Where(x => x.IsPending).ToList())
+            {
+                PriceState ps = _market.Get(o.InstrumentId);
+                if (ps == null || ps.Closed || !ps.HasPrice || portfolio.QuantityOf(o.InstrumentId) < o.Quantity)
+                {
+                    portfolio.CancelOrder(o, StandingOrderCancelReason.Closed, day);
+                    ended.Add(o);
+                    continue;
+                }
+
+                StandingOrderTrigger trigger = o.TakeProfitPrice != null && ps.Price >= o.TakeProfitPrice ? StandingOrderTrigger.TakeProfit
+                    : o.StopLossPrice != null && ps.Price <= o.StopLossPrice ? StandingOrderTrigger.StopLoss
+                    : StandingOrderTrigger.None;
+                if (trigger != StandingOrderTrigger.None)
+                {
+                    Fill(portfolio, o, trigger, day);
+                    ended.Add(o);
+                    continue;
+                }
+                if (day >= o.ExpiryDay)
+                {
+                    portfolio.CancelOrder(o, StandingOrderCancelReason.Expired, day);
+                    ended.Add(o);
+                }
+            }
+            if (ended.Count > 0) portfolio.TrimOrders(OrderSettings.OrdersKept);
+            return ended;
+        }
+
+        /// <summary>Sells the order's shares at the market, without commission; canceled if the sale is not possible.</summary>
+        private void Fill(Portfolio portfolio, StandingOrder o, StandingOrderTrigger trigger, int day)
+        {
+            TradeQuote q = Quote(o.InstrumentId, OrderSide.Sell, o.Quantity, null, portfolio, true);
+            if (!q.IsValid)
+            {
+                portfolio.CancelOrder(o, StandingOrderCancelReason.Closed, day);
+                return;
+            }
+            o.Status = StandingOrderStatus.Filled;
+            o.Trigger = trigger;
+            o.ClosedDay = day;
+            o.FillPrice = q.ExecutionPrice;
+            o.Proceeds = q.Total;
+            o.RealizedPnl = portfolio.ApplySell(o.InstrumentId, o.Quantity, q.Total, 0, q.ProfitTax);
+            portfolio.Record(new TradeRecord
+            {
+                Day = day,
+                InstrumentId = o.InstrumentId,
+                Side = OrderSide.Sell,
+                Quantity = o.Quantity,
+                ExecutionPrice = q.ExecutionPrice,
+                Total = q.Total,
+                ProfitTax = q.ProfitTax,
+                RealizedPnl = o.RealizedPnl,
+                Order = trigger,
+            }, Settings.Trading.TradeHistoryLimit);
+            _market.ApplyTradeImpact(o.InstrumentId, false, q.Impact);
+        }
+
         /// <summary>Largest quantity that passes every check for a buy (0 if none). Binary search over quotes.</summary>
         public int MaxBuyQuantity(string instrumentId, TraderProfile trader, Portfolio portfolio)
         {
@@ -183,6 +334,12 @@ namespace CalradicExchange.Core.Trading
         }
 
         private static TradeQuote Fail(TradeQuote q, TradeError error)
+        {
+            q.Error = error;
+            return q;
+        }
+
+        private static StandingOrderQuote Fail(StandingOrderQuote q, TradeError error)
         {
             q.Error = error;
             return q;

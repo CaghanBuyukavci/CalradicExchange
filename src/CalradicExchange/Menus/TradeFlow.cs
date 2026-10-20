@@ -124,7 +124,7 @@ namespace CalradicExchange.Menus
                 if (cls == InstrumentClass.Kingdom && ps != null && ps.Closed) continue; // fallen kingdoms
                 bool priced = ps != null && ps.HasPrice;
                 bool open = priced && !ps.Closed;
-                int qty = b.Portfolio.QuantityOf(def.Id);
+                int qty = b.Portfolio.FreeQuantity(def.Id); // shares in pending orders are not for sale (ADR-039)
                 double day = priced ? ps.ChangeOver(1) : 0, week = priced ? ps.ChangeOver(7) : 0;
                 string id = def.Id;
                 string name = Names.ShortInstrument(def);
@@ -271,7 +271,7 @@ namespace CalradicExchange.Menus
 
         private static void ChooseSide(ExchangeCampaignBehavior b, string id, Action back)
         {
-            if (b.Portfolio.QuantityOf(id) <= 0)
+            if (b.Portfolio.FreeQuantity(id) <= 0)
             {
                 AskQuantity(id, OrderSide.Buy, back);
                 return;
@@ -316,7 +316,7 @@ namespace CalradicExchange.Menus
             }
             else
             {
-                max = b.Portfolio.QuantityOf(id);
+                max = b.Portfolio.FreeQuantity(id);
                 if (max <= 0) return;
                 prompt = guild ? Strings.QuantitySellGuild : Strings.QuantitySell;
                 prompt.SetTextVariable("QTY", max);

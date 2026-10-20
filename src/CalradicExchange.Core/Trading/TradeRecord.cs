@@ -24,5 +24,8 @@ namespace CalradicExchange.Core.Trading
 
         /// <summary>Not a player order: guild closure or a sale to cover a guild loss (ADR-027). Schema 9.</summary>
         public bool Forced { get; set; }
+
+        /// <summary>Sold by a take-profit / stop-loss order (ADR-039); None for an ordinary trade. Schema 14.</summary>
+        public StandingOrderTrigger Order { get; set; }
     }
 }

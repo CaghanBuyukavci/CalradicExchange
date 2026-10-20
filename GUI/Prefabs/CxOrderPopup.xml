@@ -1,0 +1,130 @@
+<Prefab>
+  <!-- Calradic Exchange: take-profit / stop-loss order (ADR-039). Four rows: label | slider | value (quantity, profit %, loss %, days); fee and error below; Place and Cancel at the bottom. Data source: StandingOrderVM. -->
+  <Window>
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000ff" AlphaFactor="0.7">
+      <Children>
+
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="900" SuggestedHeight="560" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Children>
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="StdAssets\Popup\canvas" />
+
+            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" StackLayout.LayoutMethod="VerticalTopToBottom">
+              <Children>
+
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="56" MarginTop="8" Brush="Popup.Title.Text" Text="@Title" />
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="23" Sprite="StdAssets\Popup\divider" />
+
+                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="50" MarginRight="50" MarginTop="8" MarginBottom="12" Brush="Popup.Description.Text" Brush.FontSize="19" Text="@Heading" />
+
+                <!-- Quantity -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="52" MarginLeft="50" MarginRight="50" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="210" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@QuantityLabel" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+                      <Children>
+                        <SliderWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" VerticalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="true" MinValueInt="1" MaxValueInt="@MaxQuantity" ValueInt="@Quantity">
+                          <Children>
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="14" VerticalAlignment="Center" Sprite="General\Slider\slider_inner_canvas" />
+                            <BrushWidget Id="Filler" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="21" VerticalAlignment="Center" PositionYOffset="2" Sprite="General\Slider\slider_fill" />
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="5" MarginBottom="5" Brush="Slider" Brush.SaturationFactor="25" Brush.ValueFactor="-15" />
+                            <ImageWidget Id="SliderHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="38" SuggestedHeight="46" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="SliderHandle" />
+                          </Children>
+                        </SliderWidget>
+                      </Children>
+                    </Widget>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="240" MarginLeft="20" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.TextHorizontalAlignment="Left" Text="@QuantityText" />
+                  </Children>
+                </ListPanel>
+
+                <!-- Profit target -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="52" MarginLeft="50" MarginRight="50" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="210" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@TakeProfitLabel" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+                      <Children>
+                        <SliderWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" VerticalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="true" MinValueInt="0" MaxValueInt="@MaxTakeProfit" ValueInt="@TakeProfit">
+                          <Children>
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="14" VerticalAlignment="Center" Sprite="General\Slider\slider_inner_canvas" />
+                            <BrushWidget Id="Filler" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="21" VerticalAlignment="Center" PositionYOffset="2" Sprite="General\Slider\slider_fill" />
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="5" MarginBottom="5" Brush="Slider" Brush.SaturationFactor="25" Brush.ValueFactor="-15" />
+                            <ImageWidget Id="SliderHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="38" SuggestedHeight="46" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="SliderHandle" />
+                          </Children>
+                        </SliderWidget>
+                      </Children>
+                    </Widget>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="240" MarginLeft="20" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#7FCF6FFF" Brush.TextHorizontalAlignment="Left" Text="@TakeProfitText" />
+                  </Children>
+                </ListPanel>
+
+                <!-- Loss target -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="52" MarginLeft="50" MarginRight="50" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="210" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@StopLossLabel" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+                      <Children>
+                        <SliderWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" VerticalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="true" MinValueInt="0" MaxValueInt="@MaxStopLoss" ValueInt="@StopLoss">
+                          <Children>
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="14" VerticalAlignment="Center" Sprite="General\Slider\slider_inner_canvas" />
+                            <BrushWidget Id="Filler" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="21" VerticalAlignment="Center" PositionYOffset="2" Sprite="General\Slider\slider_fill" />
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="5" MarginBottom="5" Brush="Slider" Brush.SaturationFactor="25" Brush.ValueFactor="-15" />
+                            <ImageWidget Id="SliderHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="38" SuggestedHeight="46" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="SliderHandle" />
+                          </Children>
+                        </SliderWidget>
+                      </Children>
+                    </Widget>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="240" MarginLeft="20" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E06A5AFF" Brush.TextHorizontalAlignment="Left" Text="@StopLossText" />
+                  </Children>
+                </ListPanel>
+
+                <!-- Validity -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="52" MarginLeft="50" MarginRight="50" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="210" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@DaysLabel" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+                      <Children>
+                        <SliderWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" VerticalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="true" MinValueInt="1" MaxValueInt="@MaxDays" ValueInt="@Days">
+                          <Children>
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="14" VerticalAlignment="Center" Sprite="General\Slider\slider_inner_canvas" />
+                            <BrushWidget Id="Filler" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="21" VerticalAlignment="Center" PositionYOffset="2" Sprite="General\Slider\slider_fill" />
+                            <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="5" MarginBottom="5" Brush="Slider" Brush.SaturationFactor="25" Brush.ValueFactor="-15" />
+                            <ImageWidget Id="SliderHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="38" SuggestedHeight="46" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="SliderHandle" />
+                          </Children>
+                        </SliderWidget>
+                      </Children>
+                    </Widget>
+                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="240" MarginLeft="20" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.TextHorizontalAlignment="Left" Text="@DaysText" />
+                  </Children>
+                </ListPanel>
+
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" MarginLeft="50" MarginRight="50" MarginTop="10" Sprite="BlankWhiteSquare_9" Color="#E4C59BFF" AlphaFactor="0.5" />
+
+                <!-- Fee, and why the order cannot be placed -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="36" MarginLeft="50" MarginRight="50" MarginTop="8" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@FeeText" />
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30" MarginLeft="50" MarginRight="50" Brush="Popup.Description.Text" Brush.FontSize="18" Brush.FontColor="#E06A5AFF" Brush.TextHorizontalAlignment="Left" Text="@ErrorText" IsVisible="@HasError" />
+
+              </Children>
+            </ListPanel>
+
+            <!-- Buttons, bottom center: Place | Cancel -->
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="14" StackLayout.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="240" SuggestedHeight="64" MarginRight="10" Brush="Popup.Done.Button" IsEnabled="@CanConfirm" Command.Click="ExecuteConfirm">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="30" MarginRight="30" Brush="Popup.Button.Text" Text="@ConfirmText" />
+                  </Children>
+                </ButtonWidget>
+                <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="240" SuggestedHeight="64" MarginLeft="10" Brush="Popup.Cancel.Button" Command.Click="ExecuteCancel">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="30" MarginRight="30" Brush="Popup.Button.Text" Text="@CancelText" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </ListPanel>
+
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="frame_9" ExtendLeft="18" ExtendTop="18" ExtendRight="18" ExtendBottom="18" IsEnabled="false" />
+          </Children>
+        </Widget>
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

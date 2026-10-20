@@ -1,10 +1,10 @@
 <Prefab>
-  <!-- Calradic Exchange: portfolio table. Tabs: shares | baskets | guilds (TabVM). Columns: name | qty | bought at | now | profit | profit % | Buy | Sell (ADR-025 buttons). Data source: ExchangeTableVM. -->
+  <!-- Calradic Exchange: portfolio table. Tabs: shares | baskets | guilds (TabVM). Columns: name | qty (free, not locked in orders) | bought at | now | profit | profit % | Buy | Sell (ADR-025 buttons) | Order (ADR-039). Bottom: Close | My Orders | Performance. Data source: ExchangeTableVM. -->
   <Window>
     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000ff" AlphaFactor="0.7">
       <Children>
 
-        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="1040" SuggestedHeight="700" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="1120" SuggestedHeight="700" HorizontalAlignment="Center" VerticalAlignment="Center">
           <Children>
             <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="StdAssets\Popup\canvas" />
 
@@ -77,6 +77,15 @@
                                             </ButtonWidget>
                                           </Children>
                                         </Widget>
+                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="64" MarginLeft="8">
+                                          <Children>
+                                            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="64" SuggestedHeight="30" VerticalAlignment="Center" Brush="Cx.RowButton.Order" IsVisible="@CanOrder" Command.Click="ExecuteOrder">
+                                              <Children>
+                                                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#FFFFFFFF" Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center" Text="@OrderText" />
+                                              </Children>
+                                            </ButtonWidget>
+                                          </Children>
+                                        </Widget>
                                       </Children>
                                     </ListPanel>
                                   </Children>
@@ -104,13 +113,18 @@
               </Children>
             </ListPanel>
 
-            <!-- Bottom bar: status line (left), Close + optional second button (center) -->
+            <!-- Bottom bar: status line (left), Close + My Orders + Performance (center) -->
             <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="260" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginLeft="40" MarginBottom="22" Brush="Popup.Description.Text" Brush.FontSize="17" Brush.FontColor="#E4C59BFF" Brush.TextHorizontalAlignment="Left" Text="@StatusText" IsVisible="@HasStatus" />
             <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="12" StackLayout.LayoutMethod="HorizontalLeftToRight">
               <Children>
                 <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" Brush="Popup.Done.Button.NineGrid" Command.Click="ExecuteClose">
                   <Children>
                     <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginLeft="50" MarginRight="50" VerticalAlignment="Center" Brush="Popup.Button.Text" Text="@CloseText" />
+                  </Children>
+                </ButtonWidget>
+                <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" MarginLeft="16" Brush="Popup.Done.Button.NineGrid" IsVisible="@HasTertiary" Command.Click="ExecuteTertiary">
+                  <Children>
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginLeft="50" MarginRight="50" VerticalAlignment="Center" Brush="Popup.Button.Text" Text="@TertiaryText" />
                   </Children>
                 </ButtonWidget>
                 <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="64" MarginLeft="16" Brush="Popup.Done.Button.NineGrid" IsVisible="@HasSecondary" Command.Click="ExecuteSecondary">

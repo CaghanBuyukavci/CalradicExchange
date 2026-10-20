@@ -236,6 +236,47 @@
     <string id="cx_cf_profit" text="Kâr / zarar" />
     <string id="cx_denars_amount" text="{AMOUNT} dinar" />
     <string id="cx_btn_performance" text="Performans" />
+    <string id="cx_btn_order" text="EMİR" />
+    <string id="cx_btn_cancel_order" text="İPTAL" />
+    <string id="cx_btn_my_orders" text="Emirlerim" />
+    <string id="cx_btn_place_order" text="Emri Ver" />
+    <string id="cx_side_take_profit" text="Kar Al" />
+    <string id="cx_side_stop_loss" text="Zarar Durdur" />
+    <string id="cx_order_title" text="Kar Al / Zarar Durdur" />
+    <string id="cx_order_heading" text="{NAME}: emir verilebilecek {FREE} adet var. Ortalama maliyet {COST}, güncel fiyat {PRICE}. Hedefler ortalama maliyete göre yüzdedir. Emirdeki hisseler emir bitene kadar portföyden çıkar." />
+    <string id="cx_order_quantity" text="Adet" />
+    <string id="cx_order_take_profit" text="Hedef Kar %" />
+    <string id="cx_order_stop_loss" text="Hedef Zarar %" />
+    <string id="cx_order_days" text="Geçerlilik Süresi" />
+    <string id="cx_order_qty_value" text="{QTY} / {MAX} adet" />
+    <string id="cx_order_target_value" text="%{PCT} = {PRICE}" />
+    <string id="cx_order_target_off" text="Kapalı" />
+    <string id="cx_order_days_value" text="{DAYS} gün" />
+    <string id="cx_order_fee" text="Emir ücreti: {FEE} dinar (geri ödenmez). Satışta komisyon alınmaz, sadece kar vergisi." />
+    <string id="cx_orders_title" text="Emirlerim" />
+    <string id="cx_orders_empty" text="Henüz emir vermedin. Portföydeki EMİR butonunu kullan." />
+    <string id="cx_col_placed" text="Verildi" />
+    <string id="cx_col_take_profit" text="Kar Al" />
+    <string id="cx_col_stop_loss" text="Zarar Durdur" />
+    <string id="cx_col_days_left" text="Kalan süre" />
+    <string id="cx_col_status" text="Durum" />
+    <string id="cx_col_result" text="Sonuç" />
+    <string id="cx_order_days_left" text="{DAYS} gün" />
+    <string id="cx_order_pending" text="Bekleyen" />
+    <string id="cx_order_filled" text="Gerçekleşen" />
+    <string id="cx_order_canceled" text="İptal" />
+    <string id="cx_order_result_filled" text="{KIND} {PNL}" />
+    <string id="cx_order_result_expired" text="Süresi doldu" />
+    <string id="cx_order_result_player" text="Sen iptal ettin" />
+    <string id="cx_order_result_closed" text="Piyasa kapandı" />
+    <string id="cx_msg_order_placed" text="Emir verildi: {QTY} adet {NAME}, ücret {FEE} dinar." />
+    <string id="cx_msg_order_filled" text="Emir gerçekleşti ({KIND}): {QTY} adet {NAME} {TOTAL} dinara satıldı ({PNL})." />
+    <string id="cx_msg_order_expired" text="Emrin süresi doldu: {QTY} adet {NAME} portföyüne döndü." />
+    <string id="cx_msg_order_closed" text="Emir iptal oldu, piyasa kapandı: {QTY} adet {NAME} portföyüne döndü." />
+    <string id="cx_msg_order_canceled" text="Emir iptal edildi: {QTY} adet {NAME} portföyüne döndü. Ücret geri ödenmez." />
+    <string id="cx_err_orders_guild" text="Lonca ortaklıklarına emir verilmez." />
+    <string id="cx_err_order_target" text="Bir kar ya da zarar hedefi seç." />
+    <string id="cx_err_order_invalid" text="Bu emir geçerli değil." />
     <string id="cx_perf_title" text="Portföy Performansı" />
     <string id="cx_perf_period" text="{DAYS} gün" />
     <string id="cx_perf_change" text="Son {DAYS} gün: {CHANGE} dinar" />

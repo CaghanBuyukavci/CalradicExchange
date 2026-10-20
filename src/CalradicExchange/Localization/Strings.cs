@@ -228,6 +228,46 @@ namespace CalradicExchange.Localization
 
         public static TextObject NameWithOwner => new TextObject("{=cx_name_with_owner}{NAME} ({OWNER})");
         public static TextObject BtnPerformance => new TextObject("{=cx_btn_performance}Performance");
+
+        // Take-profit / stop-loss orders (ADR-039)
+        public static TextObject BtnOrder => new TextObject("{=cx_btn_order}ORDER");
+        public static TextObject BtnCancelOrder => new TextObject("{=cx_btn_cancel_order}CANCEL");
+        public static TextObject BtnMyOrders => new TextObject("{=cx_btn_my_orders}My Orders");
+        public static TextObject BtnPlaceOrder => new TextObject("{=cx_btn_place_order}Place Order");
+        public static TextObject SideTakeProfit => new TextObject("{=cx_side_take_profit}Take profit");
+        public static TextObject SideStopLoss => new TextObject("{=cx_side_stop_loss}Stop loss");
+        public static TextObject OrderTitle => new TextObject("{=cx_order_title}Take Profit / Stop Loss");
+        public static TextObject OrderHeading => new TextObject("{=cx_order_heading}{NAME}: {FREE} shares free to order. Average cost {COST}, price now {PRICE}. The targets are percents of the average cost. The shares in the order leave the portfolio until it ends.");
+        public static TextObject OrderQuantityLabel => new TextObject("{=cx_order_quantity}Quantity");
+        public static TextObject OrderTakeProfitLabel => new TextObject("{=cx_order_take_profit}Profit target %");
+        public static TextObject OrderStopLossLabel => new TextObject("{=cx_order_stop_loss}Loss target %");
+        public static TextObject OrderDaysLabel => new TextObject("{=cx_order_days}Valid for");
+        public static TextObject OrderQuantityValue => new TextObject("{=cx_order_qty_value}{QTY} of {MAX}");
+        public static TextObject OrderTargetValue => new TextObject("{=cx_order_target_value}{PCT}% = {PRICE}");
+        public static TextObject OrderTargetOff => new TextObject("{=cx_order_target_off}Off");
+        public static TextObject OrderDaysValue => new TextObject("{=cx_order_days_value}{DAYS} days");
+        public static TextObject OrderFee => new TextObject("{=cx_order_fee}Order fee: {FEE} denars (not refunded). The sale pays no commission, only the profit tax.");
+        public static TextObject OrdersTitle => new TextObject("{=cx_orders_title}My Orders");
+        public static TextObject OrdersEmpty => new TextObject("{=cx_orders_empty}You have not given an order yet. Use the ORDER button in the portfolio.");
+        public static TextObject ColPlaced => new TextObject("{=cx_col_placed}Placed");
+        public static TextObject ColTakeProfit => new TextObject("{=cx_col_take_profit}Take profit");
+        public static TextObject ColStopLoss => new TextObject("{=cx_col_stop_loss}Stop loss");
+        public static TextObject ColDaysLeft => new TextObject("{=cx_col_days_left}Time left");
+        public static TextObject ColStatus => new TextObject("{=cx_col_status}Status");
+        public static TextObject ColResult => new TextObject("{=cx_col_result}Result");
+        public static TextObject OrderDaysLeft => new TextObject("{=cx_order_days_left}{DAYS} days");
+        public static TextObject OrderPending => new TextObject("{=cx_order_pending}Pending");
+        public static TextObject OrderFilled => new TextObject("{=cx_order_filled}Filled");
+        public static TextObject OrderCanceled => new TextObject("{=cx_order_canceled}Canceled");
+        public static TextObject OrderResultFilled => new TextObject("{=cx_order_result_filled}{KIND} {PNL}");
+        public static TextObject OrderResultExpired => new TextObject("{=cx_order_result_expired}Time ran out");
+        public static TextObject OrderResultPlayer => new TextObject("{=cx_order_result_player}Canceled by you");
+        public static TextObject OrderResultClosed => new TextObject("{=cx_order_result_closed}Market closed");
+        public static TextObject OrderPlaced => new TextObject("{=cx_msg_order_placed}Order given: {QTY} {NAME}, fee {FEE} denars.");
+        public static TextObject OrderFilledMessage => new TextObject("{=cx_msg_order_filled}Order filled ({KIND}): sold {QTY} {NAME} for {TOTAL} denars ({PNL}).");
+        public static TextObject OrderExpiredMessage => new TextObject("{=cx_msg_order_expired}Order expired: {QTY} {NAME} are back in your portfolio.");
+        public static TextObject OrderClosedMessage => new TextObject("{=cx_msg_order_closed}Order canceled, the market closed: {QTY} {NAME} are back in your portfolio.");
+        public static TextObject OrderCanceledMessage => new TextObject("{=cx_msg_order_canceled}Order canceled: {QTY} {NAME} are back in your portfolio. The fee is not refunded.");
         public static TextObject PerformanceTitle => new TextObject("{=cx_perf_title}Portfolio Performance");
         public static TextObject PerformancePeriod => new TextObject("{=cx_perf_period}{DAYS} days");
         public static TextObject PerformanceChange => new TextObject("{=cx_perf_change}Last {DAYS} days: {CHANGE} denars");
@@ -276,6 +316,9 @@ namespace CalradicExchange.Localization
                 case TradeError.NotInGuildTown: return new TextObject("{=cx_err_guild_town}Partnership shares of a guild are only sold in its own town.");
                 case TradeError.GuildSharesExceeded: return new TextObject("{=cx_err_guild_shares}The guild does not have that many shares left for you.");
                 case TradeError.OwnWorkshop: return new TextObject("{=cx_err_own_workshop}You own a workshop of this guild. You cannot buy partnership shares in your own business.");
+                case TradeError.OrdersNotForGuilds: return new TextObject("{=cx_err_orders_guild}Orders are not given on guild partnerships.");
+                case TradeError.NoOrderTarget: return new TextObject("{=cx_err_order_target}Set a profit or a loss target.");
+                case TradeError.InvalidOrder: return new TextObject("{=cx_err_order_invalid}That order is not valid.");
                 default: return new TextObject("{=cx_err_generic}The trade could not be made.");
             }
         }

@@ -36,4 +36,10 @@
       <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#8E3A33FF" />
     </Layers>
   </Brush>
+
+  <Brush Name="Cx.RowButton.Order" BaseBrush="Cx.RowButton.Base">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#9A6A2CFF" />
+    </Layers>
+  </Brush>
 </Brushes>

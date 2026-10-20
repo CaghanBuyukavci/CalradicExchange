@@ -59,6 +59,16 @@
     "permanentImpactFactor": 0.5,
     "tradeHistoryLimit": 500
   },
+  "orders": {
+    "_comment": "Take-profit / stop-loss orders on held shares, not on guild partnerships (ADR-039). Targets in percent of the average cost (0 = off). Fee = max(minFee, order value x (feeRate + feePerDay x days)), paid when placed, never refunded. The sale pays no commission, only the profit tax. Pending orders lock their shares; ordersKept orders are listed and saved.",
+    "feeRate": 0.002,
+    "feePerDay": 0.0002,
+    "minFee": 10,
+    "maxDays": 60,
+    "maxTakeProfitPercent": 100,
+    "maxStopLossPercent": 50,
+    "ordersKept": 20
+  },
   "guilds": {
     "_comment": "Guild partnership shares (PLAN 2.1-2.3, ADR-027, ADR-029). Share value = max(avg daily profit, minValuedDailyProfit) x days per year / annualYield / sharesPerGuild. Profit and loss accrue per share-day and are settled every 7 days; debts cost debtRelationPenalty relation with the town's ruler each week.",
     "profitWindowDays": 28,

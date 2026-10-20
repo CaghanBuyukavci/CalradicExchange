@@ -20,6 +20,8 @@ namespace CalradicExchange.UI
         private string _statusText = "";
         private string _secondaryText = "";
         private Action _onSecondary;
+        private string _tertiaryText = "";
+        private Action _onTertiary;
         private Action<string> _onSearch;
         private bool _searchVisible;
 
@@ -86,6 +88,7 @@ namespace CalradicExchange.UI
         [DataSourceProperty] public MBBindingList<PortfolioRowVM> PortfolioRows { get; } = new MBBindingList<PortfolioRowVM>();
         [DataSourceProperty] public MBBindingList<GridRowVM> Rows { get; } = new MBBindingList<GridRowVM>();
         [DataSourceProperty] public MBBindingList<TradeRowVM> TradeRows { get; } = new MBBindingList<TradeRowVM>();
+        [DataSourceProperty] public MBBindingList<OrderRowVM> OrderRows { get; } = new MBBindingList<OrderRowVM>();
 
         /// <summary>Second section below the rows (guild tab: shares in other towns), shown while <see cref="OtherTitle"/> is set.</summary>
         [DataSourceProperty] public MBBindingList<TradeRowVM> OtherRows { get; } = new MBBindingList<TradeRowVM>();
@@ -146,6 +149,23 @@ namespace CalradicExchange.UI
         public void ExecuteSecondary()
         {
             _onSecondary?.Invoke();
+        }
+
+        [DataSourceProperty] public string TertiaryText => _tertiaryText;
+        [DataSourceProperty] public bool HasTertiary => _onTertiary != null;
+
+        /// <summary>Adds a button between Close and the second one (portfolio: My Orders left of Performance).</summary>
+        public ExchangeTableVM WithTertiary(string text, Action onClick)
+        {
+            _tertiaryText = text ?? "";
+            _onTertiary = onClick;
+            return this;
+        }
+
+        /// <summary>Bound to the middle button (Command.Click="ExecuteTertiary").</summary>
+        public void ExecuteTertiary()
+        {
+            _onTertiary?.Invoke();
         }
 
         [DataSourceProperty] public bool HasSearch => _onSearch != null && _searchVisible;

@@ -156,6 +156,8 @@ Amaç: Menü tabanlı arayüzle oynanabilir, dünyaya tepki veren ilk borsa.
 - [x] 2.15 Sınırlı arz, şehrin yatırımcıları (NPC al/sat) ve balina işlemleri (ADR-037)
   - Şema 13. Oyuncuya tutma sınırı yok; hacim sütunu yok. Oyun içi test bekleniyor.
   - Balina sonrası satış rastgele günlerde (günde %40 olasılık).
+- [x] 2.16 Kar Al / Zarar Durdur emirleri: portföyde EMİR butonu, Emirlerim penceresi, günlük kontrol (ADR-039)
+  - Şema 14. Oyun içi test bekleniyor. Otomatik Al/Sat sonraki adım.
 
 ### 2C. Ayarlar ve yerelleştirme
 - [ ] 2.13 MCM entegrasyonu (isteğe bağlı bağımlılık); MCM yoksa `settings.json`

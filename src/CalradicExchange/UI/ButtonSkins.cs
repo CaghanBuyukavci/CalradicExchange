@@ -8,7 +8,7 @@ using TaleWorlds.TwoDimension;
 namespace CalradicExchange.UI
 {
     /// <summary>
-    /// Puts the runtime button images (GUI\Textures\cx_btn_*.png) on the Buy / Sell brushes of CxBrushes.xml.
+    /// Puts the runtime button images (GUI\Textures\cx_btn_*.png) on the Buy / Sell / Order brushes of CxBrushes.xml.
     /// Brushes resolve sprites by name when the game starts, before our runtime sprites exist, so the layers are set
     /// here instead. Widgets copy their brush when created, so this must run before a trade table is shown.
     /// If an image is missing the brush keeps its plain colored square.
@@ -27,6 +27,7 @@ namespace CalradicExchange.UI
             _applied = true;
             Apply("Cx.RowButton.Buy", "cx_btn_buy", "cx_btn_buy_hover");
             Apply("Cx.RowButton.Sell", "cx_btn_sell", "cx_btn_sell_hover");
+            Apply("Cx.RowButton.Order", "cx_btn_order", "cx_btn_order_hover");
         }
 
         private static void Apply(string brushName, string normalName, string hoverName)

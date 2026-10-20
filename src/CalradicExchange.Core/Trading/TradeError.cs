@@ -21,5 +21,14 @@ namespace CalradicExchange.Core.Trading
 
         /// <summary>The trader owns a workshop of that guild: no partnership shares in one's own business (ADR-034).</summary>
         OwnWorkshop,
+
+        /// <summary>Take-profit / stop-loss orders are not given on guild partnerships (ADR-039).</summary>
+        OrdersNotForGuilds,
+
+        /// <summary>A take-profit / stop-loss order needs at least one of the two targets.</summary>
+        NoOrderTarget,
+
+        /// <summary>Validity outside 1..orders.maxDays, or a target outside its slider range.</summary>
+        InvalidOrder,
     }
 }

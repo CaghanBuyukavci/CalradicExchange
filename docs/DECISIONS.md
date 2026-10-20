@@ -409,3 +409,21 @@ Her karar: bağlam, karar, gerekçe. Yeni kararlar sona eklenir. Bir karar deği
 - **Haberler:** Muharebe haberi yer adı vermiyor ("Vlandia, Battania ordusunu yendi (118 kayıp)").
 
 **ADR-037 ek (2026-10-20):** Balina alımından sonraki satış artık garanti değil (kullanıcı isteği). Yatırımcıların paylarını başlangıç seviyesine çekmesi her araç için her gün `holdingReversionChance` (0,4) olasılıkla oluyor; o gün güç `holdingReversion` 1 (önceden her gün 0,5). Ortalama geri dönüş biraz yavaşladı (günde fazlanın ~%8'inden ~%7'sine). Simülatör 8/8 geçiyor; emtia oynaklığı medyanı %31,9, erken oyunda en iyi bot günde 46,0 dinar.
+
+## ADR-039 — Kar Al / Zarar Durdur emirleri (2026-10-20)
+
+**Bağlam:** Kullanıcı, eldeki hisseler için hedef kâr ve hedef zarar yüzdesiyle, süreli satış emri istedi. Lonca ortaklıkları hariç.
+
+**Karar** (formüller ECONOMY_MODEL §5.2):
+- **Erişim:** Portföyüm penceresinde her satırda SAT'ın sağında bronz renkli EMİR butonu (lonca sekmesinde yok). Alt çubukta Performans'ın solunda Emirlerim butonu.
+- **Emir penceresi:** Dört slider: adet, Hedef Kar %, Hedef Zarar %, Geçerlilik Süresi. Yüzdelerin sağında karşılık gelen fiyat yazar. Altında emir ücreti ve emrin verilememe sebebi. Alt ortada Emri Ver ve İptal.
+- **Yüzde tabanı:** Ortalama maliyet. Kullanıcı yüzdeyi fiyata çevirip yanına yazmamızı istedi; "kâr" maliyete göre olduğu için taban maliyet. Güncel fiyat pencerenin üstünde gösteriliyor.
+- **Bir hedef kapatılabilir** (slider 0 = Kapalı); ikisi birden kapalıysa emir verilemez (kullanıcı onayı).
+- **Satış fiyatı:** O günün piyasa fiyatı, normal kayma ile (kullanıcı onayı). Komisyon yok, sadece kâr vergisi (kullanıcı kuralı).
+- **Ücret:** Değerin %0,2'si + gün başına %0,02'si, en az 10 dinar (kullanıcı onayı). Geri ödenmez: süre dolsa da, oyuncu iptal etse de.
+- **Kilit:** Emirdeki paylar pozisyonda kalır ama kilitlidir (`Portfolio.LockedQuantity`, bekleyen emirlerden hesaplanır, ayrıca kaydedilmez). Portföy tablosu ve piyasa tablolarındaki "Elde" sütunu serbest adedi gösterir; değer, limit ve serbest pay toplam adetle hesaplanır.
+- **Kontrol:** Günlük fiyat güncellemesinden sonra, oyuncu nerede olursa olsun. Kampanya günüyle (`CampaignTime.Now.ToDays`) sayılır; Takas Geçmişim tarihleriyle aynı.
+- **Emirlerim penceresi:** Yeniden eskiye: Verildi, Ürün, Adet, Kar Al, Zarar Durdur, Kalan süre, Durum (Bekleyen / Gerçekleşen / İptal), Sonuç. Bekleyenlerde kırmızı İPTAL butonu (SAT ile aynı görsel). Son 20 emir tutulur; bekleyen emir listeden düşmez.
+- **Geçmiş ve bildirim:** Sadece gerçekleşen emirler Takas Geçmişim'de görünür ("Kar Al" / "Zarar Durdur" türüyle) ve oturum sayacına girer. Gerçekleşme, süre dolması, iptal ve piyasa kapanması sol alttaki mesajlara yazılır.
+- **Kayıt:** Şema 14: `portfolio.orders`, `portfolio.nextOrderId`, `history[].order`. Eski kayıtlarda emir yok.
+- **Konsol:** `exchange.dump_portfolio` kilitli adetleri ve emirleri de listeliyor.

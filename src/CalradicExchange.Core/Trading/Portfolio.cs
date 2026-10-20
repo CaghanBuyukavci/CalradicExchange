@@ -34,6 +34,13 @@ namespace CalradicExchange.Core.Trading
         /// <summary>Trades recorded since this portfolio was created or loaded, forced sales included. Not saved.</summary>
         [JsonIgnore] public int RecordedSinceLoad { get; private set; }
 
+        /// <summary>
+        /// Take-profit / stop-loss orders, oldest first: the pending ones and the last finished ones (ADR-039). Schema 14.
+        /// </summary>
+        public List<StandingOrder> Orders { get; set; } = new List<StandingOrder>();
+
+        public int NextOrderId { get; set; } = 1;
+
         /// <summary>Daily total profit for the performance chart, oldest first, one point per day. Added in schema 11.</summary>
         public List<PerformancePoint> Performance { get; set; } = new List<PerformancePoint>();
 
@@ -73,9 +80,63 @@ namespace CalradicExchange.Core.Trading
             return Positions.FirstOrDefault(p => p.InstrumentId == instrumentId);
         }
 
+        /// <summary>All shares held, the ones locked in pending orders included (value, limits, free float).</summary>
         public int QuantityOf(string instrumentId)
         {
             return Find(instrumentId)?.Quantity ?? 0;
+        }
+
+        /// <summary>Shares locked in pending take-profit / stop-loss orders (ADR-039).</summary>
+        public int LockedQuantity(string instrumentId)
+        {
+            int locked = 0;
+            foreach (StandingOrder o in Orders)
+            {
+                if (o.IsPending && o.InstrumentId == instrumentId) locked += o.Quantity;
+            }
+            return locked;
+        }
+
+        /// <summary>Shares the player can sell or put in an order now: held minus locked.</summary>
+        public int FreeQuantity(string instrumentId)
+        {
+            return Math.Max(0, QuantityOf(instrumentId) - LockedQuantity(instrumentId));
+        }
+
+        /// <summary>Ends a pending order without a sale: its shares are free again. The fee stays paid.</summary>
+        public void CancelOrder(StandingOrder order, StandingOrderCancelReason reason, int day)
+        {
+            if (order == null || !order.IsPending) return;
+            order.Status = StandingOrderStatus.Canceled;
+            order.CancelReason = reason;
+            order.ClosedDay = day;
+        }
+
+        /// <summary>
+        /// Cancels pending orders of <paramref name="instrumentId"/>, newest first, until the locked shares fit in the
+        /// holding again (after a forced sale). Returns the canceled orders.
+        /// </summary>
+        public List<StandingOrder> ReleaseOrdersBeyondHolding(string instrumentId, int day)
+        {
+            var released = new List<StandingOrder>();
+            for (int i = Orders.Count - 1; i >= 0 && LockedQuantity(instrumentId) > QuantityOf(instrumentId); i--)
+            {
+                StandingOrder o = Orders[i];
+                if (!o.IsPending || o.InstrumentId != instrumentId) continue;
+                CancelOrder(o, StandingOrderCancelReason.Closed, day);
+                released.Add(o);
+            }
+            return released;
+        }
+
+        /// <summary>Keeps at most <paramref name="keep"/> orders, dropping the oldest finished ones; pending ones stay.</summary>
+        public void TrimOrders(int keep)
+        {
+            for (int i = 0; i < Orders.Count && Orders.Count > Math.Max(0, keep);)
+            {
+                if (Orders[i].IsPending) i++;
+                else Orders.RemoveAt(i);
+            }
         }
 
         public void ApplyBuy(string instrumentId, int quantity, int totalPaid, int commission)
@@ -132,6 +193,7 @@ namespace CalradicExchange.Core.Trading
             quantity = Math.Min(quantity, pos.Quantity);
             int proceeds = (int)Math.Round(quantity * price, MidpointRounding.AwayFromZero);
             decimal realized = ApplySell(instrumentId, quantity, proceeds, 0);
+            ReleaseOrdersBeyondHolding(instrumentId, day);
             Record(new TradeRecord
             {
                 Day = day,
@@ -160,6 +222,7 @@ namespace CalradicExchange.Core.Trading
                 total += proceeds;
             }
             Positions.Clear();
+            foreach (StandingOrder o in Orders) CancelOrder(o, StandingOrderCancelReason.Closed, o.PlacedDay);
             return total;
         }
 

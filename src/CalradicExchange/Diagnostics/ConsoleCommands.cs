@@ -68,8 +68,14 @@ namespace CalradicExchange.Diagnostics
                 foreach (Position p in pf.Positions)
                 {
                     decimal price = b.Market.Get(p.InstrumentId)?.Price ?? 0;
-                    sb.AppendLine(string.Format(Inv, "{0,-22} qty {1,6}  avg {2,9:0.00}  now {3,9:0.00}  open {4,9:+0;-0}",
-                        p.InstrumentId, p.Quantity, p.AverageCost, price, p.Quantity * price - p.CostBasis));
+                    sb.AppendLine(string.Format(Inv, "{0,-22} qty {1,6} (locked {5})  avg {2,9:0.00}  now {3,9:0.00}  open {4,9:+0;-0}",
+                        p.InstrumentId, p.Quantity, p.AverageCost, price, p.Quantity * price - p.CostBasis, pf.LockedQuantity(p.InstrumentId)));
+                }
+                foreach (StandingOrder o in pf.Orders)
+                {
+                    sb.AppendLine(string.Format(Inv, "order #{0} {1} x{2} tp {3} sl {4} days {5}..{6} fee {7}: {8} {9}",
+                        o.Id, o.InstrumentId, o.Quantity, o.TakeProfitPrice?.ToString("0.00", Inv) ?? "-", o.StopLossPrice?.ToString("0.00", Inv) ?? "-",
+                        o.PlacedDay, o.ExpiryDay, o.Fee, o.Status, o.Status == StandingOrderStatus.Filled ? o.Trigger.ToString() : o.CancelReason.ToString()));
                 }
                 sb.AppendLine(string.Format(Inv, "realized {0:+0;-0}, fees {1}, taxes {2}, trades {3}", pf.RealizedPnl, pf.TotalCommissionPaid, pf.TotalProfitTaxPaid, pf.TradeCount));
                 return sb.ToString();
